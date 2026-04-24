@@ -137,11 +137,9 @@ def post_session_fact_check(
         fact_strings: list[str] = _to_prolog_strings(extracted)
 
         for fact_str in fact_strings:
-            contradiction = keystore.check_contradiction(fact_str)
+            found, old_fact = keystore.check_contradiction(fact_str)
 
-            if contradiction:
-                # contradiction is the conflicting existing fact string
-                old_fact = contradiction
+            if found:
                 if profile.O >= 0.5:
                     # High Openness — accept the new belief
                     keystore.retract_fact(old_fact)
