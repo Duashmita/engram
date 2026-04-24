@@ -58,7 +58,14 @@ class GeminiClient:
                     contents=prompt,
                     config=types.GenerateContentConfig(**config_kwargs) if config_kwargs else None,
                 )
-                return response.text or ""
+                # Extract text parts directly to avoid SDK warning about
+                # non-text parts (e.g. thought_signature from thinking models).
+                try:
+                    parts = response.candidates[0].content.parts
+                    text = "".join(p.text for p in parts if getattr(p, "text", None))
+                    return text
+                except (AttributeError, IndexError):
+                    return response.text or ""
             except Exception as exc:  # noqa: BLE001
                 last_exc = exc
                 if attempt < 2:

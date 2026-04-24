@@ -205,7 +205,13 @@ class NPCAgent:
         # Import tagging here to avoid a circular import at module level
         from .llm.tagging import tag_event
 
+        n = len(self.config.backstory)
         for i, backstory_text in enumerate(self.config.backstory):
+            print(
+                f"    [{self.config.npc_id}] backstory {i + 1}/{n} ...",
+                end="\r",
+                flush=True,
+            )
             embedding = self.llm.embed(backstory_text)
             tags = tag_event(
                 backstory_text,
@@ -220,6 +226,7 @@ class NPCAgent:
                 source="backstory",
             )
             self.memory_manager.add_memory(memory)
+        print(f"    [{self.config.npc_id}] backstory {n}/{n} done.     ")
 
         # Assert initial Prolog facts (pre-seeded world knowledge)
         for fact in self.config.initial_facts:
