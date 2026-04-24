@@ -1,7 +1,7 @@
 import os
 
-GEMINI_CHAT_MODEL = 'gemini-2.5-flash'
-GEMINI_EMBED_MODEL = 'gemini-embedding-exp-03-07'
+GEMINI_CHAT_MODEL = 'gemini-3-flash-preview'
+GEMINI_EMBED_MODEL = 'gemini-embedding-2'
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 
 SESSION_WINDOW = 7        # max turns before eviction
