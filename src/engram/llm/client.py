@@ -20,15 +20,20 @@ from ..config import GEMINI_API_KEY, GEMINI_CHAT_MODEL, GEMINI_EMBED_MODEL
 class GeminiClient:
     """Thin wrapper around the google-genai SDK used throughout Engram."""
 
-    def __init__(self, api_key: str | None = None) -> None:
+    def __init__(
+        self,
+        api_key: str | None = None,
+        chat_model: str | None = None,
+        embed_model: str | None = None,
+    ) -> None:
         key = api_key or GEMINI_API_KEY
         if not key:
             raise ValueError(
                 "No Gemini API key supplied and GEMINI_API_KEY env var is not set."
             )
         self._client = genai.Client(api_key=key)
-        self._chat_model = GEMINI_CHAT_MODEL
-        self._embed_model = GEMINI_EMBED_MODEL
+        self._chat_model = chat_model or GEMINI_CHAT_MODEL
+        self._embed_model = embed_model or GEMINI_EMBED_MODEL
 
     # ------------------------------------------------------------------
     # Text generation

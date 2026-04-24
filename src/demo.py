@@ -2,51 +2,167 @@
 Engram demo — Personality-Parameterised NPC Memory (FDG '26)
 
 Runs two NPCs — a Paranoid Guard and a Friendly Merchant — through the same
-three player inputs side-by-side, demonstrating how OCEAN personality governs
-memory encoding, threat perception, and dialogue output independently of NPC
-persona.
+player inputs side-by-side, demonstrating how OCEAN personality governs
+memory encoding, threat perception, and dialogue output independently of
+NPC persona.
 
 Usage:
+    python src/demo.py [options]
+
+    GEMINI_API_KEY must be set in the environment.
+
+Examples:
+    # Default 3-round run
     GEMINI_API_KEY=<key> python src/demo.py
+
+    # Custom model, fresh state, 2 rounds
+    GEMINI_API_KEY=<key> python src/demo.py --model gemini-2.5-pro --fresh --rounds 2
+
+    # Custom data directory
+    GEMINI_API_KEY=<key> python src/demo.py --data-dir /tmp/engram_data
 """
 
 from __future__ import annotations
 
+import argparse
 import os
+import shutil
 import sys
 import textwrap
+import warnings
 
-# Ensure the src/ directory is on sys.path so `import engram` resolves whether
-# this script is run as `python src/demo.py` (from project root) or
-# `python demo.py` (from inside src/).
+# Suppress low-signal warnings before any imports that trigger them
+warnings.filterwarnings("ignore", category=RuntimeWarning)   # pyswip/SWI-Prolog fallback
+warnings.filterwarnings("ignore", category=FutureWarning)    # google-auth EOL notice
+warnings.filterwarnings("ignore", ".*NotOpenSSLWarning.*")   # urllib3 LibreSSL notice
+warnings.filterwarnings("ignore", ".*ssl.*")
+
+import logging as _logging  # noqa: E402  (needed before engram imports)
+_logging.getLogger("engram").setLevel(_logging.ERROR)  # silence KeyStore/PrologEngine INFO/WARN
+
+# Ensure src/ is on sys.path
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 
+
 # ---------------------------------------------------------------------------
-# Environment check
+# CLI
 # ---------------------------------------------------------------------------
 
-_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-if not _API_KEY:
-    print(
-        "\n[ERROR] GEMINI_API_KEY environment variable is not set.\n"
-        "Export it before running:\n\n"
-        "    export GEMINI_API_KEY=your_key_here\n"
-        "    python src/demo.py\n"
+def _build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="demo.py",
+        description="Engram — side-by-side NPC memory demo (FDG '26)",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent("""\
+            environment:
+              GEMINI_API_KEY   required — your Gemini API key
+
+            personality profiles (built-in):
+              paranoid     high-N, low-A  (O=0.2, C=0.5, E=0.3, A=0.2, N=0.9)
+              merchant     high-E, high-A (O=0.5, C=0.5, E=0.9, A=0.8, N=0.2)
+              clerk        low-O, high-C  (O=0.1, C=0.9, E=0.3, A=0.5, N=0.4)
+        """),
     )
-    sys.exit(1)
+    p.add_argument(
+        "--model",
+        metavar="MODEL_ID",
+        default=None,
+        help="override the Gemini chat model (default: gemini-2.5-flash)",
+    )
+    p.add_argument(
+        "--embed-model",
+        metavar="MODEL_ID",
+        default=None,
+        help="override the Gemini embedding model",
+    )
+    p.add_argument(
+        "--data-dir",
+        metavar="DIR",
+        default="data",
+        help="root directory for persisted NPC state (default: data/)",
+    )
+    p.add_argument(
+        "--rounds",
+        metavar="N",
+        type=int,
+        default=None,
+        help="number of player turns to run (default: all built-in inputs)",
+    )
+    p.add_argument(
+        "--profile1",
+        metavar="PRESET",
+        default="paranoid",
+        choices=["paranoid", "merchant", "clerk"],
+        help="left-column personality preset (default: paranoid)",
+    )
+    p.add_argument(
+        "--profile2",
+        metavar="PRESET",
+        default="merchant",
+        choices=["paranoid", "merchant", "clerk"],
+        help="right-column personality preset (default: merchant)",
+    )
+    p.add_argument(
+        "--fresh",
+        action="store_true",
+        help="delete saved NPC state before running (clean slate)",
+    )
+    p.add_argument(
+        "--quiet",
+        action="store_true",
+        help="suppress [init] progress messages",
+    )
+    return p
+
 
 # ---------------------------------------------------------------------------
-# Engram imports (after env check so import errors are distinct)
+# Environment guard (after parse so --help works without a key)
 # ---------------------------------------------------------------------------
 
-from engram.llm.client import GeminiClient
-from engram.models import NPCConfig, OCEANProfile
-from engram.npc import NPCAgent
+def _require_api_key() -> str:
+    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not key:
+        print(
+            "\n  error: GEMINI_API_KEY is not set.\n\n"
+            "  Export it before running:\n\n"
+            "      export GEMINI_API_KEY=your_key_here\n"
+            "      python src/demo.py\n",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return key
+
 
 # ---------------------------------------------------------------------------
-# NPC definitions — both NPCs are the same character; only personality differs
+# Engram imports (after arg parsing so --help / --version always work)
+# ---------------------------------------------------------------------------
+
+from engram.config import GEMINI_CHAT_MODEL as _DEFAULT_CHAT, GEMINI_EMBED_MODEL as _DEFAULT_EMBED  # noqa: E402
+from engram.llm.client import GeminiClient  # noqa: E402
+from engram.models import NPCConfig, OCEANProfile  # noqa: E402
+from engram.npc import NPCAgent  # noqa: E402
+
+
+# ---------------------------------------------------------------------------
+# Personality presets
+# ---------------------------------------------------------------------------
+
+_PRESETS: dict[str, OCEANProfile] = {
+    "paranoid": OCEANProfile(name="Paranoid Guard",   O=0.2, C=0.5, E=0.3, A=0.2, N=0.9),
+    "merchant": OCEANProfile(name="Friendly Merchant", O=0.5, C=0.5, E=0.9, A=0.8, N=0.2),
+    "clerk":    OCEANProfile(name="Rigid Clerk",       O=0.1, C=0.9, E=0.3, A=0.5, N=0.4),
+}
+
+_PRESET_LABELS: dict[str, str] = {
+    "paranoid": "high-N, low-A",
+    "merchant": "high-E, high-A",
+    "clerk":    "low-O, high-C",
+}
+
+# ---------------------------------------------------------------------------
+# NPC persona (shared across personality variants)
 # ---------------------------------------------------------------------------
 
 _RICO_PERSONA = (
@@ -86,39 +202,11 @@ _RICO_INITIAL_FACTS = [
     "belief(rico, strangers_want_something, true)",
 ]
 
-_PARANOID_PROFILE = OCEANProfile(
-    name="Paranoid Guard",
-    O=0.2, C=0.5, E=0.3, A=0.2, N=0.9,
-)
-
-_MERCHANT_PROFILE = OCEANProfile(
-    name="Friendly Merchant",
-    O=0.5, C=0.5, E=0.9, A=0.8, N=0.2,
-)
-
-_PARANOID_CONFIG = NPCConfig(
-    npc_id="rico_paranoid",
-    name="Rico",
-    persona=_RICO_PERSONA,
-    backstory=_RICO_BACKSTORY,
-    profile=_PARANOID_PROFILE,
-    initial_facts=list(_RICO_INITIAL_FACTS),
-)
-
-_MERCHANT_CONFIG = NPCConfig(
-    npc_id="rico_merchant",
-    name="Rico",
-    persona=_RICO_PERSONA,
-    backstory=_RICO_BACKSTORY,
-    profile=_MERCHANT_PROFILE,
-    initial_facts=list(_RICO_INITIAL_FACTS),
-)
-
 # ---------------------------------------------------------------------------
-# Player inputs (same three for both NPCs)
+# Default player inputs
 # ---------------------------------------------------------------------------
 
-_INPUTS = [
+_DEFAULT_INPUTS = [
     (
         "Hey, you're Rico right? I heard you know these docks better than anyone. "
         "I need help getting something past the harbormaster."
@@ -133,17 +221,17 @@ _INPUTS = [
     ),
 ]
 
+
 # ---------------------------------------------------------------------------
 # Display helpers
 # ---------------------------------------------------------------------------
 
 _COL_WIDTH = 45
-_SEPARATOR = "=" * ((_COL_WIDTH * 2) + 7)
-_THIN_SEP  = "-" * ((_COL_WIDTH * 2) + 7)
+_SEP   = "=" * ((_COL_WIDTH * 2) + 7)
+_TSEP  = "-" * ((_COL_WIDTH * 2) + 7)
 
 
 def _wrap(text: str, width: int = _COL_WIDTH) -> list[str]:
-    """Wrap *text* into lines of at most *width* characters."""
     if not text:
         return [""]
     lines: list[str] = []
@@ -153,163 +241,173 @@ def _wrap(text: str, width: int = _COL_WIDTH) -> list[str]:
     return lines or [""]
 
 
-def print_side_by_side(
+def _side_by_side(
     left_label: str,
     left_text: str,
     right_label: str,
     right_text: str,
 ) -> None:
-    """Print two text blocks side-by-side with a dividing column.
-
-    Each column is ~45 characters wide.
-    """
     left_lines  = _wrap(left_text)
     right_lines = _wrap(right_text)
     max_rows = max(len(left_lines), len(right_lines))
-
-    # Header row
     print(f"  {left_label:<{_COL_WIDTH}}  |  {right_label:<{_COL_WIDTH}}")
-    print(_THIN_SEP)
-
+    print(_TSEP)
     for i in range(max_rows):
-        lline = left_lines[i]  if i < len(left_lines)  else ""
-        rline = right_lines[i] if i < len(right_lines) else ""
-        print(f"  {lline:<{_COL_WIDTH}}  |  {rline:<{_COL_WIDTH}}")
+        ll = left_lines[i]  if i < len(left_lines)  else ""
+        rl = right_lines[i] if i < len(right_lines) else ""
+        print(f"  {ll:<{_COL_WIDTH}}  |  {rl:<{_COL_WIDTH}}")
 
 
 def _mode_label(mode: str) -> str:
-    labels = {
-        "fight_flight": "FIGHT/FLIGHT",
-        "instinct":     "INSTINCT",
-        "standard":     "STANDARD",
-    }
-    return labels.get(mode, mode.upper())
+    return {"fight_flight": "FIGHT/FLIGHT", "instinct": "INSTINCT", "standard": "STANDARD"}.get(
+        mode, mode.upper()
+    )
+
+
+def _log(msg: str, quiet: bool) -> None:
+    if not quiet:
+        print(msg)
+
+
+# ---------------------------------------------------------------------------
+# Agent factory
+# ---------------------------------------------------------------------------
+
+def _make_agent(
+    preset_key: str,
+    data_dir: str,
+    llm: GeminiClient,
+) -> NPCAgent:
+    profile = _PRESETS[preset_key]
+    npc_id = f"rico_{preset_key}"
+    config = NPCConfig(
+        npc_id=npc_id,
+        name="Rico",
+        persona=_RICO_PERSONA,
+        backstory=_RICO_BACKSTORY,
+        profile=profile,
+        initial_facts=list(_RICO_INITIAL_FACTS),
+    )
+    return NPCAgent(config, llm, data_dir=data_dir)
 
 
 # ---------------------------------------------------------------------------
 # Demo runner
 # ---------------------------------------------------------------------------
 
-def run_demo() -> None:
-    print("\n" + _SEPARATOR)
-    print("  ENGRAM — Personality-Parameterised NPC Memory Demo")
+def run_demo(args: argparse.Namespace) -> None:
+    api_key = _require_api_key()
+
+    quiet = args.quiet
+
+    chat_model  = args.model       or _DEFAULT_CHAT
+    embed_model = args.embed_model or _DEFAULT_EMBED
+
+    print()
+    print(_SEP)
+    print("  ENGRAM  —  Personality-Parameterised NPC Memory")
     print("  FDG '26 Research Prototype")
-    print(_SEPARATOR)
+    print(_SEP)
+
+    p1_label = f"{_PRESETS[args.profile1].name} ({_PRESET_LABELS[args.profile1]})"
+    p2_label = f"{_PRESETS[args.profile2].name} ({_PRESET_LABELS[args.profile2]})"
+    print(f"  Left  : {p1_label}")
+    print(f"  Right : {p2_label}")
+    print(f"  Model : {chat_model}")
+    print(f"  Data  : {os.path.abspath(args.data_dir)}")
+    print(_SEP)
     print()
 
-    # Instantiate the LLM client once (shared)
-    print("[init] Creating GeminiClient...")
-    llm = GeminiClient(api_key=_API_KEY)
+    # Optionally wipe saved state
+    if args.fresh:
+        for preset in (args.profile1, args.profile2):
+            npc_dir = os.path.join(args.data_dir, f"rico_{preset}")
+            if os.path.isdir(npc_dir):
+                shutil.rmtree(npc_dir)
+                _log(f"  [fresh] removed {npc_dir}", quiet)
 
-    # Instantiate NPCAgents (data stored under data/<npc_id>/)
-    print("[init] Initialising NPCAgent: Paranoid Guard Rico...")
-    paranoid_agent = NPCAgent(_PARANOID_CONFIG, llm, data_dir="data")
+    _log("  [init] creating GeminiClient ...", quiet)
+    llm = GeminiClient(api_key=api_key, chat_model=chat_model, embed_model=embed_model)
 
-    print("[init] Initialising NPCAgent: Friendly Merchant Rico...")
-    merchant_agent = NPCAgent(_MERCHANT_CONFIG, llm, data_dir="data")
+    _log(f"  [init] loading {args.profile1} agent ...", quiet)
+    agent1 = _make_agent(args.profile1, args.data_dir, llm)
 
-    print("[init] Done.\n")
+    _log(f"  [init] loading {args.profile2} agent ...", quiet)
+    agent2 = _make_agent(args.profile2, args.data_dir, llm)
 
-    # ---------------------------------------------------------------- 3 rounds
-    for round_idx, player_input in enumerate(_INPUTS, start=1):
-        print(_SEPARATOR)
-        print(f"  ROUND {round_idx}")
-        print(_SEPARATOR)
+    _log("  [init] ready.\n", quiet)
 
-        # Player input (full width)
-        wrapped_input = " ".join(_wrap(player_input, width=_COL_WIDTH * 2 + 3))
-        print(f"\n  Player: {wrapped_input}\n")
-        print(_THIN_SEP)
+    # Select inputs
+    inputs = _DEFAULT_INPUTS
+    if args.rounds is not None:
+        inputs = inputs[: args.rounds]
 
-        # --- Run both agents through the turn ---
-        p_response = paranoid_agent.run_turn(player_input)
-        m_response = merchant_agent.run_turn(player_input)
+    # ---------------------------------------------------------------- rounds
+    for round_idx, player_input in enumerate(inputs, start=1):
+        print(_SEP)
+        print(f"  ROUND {round_idx} / {len(inputs)}")
+        print(_SEP)
 
-        # Retrieve the assessments we just ran (last item in session_memories
-        # gives us tags; the assessment itself is not cached on the agent so we
-        # re-derive the display strings from what we have).
-        p_mem = paranoid_agent.session_memories[-1] if paranoid_agent.session_memories else None
-        m_mem = merchant_agent.session_memories[-1] if merchant_agent.session_memories else None
+        wrapped = " ".join(_wrap(player_input, width=_COL_WIDTH * 2 + 3))
+        print(f"\n  Player: {wrapped}\n")
+        print(_TSEP)
 
-        p_mode = _mode_label(
-            paranoid_agent.history[-1].get("_mode", "")
-            if paranoid_agent.history and "_mode" in paranoid_agent.history[-1]
-            else "standard"
-        )
-        m_mode = _mode_label(
-            merchant_agent.history[-1].get("_mode", "")
-            if merchant_agent.history and "_mode" in merchant_agent.history[-1]
-            else "standard"
-        )
+        r1 = agent1.run_turn(player_input)
+        r2 = agent2.run_turn(player_input)
 
-        # ---- Threat Assessment display ----
-        # We extract threat info from the stored memory tags
-        p_threat_str = (
-            f"Threat level: {p_mem.tags.threat_level:.2f}" if p_mem else "N/A"
-        )
-        m_threat_str = (
-            f"Threat level: {m_mem.tags.threat_level:.2f}" if m_mem else "N/A"
-        )
+        mem1 = agent1.session_memories[-1] if agent1.session_memories else None
+        mem2 = agent2.session_memories[-1] if agent2.session_memories else None
 
+        # Threat
         print()
-        print_side_by_side(
-            "Paranoid Guard (high-N, low-A)",
-            p_threat_str,
-            "Friendly Merchant (high-E, high-A)",
-            m_threat_str,
+        _side_by_side(
+            f"{_PRESETS[args.profile1].name}",
+            f"Threat: {mem1.tags.threat_level:.2f}" if mem1 else "N/A",
+            f"{_PRESETS[args.profile2].name}",
+            f"Threat: {mem2.tags.threat_level:.2f}" if mem2 else "N/A",
         )
         print()
 
-        # ---- Responses ----
-        print_side_by_side(
-            "Rico [Paranoid Guard] responds:",
-            p_response or "(no response)",
-            "Rico [Friendly Merchant] responds:",
-            m_response or "(no response)",
+        # Responses
+        _side_by_side(
+            f"Rico [{_PRESETS[args.profile1].name}]:",
+            r1 or "(no response)",
+            f"Rico [{_PRESETS[args.profile2].name}]:",
+            r2 or "(no response)",
         )
         print()
 
-        # ---- Memory stored? ----
-        p_stored = "Yes" if p_mem else "No"
-        m_stored = "Yes" if m_mem else "No"
-        print_side_by_side(
-            "Memory stored?",
-            f"{p_stored}  (importance={p_mem.tags.importance if p_mem else '-'})",
-            "Memory stored?",
-            f"{m_stored}  (importance={m_mem.tags.importance if m_mem else '-'})",
-        )
+        # Memory
+        s1 = f"stored  importance={mem1.tags.importance}" if mem1 else "not stored"
+        s2 = f"stored  importance={mem2.tags.importance}" if mem2 else "not stored"
+        _side_by_side("Memory", s1, "Memory", s2)
         print()
 
-    # ---------------------------------------------------------------- End sessions
-    print(_SEPARATOR)
-    print("  SESSION END — consolidating memories and checking facts...")
-    print(_SEPARATOR)
+    # ------------------------------------------------------------ end session
+    print(_SEP)
+    print("  Consolidating memories...")
+    print(_SEP)
+    agent1.end_session()
+    agent2.end_session()
+    _log("  done.\n", quiet)
 
-    paranoid_agent.end_session()
-    merchant_agent.end_session()
-    print("  Done.\n")
-
-    # ---------------------------------------------------------------- Summary table
-    print(_SEPARATOR)
+    # ---------------------------------------------------------------- summary
+    print(_SEP)
     print("  SUMMARY")
-    print(_SEPARATOR)
-
-    header = f"  {'NPC':<28}  {'Memories':>8}  {'Turns':>6}  {'OCEAN vector'}"
-    print(header)
-    print(_THIN_SEP)
-
-    for agent in (paranoid_agent, merchant_agent):
+    print(_SEP)
+    hdr = f"  {'NPC':<28}  {'Memories':>8}  {'Turns':>6}  {'OCEAN (effective)'}"
+    print(hdr)
+    print(_TSEP)
+    for agent, preset in ((agent1, args.profile1), (agent2, args.profile2)):
         eff = agent.profile.effective
-        ocean_str = (
+        ocean = (
             f"O={eff['O']:.2f} C={eff['C']:.2f} E={eff['E']:.2f} "
             f"A={eff['A']:.2f} N={eff['N']:.2f}"
         )
-        name = f"{agent.profile.name}"
+        label = f"{agent.profile.name} ({_PRESET_LABELS[preset]})"
         n_mem = len(agent.memory_manager.all_memories)
-        turns = agent.turn_count
-        print(f"  {name:<28}  {n_mem:>8}  {turns:>6}  {ocean_str}")
-
-    print(_SEPARATOR)
+        print(f"  {label:<28}  {n_mem:>8}  {agent.turn_count:>6}  {ocean}")
+    print(_SEP)
     print()
 
 
@@ -318,4 +416,6 @@ def run_demo() -> None:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    run_demo()
+    parser = _build_parser()
+    args = parser.parse_args()
+    run_demo(args)

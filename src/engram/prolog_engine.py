@@ -41,6 +41,7 @@ except (ImportError, OSError):
 # ---------------------------------------------------------------------------
 
 _BUILTIN_RULES = """\
+:- set_prolog_flag(verbose, silent).
 % Engram built-in OCEAN memory-strength rules — auto-generated.
 
 apply_openness_filter(Novelty, O, FN) :- FN is Novelty * (0.3 + 0.7 * O).
