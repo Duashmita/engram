@@ -196,12 +196,17 @@ def _to_prolog_strings(extracted: dict) -> list[str]:
 
 
 def _slugify(value: str) -> str:
-    """
-    Normalise a string to a safe Prolog atom: lowercase, spaces → underscores,
-    non-alphanumeric characters stripped.
+    """Normalise a string to a safe Prolog atom.
+
+    Prolog atoms must start with a lowercase letter or underscore; digits at
+    the start are invalid without quoting.  We prefix those with 'a_'.
     """
     import re
     value = str(value).lower().strip()
     value = re.sub(r"[^a-z0-9_]+", "_", value)
     value = value.strip("_")
-    return value or "unknown"
+    if not value:
+        return "unknown"
+    if value[0].isdigit():
+        value = "a_" + value
+    return value

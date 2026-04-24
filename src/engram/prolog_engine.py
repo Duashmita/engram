@@ -166,7 +166,15 @@ class PrologEngine:
         if self.available:
             self._prolog: "_SWIProlog | None" = _SWIProlog()
             try:
-                list(self._prolog.query("set_prolog_flag(verbose_load, silent)"))
+                for _flag in (
+                    "set_prolog_flag(verbose_load, silent)",
+                    "set_prolog_flag(debug, false)",
+                    "nodebug",
+                ):
+                    try:
+                        list(self._prolog.query(_flag))
+                    except Exception:
+                        pass
                 self._prolog.consult(self._rules_path)
             except Exception as exc:
                 logger.warning(

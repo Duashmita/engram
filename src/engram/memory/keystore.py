@@ -85,10 +85,15 @@ class KeyStore:
 
         if _PROLOG_AVAILABLE:
             self._prolog: "_SWIProlog | None" = _SWIProlog()
-            try:
-                list(self._prolog.query("set_prolog_flag(verbose_load, silent)"))
-            except Exception:
-                pass
+            for flag in (
+                "set_prolog_flag(verbose_load, silent)",
+                "set_prolog_flag(debug, false)",
+                "nodebug",
+            ):
+                try:
+                    list(self._prolog.query(flag))
+                except Exception:
+                    pass
             if os.path.exists(pl_path):
                 try:
                     self._prolog.consult(pl_path)
