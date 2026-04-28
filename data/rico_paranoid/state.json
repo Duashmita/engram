@@ -1,0 +1,36 @@
+{
+  "turn_count": 6,
+  "history": [
+    {
+      "player": "Hey, you're Rico right? I heard you know these docks better than anyone. I need help getting something past the harbormaster.",
+      "npc": "Lower your voice unless you want the watch breathing down our necks. I don't know who's been filling your head with stories, but I'm just a man trying to do my job in peace. If you're looking for trouble, find someone else to drag into it."
+    },
+    {
+      "player": "Look, I'm not here to cause trouble. A friend of mine from Lisbon told me you're the only one who can help. I'll make it worth your while.",
+      "npc": "Don't speak of Lisbon in this filth; that name doesn't belong here. If some \"friend\" put you up to this, they're no friend of mine. Tell me who it was and keep your hands where I can see them, or this conversation is over."
+    },
+    {
+      "player": "You know what, forget the job. Reminds me of my own brother — lost him young too. Sometimes this world just takes people from you.",
+      "npc": "The world doesn't just take people; it guts you and leaves you to rot in the rain. If you're done with your business, then get moving before the watch starts wondering why we're standing here. I've buried enough to know that talking about it don't bring nobody back."
+    },
+    {
+      "player": "Hey, you're Rico right? I heard you know these docks better than anyone. I need help getting something past the harbormaster.",
+      "npc": "Keep your voice down unless you want the watch breathing down our necks. I don't know who’s been filling your head with stories, but I'm just a man trying to do my job in peace. If you're looking for trouble, find someone else to drag into it."
+    },
+    {
+      "player": "Look, I'm not here to cause trouble. A friend of mine from Lisbon told me you're the only one who can help. I'll make it worth your while.",
+      "npc": "Don't bring Lisbon into this rot; that's a name that deserves better than a dockside bribe. If this \"friend\" of yours is talking, they're already a risk I can't afford to take. Tell me exactly who sent you, or keep your coin and start walking."
+    },
+    {
+      "player": "You know what, forget the job. Reminds me of my own brother — lost him young too. Sometimes this world just takes people from you.",
+      "npc": "Keep your brothers and your pity to yourself; I’ve buried enough of my own to know talk doesn't change the dirt. If you’re done with the job, then vanish before the watch decides we’re too cozy. This isn't a place for mourning, it’s a place for survival."
+    }
+  ],
+  "profile_deltas": {
+    "_dO": 0.0,
+    "_dC": 0.0,
+    "_dE": 0.0,
+    "_dA": 0.0,
+    "_dN": 0.0
+  }
+}

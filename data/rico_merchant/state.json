@@ -1,0 +1,24 @@
+{
+  "turn_count": 3,
+  "history": [
+    {
+      "player": "Hey, you're Rico right? I heard you know these docks better than anyone. I need help getting something past the harbormaster.",
+      "npc": "You've got the right man, though you might want to keep that talk for when the gulls are the only ones listening. I’ve been dodging that harbormaster since I was a lad hauling ropes for pennies, so I know a quiet path or two. Tell me what you’re hauling, and we’ll see if we can make it disappear before it ever hits the gate."
+    },
+    {
+      "player": "Look, I'm not here to cause trouble. A friend of mine from Lisbon told me you're the only one who can help. I'll make it worth your while.",
+      "npc": "Lisbon, you say? If a friend from back home vouched for me, then I suppose we can skip the formalities and get down to business. Keep your gold tucked away for a moment and tell me what we’re moving; I’ve learned that a heavy purse is no good if the harbormaster catches the scent before we even start."
+    },
+    {
+      "player": "You know what, forget the job. Reminds me of my own brother — lost him young too. Sometimes this world just takes people from you.",
+      "npc": "It’s a cruel tide that pulls the good ones out to sea before their time, and it’s a path I’ve walked twice over with my own brothers. Don’t you worry about the business for now; a man who honors his kin is a man I can trust. Take a moment to catch your breath, and we’ll handle the rest when the fog clears."
+    }
+  ],
+  "profile_deltas": {
+    "_dO": 0.0,
+    "_dC": 0.0,
+    "_dE": 0.0,
+    "_dA": 0.0,
+    "_dN": 0.0
+  }
+}

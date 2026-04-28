@@ -1,0 +1,60 @@
+{
+  "turn_count": 12,
+  "history": [
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "Who sent you to pester me? This key stays firmly in my pocket, and I'll not have some stranger snatching it away while my back is turned. Step back, I say, or I'll have the watch down on you in a heartbeat!"
+    },
+    {
+      "player": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "npc": "You’ll find nothing but a cold gaol if you lay a finger on me! I’ve seen plenty of filth wash up on these docks, and I won’t be cowed by some common rogue. Help! The watch! To the storeroom, quickly!"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "A likely story to lure me away from my post! You think I'm a fool to forget your threats so easily? Keep your distance, or I'll see you in the stocks before the first course is even served."
+    },
+    {
+      "player": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "npc": "Aye, and while I’m dancing, you’ll be picking my pockets or breaking into this very door! A crowd is just a cover for rogues like you to do your dirty work unseen. Be off with you, and take your \"good times\" elsewhere!"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "First you threaten me, then you lure me with food, and now you spread foul lies about the Mayor? This is clearly a trap to get me away from this door, and I'll not be your fool. Be off with your treasonous talk before the watch hauls you away for good!"
+    },
+    {
+      "player": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "npc": "Forged papers and silver tongues won't move me from this door! You’re likely the one who’s been tampering with records to cover your own thievery. Be gone, or I'll see to it the Magistrate hears of your slanderous tongue!"
+    },
+    {
+      "player": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "npc": "A sick child? A likely tale to pluck at my heartstrings while your cohorts sneak in the back! You've tried threats and you've tried lies, and now you resort to this shameful charade to lure me from my post. Be off with you before I call the watch to settle this once and for all!"
+    },
+    {
+      "player": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "npc": "Fever? A convenient excuse to get me to lower my guard! You're likely trying to spread the plague just to clear the docks for your thievery. One more word and I'll have the watch toss you in the harbor to cool those lies!"
+    },
+    {
+      "player": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "npc": "Early? Nothing arrives two hours early in this port unless there’s mischief afoot or the logs have been tampered with! You’re just looking for an excuse to get me to unbar these doors while the streets are still empty and quiet. I’ll not be moved by your \"shipments\" or any other of your desperate lies!"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "Twelve crates, is it? You're far too eager for me to turn my back and start counting, which is exactly when your accomplices would strike! I’ll not be lured out by your talk of cargo when I know a trap is being laid. Back away from the door before I call for the watch to inspect those crates—and your neck!"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "A likely story to lure me from this door while your accomplices slip inside! You probably loosed some poor cur yourself just to create a commotion and see me abandon my post. I’m staying right here, and if any \"strange animal\" comes near, it’ll taste my pike!"
+    },
+    {
+      "player": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "npc": "Bad omens are the talk of fools and those looking to hide their own sins in the shadows! You’re just trying to rattle my nerves so I’ll desert my post and leave these goods ripe for the taking. I’ll keep my eyes on you and my hand on my pike, omen or no!"
+    }
+  ],
+  "profile_deltas": {
+    "_dO": 0.0,
+    "_dC": 0.0,
+    "_dE": 0.0,
+    "_dA": 0.0,
+    "_dN": 0.0
+  }
+}
