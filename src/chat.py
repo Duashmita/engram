@@ -45,6 +45,7 @@ from engram.config import (  # noqa: E402
 from engram.llm.client import GeminiClient  # noqa: E402
 from engram.models import NPCConfig, OCEANProfile  # noqa: E402
 from engram.npc import NPCAgent  # noqa: E402
+from engram.presets import PRESETS, get_preset, list_presets  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -56,10 +57,12 @@ def _build_parser() -> argparse.ArgumentParser:
         prog="chat.py",
         description="Engram — interactive NPC chat",
     )
+    p.add_argument("--preset", help=f"start from a preset NPC ({', '.join(PRESETS)})")
     p.add_argument("--name", help="NPC name (skips the prompt; resumes if state exists)")
     p.add_argument("--data-dir", default="data", help="root for persisted NPC state (default: data/)")
     p.add_argument("--model", default=None, help="override Gemini chat model")
     p.add_argument("--fresh", action="store_true", help="wipe saved state for this NPC before starting")
+    p.add_argument("--list-presets", action="store_true", help="show available presets and exit")
     return p
 
 
@@ -134,8 +137,25 @@ def _ocean_preset_label(p: OCEANProfile) -> str:
 def _build_config_interactive() -> NPCConfig:
     print()
     print("─" * 60)
-    print("  Define your NPC")
+    print("  Pick a preset or build your own")
     print("─" * 60)
+    print(list_presets())
+    print(f"  {'custom':<10}build your own (you'll be prompted for everything)")
+    print()
+
+    while True:
+        choice = input("Preset key, or 'custom' to build [custom]: ").strip().lower()
+        if not choice or choice == "custom":
+            break
+        if choice in PRESETS:
+            cfg = get_preset(choice)
+            p = cfg.profile
+            print(
+                f"  → {cfg.name}  "
+                f"O={p.O:.2f} C={p.C:.2f} E={p.E:.2f} A={p.A:.2f} N={p.N:.2f}\n"
+            )
+            return cfg
+        print(f"  unknown preset '{choice}'. Options: {', '.join(PRESETS)}, custom")
 
     name = _ask("Name (e.g. Eleanor)")
     npc_id = _slugify(name)
@@ -257,6 +277,11 @@ def _chat(agent: NPCAgent) -> None:
 def main() -> None:
     args = _build_parser().parse_args()
 
+    if args.list_presets:
+        print("Available presets:")
+        print(list_presets())
+        return
+
     api_key = (_ENV_API_KEY or os.environ.get("GEMINI_API_KEY", "")).strip()
     if not api_key:
         print(
@@ -270,16 +295,34 @@ def main() -> None:
 
     data_dir = args.data_dir
 
-    if args.name and args.fresh:
-        npc_dir = os.path.join(data_dir, _slugify(args.name))
-        if os.path.isdir(npc_dir):
-            shutil.rmtree(npc_dir)
-            print(f"  [fresh] removed {npc_dir}")
+    # ---- preset path -----------------------------------------------------
+    if args.preset:
+        if args.preset not in PRESETS:
+            print(
+                f"error: unknown preset '{args.preset}'. "
+                f"Options: {', '.join(PRESETS)}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        config = get_preset(args.preset)
+        if args.fresh:
+            npc_dir = os.path.join(data_dir, config.npc_id)
+            if os.path.isdir(npc_dir):
+                shutil.rmtree(npc_dir)
+                print(f"  [fresh] removed {npc_dir}")
 
-    if args.name and _existing_state_path(data_dir, _slugify(args.name)) and not args.fresh:
+    # ---- resume by name --------------------------------------------------
+    elif args.name and _existing_state_path(data_dir, _slugify(args.name)) and not args.fresh:
         print(f"  resuming '{args.name}' from {data_dir}/")
         config = _build_config_from_name(args.name, data_dir)
+
+    # ---- interactive build (preset menu first, custom fallback) ----------
     else:
+        if args.name and args.fresh:
+            npc_dir = os.path.join(data_dir, _slugify(args.name))
+            if os.path.isdir(npc_dir):
+                shutil.rmtree(npc_dir)
+                print(f"  [fresh] removed {npc_dir}")
         config = _build_config_interactive()
         if args.fresh:
             npc_dir = os.path.join(data_dir, config.npc_id)

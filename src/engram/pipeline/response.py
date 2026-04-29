@@ -22,16 +22,16 @@ from ..models import Memory, NPCConfig, OCEANProfile, ThreatAssessment
 # with words, not what they ARE. Mid-range traits stay quiet.
 #
 _SPEECH_HIGH = {
-    "O": "You'll entertain an unfamiliar idea — even one you disagree with — long enough to give it a hearing.",
+    "O": "You're drawn to ideas and people you don't fully understand yet. When something's new, you ask about it instead of pretending you've already worked it out.",
     "C": "You mean what you say. Vague answers bother you; you'd rather be specific than diplomatic.",
-    "E": "You're easy with words. You fill silences, ask things back, talk to feel out a person.",
+    "E": "You're easy with words. You fill silences, ask things back, and you actually want to know who you're talking to — what they think, what they're up to, what brought them here. You volunteer your own thoughts without being asked.",
     "A": "You soften disagreement. You'll find the gentle way to say something hard.",
     "N": "You hesitate, double back, trail off when you're unsure. You don't tell people you're anxious — they hear it in how you talk.",
 }
 _SPEECH_LOW = {
     "O": "You don't engage with ideas you've already made up your mind about. You cut them short.",
     "C": "You're loose with details. Easy answers, don't sweat precision.",
-    "E": "You say less than expected. Pauses don't bother you; you let the other person carry the weight.",
+    "E": "You say less than expected. Pauses don't bother you; you let the other person carry the weight. You don't ask back out of politeness — if you don't care to know, you don't pretend.",
     "A": "You don't sugarcoat. If you don't like something, it shows.",
     "N": "You speak evenly. You don't hedge, you don't pad — you just say it.",
 }
@@ -172,6 +172,34 @@ def generate_response(
         )
 
     # ---- the rules of engagement -----------------------------------------
+    # The "ask back" guideline is conditional on Extraversion: high-E NPCs
+    # are encouraged to be curious and proactive, low-E NPCs are restrained,
+    # mid-E falls in the middle.
+    e_eff = profile.effective["E"]
+    if e_eff >= 0.65:
+        engagement_rule = (
+            "- BE CURIOUS about the player. You're someone who wants to "
+            "  know who you're talking to. Ask follow-ups, pick up on "
+            "  what they share, bring up your own thoughts unprompted. "
+            "  Drive the conversation when you feel like it — don't wait "
+            "  to be drawn out. Just don't *only* ask questions; mix in "
+            "  your own takes too."
+        )
+    elif e_eff <= 0.35:
+        engagement_rule = (
+            "- DON'T ask follow-up questions out of politeness. Pauses "
+            "  are fine. If the player gives you something you don't care "
+            "  to engage with, don't pretend. Let them carry the weight "
+            "  of the conversation unless you actually want to weigh in."
+        )
+    else:
+        engagement_rule = (
+            "- DON'T mechanically end every reply with a follow-up "
+            "  question — that makes you sound like a chatbot. Ask when "
+            "  you'd actually want to know, otherwise just answer and "
+            "  stop."
+        )
+
     parts.append(
         "Guidelines:\n"
         "- MATCH the player's register. A passing aside gets a passing "
@@ -182,9 +210,7 @@ def generate_response(
         "- DON'T narrate your own emotional state. A nervous person "
         "  doesn't say \"I'm anxious\" — their sentences trail off, "
         "  they hedge, they double back. Show, don't tell.\n"
-        "- DON'T always end with a follow-up question. Sometimes you "
-        "  just answer and stop. Asking back every turn makes you sound "
-        "  like a chatbot, not a person.\n"
+        f"{engagement_rule}\n"
         "- DON'T recite or paraphrase your background. The player is "
         "  not asking for your bio.\n"
         "- IF your personality calls for bluntness, dismissiveness, "
