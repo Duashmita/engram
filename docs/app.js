@@ -16,13 +16,18 @@
 
 import { freshState, apply, rebuild } from './js/state.js';
 import { initRadar, renderAll } from './js/render.js';
+import { enterLive, exitLive } from './js/live.js';
 
 // --------------- globals (single-NPC mode) ---------------
 let manifest    = null;        // {sessions: [...]}
 let activeEntry = null;        // currently loaded manifest entry
 let events      = [];          // event array for active session
 let header      = null;        // session_init payload
-let state       = null;        // mutable state object
+// `state` is held inside `stateRef` so live.js can swap the underlying object
+// (e.g. on /start) and we both observe the change.
+const stateRef  = { state: null };
+function getState() { return stateRef.state; }
+function setState(s) { stateRef.state = s; }
 
 let i_emit      = 0;           // index of next unconsumed event
 let t_virtual   = 0;           // virtual playback clock (seconds)
@@ -35,11 +40,14 @@ let last_frame_ts = null;
 const STATUS = (msg) => { document.getElementById('status-text').textContent = msg; };
 
 // --------------- boot ---------------
+const MODE_KEY = 'engram_mode';
+let currentMode = 'replay';
+
 async function boot() {
-  // chart
+  // chart (shared across modes)
   initRadar(document.getElementById('ocean-radar'));
 
-  // wire controls
+  // wire replay controls
   document.getElementById('btn-play').addEventListener('click', togglePlay);
   document.getElementById('btn-step').addEventListener('click', stepOne);
   document.getElementById('btn-step-turn').addEventListener('click', stepTurn);
@@ -50,7 +58,40 @@ async function boot() {
   document.getElementById('scrubber').addEventListener('input', onScrub);
   document.getElementById('session-select').addEventListener('change', onSelectSession);
 
-  // load manifest
+  // wire mode toggle
+  document.querySelectorAll('.mode-btn').forEach(b =>
+    b.addEventListener('click', () => switchMode(b.dataset.mode))
+  );
+
+  // pick mode from localStorage (default replay)
+  const initial = localStorage.getItem(MODE_KEY) === 'live' ? 'live' : 'replay';
+  await switchMode(initial, /*persist=*/false);
+}
+
+async function switchMode(mode, persist = true) {
+  if (mode !== 'replay' && mode !== 'live') mode = 'replay';
+  currentMode = mode;
+  if (persist) localStorage.setItem(MODE_KEY, mode);
+
+  // toggle button highlight
+  document.querySelectorAll('.mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode)
+  );
+  // brand subtitle reflects mode
+  const sub = document.getElementById('brand-sub');
+  if (sub) sub.textContent = mode === 'live' ? 'Live Chat' : 'Memory Replay';
+
+  if (mode === 'replay') {
+    exitLive();
+    await loadManifest();
+  } else {
+    pause();
+    enterLive({ stateRef, applyFn: apply, renderFn: renderAll });
+  }
+}
+
+async function loadManifest() {
+  // load manifest (same as legacy boot tail)
   try {
     const res = await fetch('sessions/manifest.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`manifest ${res.status}`);
@@ -173,18 +214,18 @@ async function loadSession(entry) {
 // --------------- replay engine ---------------
 function reset() {
   pause();
-  state = freshState(header);
+  setState(freshState(header));
   // session_init has been consumed conceptually — but we still want to apply it
   // to overwrite freshState defaults if anything diverges. Index advances past it.
   i_emit = 0;
   t_virtual = 0;
   // apply session_init if present at index 0 (no-op for clean state but safe)
   if (events[0] && (events[0].type === 'session_init' || events[0].type === 'session_init_npc')) {
-    apply(state, events[0]);
+    apply(getState(), events[0]);
     i_emit = 1;
   }
   updateClockUI();
-  renderAll(state);
+  renderAll(getState());
 }
 
 function togglePlay() {
@@ -219,12 +260,12 @@ function tick(ts) {
   // emit any events whose t <= t_virtual
   let advanced = false;
   while (i_emit < events.length && (events[i_emit].t ?? 0) <= t_virtual) {
-    apply(state, events[i_emit]);
+    apply(getState(), events[i_emit]);
     i_emit++;
     advanced = true;
   }
 
-  if (advanced) renderAll(state);
+  if (advanced) renderAll(getState());
   updateClockUI();
 
   if (i_emit >= events.length) {
@@ -238,10 +279,10 @@ function tick(ts) {
 function stepOne() {
   pause();
   if (i_emit >= events.length) return;
-  apply(state, events[i_emit]);
+  apply(getState(), events[i_emit]);
   t_virtual = events[i_emit].t ?? t_virtual;
   i_emit++;
-  renderAll(state);
+  renderAll(getState());
   updateClockUI();
 }
 
@@ -249,12 +290,12 @@ function stepTurn() {
   pause();
   while (i_emit < events.length) {
     const ev = events[i_emit];
-    apply(state, ev);
+    apply(getState(), ev);
     t_virtual = ev.t ?? t_virtual;
     i_emit++;
     if (ev.type === 'turn_end') break;
   }
-  renderAll(state);
+  renderAll(getState());
   updateClockUI();
 }
 
@@ -267,9 +308,9 @@ function onScrub(e) {
   for (let k = 0; k < events.length; k++) {
     if ((events[k].t ?? 0) <= target) upto = k; else break;
   }
-  state = rebuild(events, upto, header);
+  setState(rebuild(events, upto, header));
   i_emit = upto + 1;
-  renderAll(state);
+  renderAll(getState());
   updateClockUI();
 }
 

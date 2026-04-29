@@ -47,6 +47,7 @@ import sys
 import time
 from contextlib import contextmanager
 from threading import Lock
+from typing import Callable
 
 
 _ENV_PATH_KEY = "ENGRAM_VIZ_LOG"
@@ -67,6 +68,7 @@ class _EventBus:
         self._sink_path: str | None = None
         self._fh = None
         self._lock = Lock()
+        self._subscribers: list[Callable[[dict], None]] = []
 
     # ------------------------------------------------------------------
     # Lifecycle
@@ -147,6 +149,63 @@ class _EventBus:
                     fh.flush()
                 except Exception as exc:  # noqa: BLE001
                     print(f"[observability] sink write error: {exc}", file=sys.stderr)
+
+            # Snapshot subscribers under the lock so concurrent (un)subscribe
+            # calls can't race the iteration below.
+            subscribers = list(self._subscribers)
+
+        # Fire subscribers OUTSIDE the lock — a slow callback must not block
+        # other emitters. Per-callback exceptions are swallowed so a buggy
+        # subscriber can't crash the pipeline.
+        for cb in subscribers:
+            try:
+                cb(event)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[observability] subscriber error: {exc}", file=sys.stderr)
+
+    # ------------------------------------------------------------------
+    # Subscribers — live event fan-out (used by the FastAPI backend)
+    # ------------------------------------------------------------------
+
+    def subscribe(self, callback: Callable[[dict], None]) -> Callable[[], None]:
+        """Register *callback* to fire on every emit.
+
+        Returns an unsubscribe handle. The callback receives the full event
+        dict ``{t, type, payload}``. Subscribers fire whenever the bus is
+        active, in addition to (and after) the existing buffer/file sinks.
+        """
+        with self._lock:
+            self._subscribers.append(callback)
+
+        def _unsubscribe() -> None:
+            with self._lock:
+                try:
+                    self._subscribers.remove(callback)
+                except ValueError:
+                    pass
+
+        return _unsubscribe
+
+    def activate(self) -> None:
+        """Activate the bus without emitting ``session_init`` or opening a sink.
+
+        Resets the timer to 0 and clears the events buffer. Used by per-turn
+        server scoping where the header has been delivered out-of-band by
+        a /start endpoint and only the per-turn events need to stream.
+        """
+        with self._lock:
+            self._active = True
+            self._start_time = time.perf_counter()
+            self._events = []
+
+    def deactivate(self) -> None:
+        """Deactivate the bus. Does NOT emit ``session_end`` or close any sink.
+
+        Pairs with :meth:`activate` at the end of a turn. Doesn't touch
+        ``_fh`` because :meth:`activate` never opened one.
+        """
+        with self._lock:
+            self._active = False
 
     # ------------------------------------------------------------------
     # Introspection

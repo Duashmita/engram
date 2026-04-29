@@ -15,13 +15,24 @@
 <header class="topbar">
   <div class="brand">
     <div class="logo-dot"></div>
-    <h1>Engram <span class="sub">Memory Replay</span></h1>
+    <h1>Engram <span class="sub" id="brand-sub">Memory Replay</span></h1>
+  </div>
+
+  <div class="mode-toggle" role="tablist" aria-label="Mode">
+    <button id="mode-replay" class="mode-btn active" data-mode="replay" role="tab">Replay</button>
+    <button id="mode-live"   class="mode-btn"        data-mode="live"   role="tab">Live</button>
   </div>
 
   <div class="session-picker">
     <label for="session-select">Session</label>
     <select id="session-select"></select>
     <span id="group-badge" class="group-badge hidden"></span>
+  </div>
+
+  <div id="live-picker" class="live-picker hidden">
+    <label for="live-npc-select">NPC</label>
+    <select id="live-npc-select"></select>
+    <button id="live-start" class="ctrl primary" title="Start session">Start session</button>
   </div>
 
   <div class="controls">
@@ -36,6 +47,8 @@
       <button data-speed="4">4x</button>
     </div>
   </div>
+
+  <button id="btn-settings" class="ctrl" title="Settings">⚙</button>
 </header>
 
 <div class="scrubber-row">
@@ -96,6 +109,13 @@
     <section class="panel panel-d">
       <header class="panel-header"><h2>Transcript</h2></header>
       <div class="transcript" id="transcript"></div>
+      <div id="composer" class="composer hidden">
+        <textarea id="composer-input" rows="1" placeholder="Type a message — Enter to send, Shift+Enter for newline" disabled></textarea>
+        <div class="composer-right">
+          <button id="composer-send" class="ctrl primary" disabled>Send</button>
+          <span id="composer-status" class="composer-status"></span>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -108,6 +128,27 @@
   <span class="spacer"></span>
   <span class="muted" id="event-counter">0/0 events</span>
 </footer>
+
+<dialog id="settings-dialog" class="settings-dialog">
+  <form method="dialog">
+    <header class="settings-header">
+      <h2>Settings</h2>
+      <button id="settings-close" class="ctrl" title="Close">×</button>
+    </header>
+    <label class="settings-row">
+      <span>Your Gemini API key (optional)</span>
+      <input id="settings-key-input" type="password" autocomplete="off" placeholder="AIza…" />
+    </label>
+    <p class="muted settings-hint">
+      When set, requests use your key directly and bypass the public rate limit.
+      Stored only in your browser's localStorage.
+    </p>
+    <div class="settings-actions">
+      <button id="settings-clear" class="ctrl">Clear</button>
+      <button id="settings-save"  class="ctrl primary">Use this key</button>
+    </div>
+  </form>
+</dialog>
 
 <script type="module" src="app.js"></script>
 </body>
