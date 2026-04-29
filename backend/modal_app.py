@@ -41,11 +41,14 @@ from sse_starlette.sse import EventSourceResponse
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(_THIS_DIR)
 
-# Local dev: src is at <repo>/src. Modal: image copies the repo to /root/engram
-# and we add /root/engram/src in the modal entrypoint below.
-_LOCAL_SRC = os.path.join(REPO_ROOT, "src")
-if os.path.isdir(_LOCAL_SRC) and _LOCAL_SRC not in sys.path:
-    sys.path.insert(0, _LOCAL_SRC)
+# Local dev: src is at <repo>/src.
+# Modal: deploy file lives at /root/modal_app.py while the repo (mounted via
+# add_local_dir) is at /root/engram, so src is at /root/engram/src. Both paths
+# are checked here at module load — the engram imports below MUST resolve
+# before the Modal runner inspects the FastAPI app.
+for _candidate in (os.path.join(REPO_ROOT, "src"), "/root/engram/src"):
+    if os.path.isdir(_candidate) and _candidate not in sys.path:
+        sys.path.insert(0, _candidate)
 
 from engram import config as engram_config  # noqa: E402
 from engram.llm.client import GeminiClient  # noqa: E402
@@ -175,15 +178,23 @@ def _resolve_llm(byok: Optional[str]) -> GeminiClient:
 
 
 def _make_data_dir(session_id: str, npc_id: str) -> str:
-    """Per-session sandbox under /tmp. Reuses pre-baked preset data when present."""
+    """Per-session sandbox under /tmp. Reuses pre-baked preset data when present.
+
+    Local dev: pre-baked data lives at <repo>/data/<npc_id>/.
+    Modal container: the repo is mounted at /root/engram, so it lives at
+    /root/engram/data/<npc_id>/. Try both — first match wins.
+    """
     os.makedirs(_SESSION_BASE_DIR, exist_ok=True)
     dst = os.path.join(_SESSION_BASE_DIR, session_id)
-    src = os.path.join(REPO_ROOT, "data", npc_id)
-    if os.path.isdir(src):
-        # copytree won't overwrite existing dirs without dirs_exist_ok=True (Py 3.8+).
-        shutil.copytree(src, dst, dirs_exist_ok=True)
-    else:
-        os.makedirs(dst, exist_ok=True)
+    for src in (
+        os.path.join(REPO_ROOT, "data", npc_id),
+        f"/root/engram/data/{npc_id}",
+    ):
+        if os.path.isdir(src):
+            # copytree won't overwrite existing dirs without dirs_exist_ok=True (Py 3.8+).
+            shutil.copytree(src, dst, dirs_exist_ok=True)
+            return dst
+    os.makedirs(dst, exist_ok=True)
     return dst
 
 
@@ -383,7 +394,7 @@ except ImportError:  # pragma: no cover — local-dev fallback
 
 
 if modal is not None:
-    stub = modal.App("engram-demo")
+    app = modal.App("engram-demo")
     image = (
         modal.Image.debian_slim(python_version="3.11")
         .apt_install("swi-prolog")
@@ -395,12 +406,16 @@ if modal is not None:
         )
     )
 
-    @stub.function(
+    @app.function(
         image=image,
         secrets=[modal.Secret.from_name("engram-gemini-key")],
-        min_containers=0,
-        max_containers=4,
-        scaledown_window=120,
+        # Pinned to a single container so SESSIONS (in-process dict) and the
+        # bus singleton + Prolog state all stay coherent across requests.
+        # Sticky sessions across containers would require modal.Dict + agent
+        # serialization (out of scope for the demo).
+        min_containers=1,
+        max_containers=1,
+        scaledown_window=600,
         timeout=120,
     )
     @modal.concurrent(max_inputs=1)  # serialize: bus + SESSIONS are process-global
