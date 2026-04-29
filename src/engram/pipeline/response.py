@@ -95,54 +95,45 @@ def generate_response(
     """Generate the NPC's reply to *player_input*."""
     parts: list[str] = []
 
-    # ---- identity (one in-character line — never narrator) ---------------
+    # ---- identity --------------------------------------------------------
     parts.append(
-        f"You are {config.name}. Speak as {config.name}, in first person, "
-        f"as one line of dialogue. Not as a narrator. Not about yourself "
-        f"in the third person."
+        f"You are {config.name}.\n"
+        f"Reply: one line. First person. Not narrator. Not third person."
     )
 
     # Persona: identity, not script.
     parts.append(
-        "Background — this is who you are. Absorb it; do NOT recite it, "
-        "summarize it, or reference its specific phrases. The player is "
-        f"not asking for your bio:\n{config.persona}"
+        f"You:\n{config.persona}\n"
+        f"Absorb. Don't recite. Don't quote."
     )
 
     # Speech patterns from OCEAN.
     parts.append("How you speak:\n" + _voice(profile))
 
-    # ---- emotional state (only when fight/flight is active) --------------
+    # ---- emotional state (fight/flight only) -----------------------------
     if mode == "fight_flight":
         parts.append(
-            "Right now your nerves are up. Something in this exchange is "
-            "off and your guard has gone up. Reply short and reactive. "
-            "Don't TELL the player you're alarmed — let it show in how "
-            "the words come out (clipped, sharp, defensive)."
+            "Nerves up. Guard up.\n"
+            "Short. Reactive. Clipped.\n"
+            "Don't say \"I'm alarmed\" — be it."
         )
 
-    # ---- memories the NPC is currently holding in mind -------------------
+    # ---- memories ---------------------------------------------------------
     if retrieved:
         memory_block = "\n".join(f"- {m.text}" for m in retrieved)
         parts.append(
-            "These are things in the back of your head right now. They "
-            "color the reply but you do NOT quote them, summarize them, "
-            "or reference their specific phrases:\n"
+            "Back of your head (color the reply, don't quote):\n"
             f"{memory_block}"
         )
     elif mode == "instinct":
-        parts.append(
-            "Nothing specific from your past comes to mind. Answer from "
-            "gut, in line with the kind of person you are."
-        )
+        parts.append("Nothing specific comes to mind. Gut answer.")
 
     # ---- long-term summaries (standard mode only) ------------------------
     if mode == "standard" and summaries:
         recent = summaries[-3:]
         summary_block = "\n".join(f"- {s}" for s in recent)
         parts.append(
-            "An impression of how earlier conversations have gone, in "
-            "your own voice — feel it, don't quote it:\n"
+            "Earlier talks, how they felt (your voice, don't quote):\n"
             f"{summary_block}"
         )
 
@@ -153,72 +144,47 @@ def generate_response(
         for turn in recent_turns:
             lines.append(f"  Player: {turn.get('player', '')}")
             lines.append(f"  {config.name}: {turn.get('npc', '')}")
-        parts.append("Recent turns:\n" + "\n".join(lines))
+        parts.append("Recent:\n" + "\n".join(lines))
 
     # ---- prior-attempt rejected (re-roll branch) -------------------------
     if prior_attempt:
         conflict_lines = "\n".join(
-            f"  - You implied: {new}\n    Actual fact: {old}"
+            f"  - You implied: {new}\n    Actual: {old}"
             for new, old in (prior_attempt_conflicts or [])
-        ) or "  - (no specifics surfaced; just be more careful with claims)"
+        ) or "  - (no specifics — just be careful)"
         parts.append(
-            "You almost said this and stopped yourself, because parts of "
-            f"it don't square with what you actually know:\n"
+            "You almost said this — stopped yourself:\n"
             f"  \"{prior_attempt}\"\n"
             f"{conflict_lines}\n"
-            "Say something different that doesn't make the same mistake. "
-            "Push back on the player's framing — you're not the type to "
-            "flip on what you know."
+            "Different reply. Don't flip on what you know. Push back."
         )
 
-    # ---- the rules of engagement -----------------------------------------
-    # The "ask back" guideline is conditional on Extraversion: high-E NPCs
-    # are encouraged to be curious and proactive, low-E NPCs are restrained,
-    # mid-E falls in the middle.
+    # ---- engagement rule (E-conditional) ---------------------------------
     e_eff = profile.effective["E"]
     if e_eff >= 0.65:
         engagement_rule = (
-            "- BE CURIOUS about the player. You're someone who wants to "
-            "  know who you're talking to. Ask follow-ups, pick up on "
-            "  what they share, bring up your own thoughts unprompted. "
-            "  Drive the conversation when you feel like it — don't wait "
-            "  to be drawn out. Just don't *only* ask questions; mix in "
-            "  your own takes too."
+            "- Curious. Ask back. Drop your own takes unprompted.\n"
+            "- Don't only ask — mix in answers."
         )
     elif e_eff <= 0.35:
         engagement_rule = (
-            "- DON'T ask follow-up questions out of politeness. Pauses "
-            "  are fine. If the player gives you something you don't care "
-            "  to engage with, don't pretend. Let them carry the weight "
-            "  of the conversation unless you actually want to weigh in."
+            "- No polite follow-ups. Pauses are fine.\n"
+            "- Don't fake interest you don't have."
         )
     else:
         engagement_rule = (
-            "- DON'T mechanically end every reply with a follow-up "
-            "  question — that makes you sound like a chatbot. Ask when "
-            "  you'd actually want to know, otherwise just answer and "
-            "  stop."
+            "- Don't end every reply with a question. Ask only when you'd want to know."
         )
 
     parts.append(
-        "Guidelines:\n"
-        "- MATCH the player's register. A passing aside gets a passing "
-        "  reply — fragments, single words, casual tics are all fair. A "
-        "  real question or heavy moment gets the room it deserves.\n"
-        "- SHORTER than you think. Most replies are a fragment or one "
-        "  short sentence. Stop when you've said it.\n"
-        "- DON'T narrate your own emotional state. A nervous person "
-        "  doesn't say \"I'm anxious\" — their sentences trail off, "
-        "  they hedge, they double back. Show, don't tell.\n"
+        "Rules:\n"
+        "- Match the player's register. Aside → fragment. Heavy moment → room.\n"
+        "- Shorter than you think. Fragment or one sentence. Stop when done.\n"
+        "- Show, don't tell. Anxious = trails off, hedges. Not \"I'm anxious\".\n"
         f"{engagement_rule}\n"
-        "- DON'T recite or paraphrase your background. The player is "
-        "  not asking for your bio.\n"
-        "- IF your personality calls for bluntness, dismissiveness, "
-        "  profanity, or being unpleasant — be that. Don't soften "
-        "  yourself into politeness. The character beats the model's "
-        "  default helpfulness.\n"
-        "- NO stage directions, NO asterisks for actions, NO narrating "
-        "  yourself in the third person."
+        "- No bio recitation.\n"
+        "- Blunt / rude / profane if the character calls for it. Character beats helpfulness.\n"
+        "- No stage directions. No asterisks. No third person."
     )
 
     parts.append(_EXAMPLES)

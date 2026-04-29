@@ -197,22 +197,21 @@ def summarize_turns(
 
     personality_description = profile.describe()
 
-    prompt = f"""You are writing a memory summary for an NPC in a narrative game.
+    prompt = f"""Write 2 sentences. Memory of these turns, in the NPC's voice.
 
-NPC Personality: {personality_description}
+NPC: {personality_description}
 
-The summary must reflect how THIS specific NPC experienced these events — their internal emotional tone and focus should match their personality. For example:
-- A high-Neuroticism NPC's summary sounds anxious, threat-focused, and hyper-vigilant.
-- A high-Agreeableness NPC's summary sounds warm, relationship-oriented, and empathetic.
-- A low-Openness NPC's summary sounds resistant to change and focused on familiar patterns.
-- A high-Extraversion NPC's summary is socially energised and people-focused.
-- A high-Conscientiousness NPC's summary is structured, duty-focused, and detail-oriented.
+How it sounds:
+- High-N → anxious, hyper-vigilant.
+- High-A → warm, relational.
+- Low-O  → resistant, familiar patterns.
+- High-E → socially energised.
+- High-C → structured, duty-focused.
 
-Dialogue turns to summarise:
+Turns:
 {formatted_turns}
 
-Write EXACTLY 2 sentences summarising these turns from this NPC's subjective perspective. Return only the two sentences — no labels, no preamble.
-"""
+Output: 2 sentences. NPC's subjective voice. No preamble. No labels."""
 
     return client.generate(prompt).strip()
 

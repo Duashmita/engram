@@ -16,6 +16,7 @@ from ..config import THREAT_MAX_TOKENS
 from ..llm.client import GeminiClient
 from ..memory.manager import MemoryManager
 from ..models import OCEANProfile, ThreatAssessment
+from ..observability import bus
 
 
 def assess_threat(
@@ -70,14 +71,23 @@ Return ONLY this JSON object — no prose, no markdown fences:
         cleaned = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.IGNORECASE)
         cleaned = re.sub(r"\s*```$", "", cleaned.strip())
         data = json.loads(cleaned)
-        return ThreatAssessment(
+        result = ThreatAssessment(
             is_threat=bool(data.get("is_threat", False)),
             threat_magnitude=float(data.get("threat_magnitude", 0.0)),
             reasoning=str(data.get("reasoning", "")),
         )
     except Exception:  # noqa: BLE001
-        return ThreatAssessment(
+        result = ThreatAssessment(
             is_threat=False,
             threat_magnitude=0.0,
             reasoning="Assessment parse failed",
         )
+
+    bus.emit(
+        "threat_assessed",
+        is_threat=result.is_threat,
+        magnitude=result.threat_magnitude,
+        reasoning=result.reasoning,
+        context_memory_ids=[m.id for m in past_memories],
+    )
+    return result

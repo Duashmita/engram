@@ -29,6 +29,7 @@ from ..llm.client import GeminiClient
 from ..llm.tagging import extract_facts, tag_event
 from ..memory.manager import MemoryManager
 from ..models import Memory, NPCConfig, OCEANProfile
+from ..observability import bus
 
 
 # ---------------------------------------------------------------------------
@@ -40,6 +41,7 @@ def check_contradictions(
     config: NPCConfig,
     keystore,
     llm: GeminiClient,
+    _emit_stage: str = "generic",
 ) -> list[tuple[str, str]]:
     """Detect contradictions between facts extracted from *text* and the
     NPC's Prolog fact base.
@@ -51,6 +53,10 @@ def check_contradictions(
       claim that conflicts with the fact base triggers a re-roll, paper §3.4).
 
     Returns ``(new_fact, conflicting_old_fact)`` tuples; empty list = clean.
+
+    The ``_emit_stage`` kwarg lets the orchestrator label the emitted
+    observability event ("pre" | "post" | "generic"); it has no effect on
+    the returned value.
     """
     extracted = extract_facts(text, config.npc_id, config.persona, llm)
     candidates = _to_prolog_strings(extracted)
@@ -60,6 +66,13 @@ def check_contradictions(
         found, old_fact = keystore.check_contradiction(fact_str)
         if found:
             contradictions.append((fact_str, old_fact))
+
+    bus.emit(
+        "contradiction_check",
+        stage=_emit_stage,
+        text=text[:200],
+        conflicts=[{"new": new, "old": old} for new, old in contradictions],
+    )
     return contradictions
 
 
@@ -183,9 +196,13 @@ def post_session_fact_check(
                     # High Openness — accept the new belief
                     keystore.retract_fact(old_fact)
                     keystore.assert_fact(fact_str)
-                # else: Low Openness — reject new belief silently
+                    bus.emit("fact_revised", fact=fact_str, old=old_fact)
+                else:
+                    # Low Openness — reject new belief silently
+                    bus.emit("fact_rejected", fact=fact_str, old=old_fact)
             else:
                 keystore.assert_fact(fact_str)
+                bus.emit("fact_asserted", fact=fact_str)
 
 
 # ---------------------------------------------------------------------------

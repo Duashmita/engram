@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Engram — Memory Replay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo-dot"></div>
+    <h1>Engram <span class="sub">Memory Replay</span></h1>
+  </div>
+
+  <div class="session-picker">
+    <label for="session-select">Session</label>
+    <select id="session-select"></select>
+    <span id="group-badge" class="group-badge hidden"></span>
+  </div>
+
+  <div class="controls">
+    <button id="btn-reset"   class="ctrl" title="Reset">⟲</button>
+    <button id="btn-step"    class="ctrl" title="Step one event">›</button>
+    <button id="btn-step-turn" class="ctrl" title="Step to next turn">»</button>
+    <button id="btn-play"    class="ctrl primary" title="Play/Pause">▶</button>
+    <div class="speed">
+      <button data-speed="0.5">0.5x</button>
+      <button data-speed="1" class="active">1x</button>
+      <button data-speed="2">2x</button>
+      <button data-speed="4">4x</button>
+    </div>
+  </div>
+</header>
+
+<div class="scrubber-row">
+  <span id="time-cur">0.00s</span>
+  <input id="scrubber" type="range" min="0" max="1000" value="0" step="1" />
+  <span id="time-end">0.00s</span>
+</div>
+
+<main id="stage">
+  <!-- Single-NPC layout (rendered by app.js) -->
+  <div id="single-view" class="layout-single">
+
+    <!-- Panel A — OCEAN radar -->
+    <section class="panel panel-a" id="panel-a">
+      <header class="panel-header">
+        <h2>OCEAN</h2>
+        <div class="npc-name" id="npc-name">—</div>
+      </header>
+      <div class="radar-wrap" id="radar-wrap">
+        <canvas id="ocean-radar"></canvas>
+      </div>
+      <div class="ocean-readout" id="ocean-readout"></div>
+      <div class="persona" id="persona"></div>
+    </section>
+
+    <!-- Panel B — Pipeline timeline -->
+    <section class="panel panel-b">
+      <header class="panel-header">
+        <h2>Pipeline</h2>
+        <div class="legend">
+          <span class="lg lg-standard">standard</span>
+          <span class="lg lg-fight">fight/flight</span>
+          <span class="lg lg-instinct">instinct</span>
+        </div>
+      </header>
+      <div class="turn-list" id="turn-list"></div>
+    </section>
+
+    <!-- Panel C — Memory store -->
+    <aside class="panel panel-c">
+      <section class="sub">
+        <header class="sub-header"><h3>Session window</h3><span class="muted" id="window-count">0/7</span></header>
+        <div class="window-track" id="window-track"></div>
+        <div class="summaries" id="summaries"></div>
+      </section>
+      <section class="sub">
+        <header class="sub-header"><h3>All memories</h3><span class="muted" id="mem-count">0</span></header>
+        <div class="mem-list" id="mem-list"></div>
+      </section>
+      <section class="sub">
+        <header class="sub-header"><h3>Key memories &amp; Prolog facts</h3></header>
+        <div class="key-list" id="key-list"></div>
+        <div class="facts-list" id="facts-list"></div>
+      </section>
+    </aside>
+
+    <!-- Panel D — Transcript -->
+    <section class="panel panel-d">
+      <header class="panel-header"><h2>Transcript</h2></header>
+      <div class="transcript" id="transcript"></div>
+    </section>
+  </div>
+
+  <!-- Multi-NPC layout container (built dynamically) -->
+  <div id="multi-view" class="layout-multi hidden"></div>
+</main>
+
+<footer class="statusbar">
+  <span id="status-text">loading…</span>
+  <span class="spacer"></span>
+  <span class="muted" id="event-counter">0/0 events</span>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

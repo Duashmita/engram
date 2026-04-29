@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import os
 
+from ..observability import bus
+
 
 class LongTermMemory:
     """Persists OCEAN-biased summaries of evicted session turns to a JSON file.
@@ -24,6 +26,7 @@ class LongTermMemory:
         """Append *summary* to the in-memory list and persist immediately."""
         self.summaries.append(summary)
         self._save()
+        bus.emit("summary_added", summary=summary, total_summaries=len(self.summaries))
 
     def get_summaries(self) -> list[str]:
         """Return a copy of the current summaries list."""

@@ -1,0 +1,25 @@
+{
+  "sessions": [
+    {
+      "id": "demo-jeanie-2026-04-29",
+      "npc_id": "jeanie",
+      "npc_name": "Jeanie",
+      "file": "sample-session.ndjson",
+      "group": null
+    },
+    {
+      "id": "jeanie-20260429-040102",
+      "npc_id": "jeanie",
+      "npc_name": "Jeanie",
+      "file": "jeanie-20260429-040102.ndjson",
+      "group": null
+    },
+    {
+      "id": "jeanie-20260429-040342",
+      "npc_id": "jeanie",
+      "npc_name": "Jeanie",
+      "file": "jeanie-20260429-040342.ndjson",
+      "group": null
+    }
+  ]
+}

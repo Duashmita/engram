@@ -27,12 +27,15 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import uuid
 from typing import TYPE_CHECKING
 
+from . import config as engram_config
 from .config import DECAY_RATE
 from .memory.manager import MemoryManager
 from .models import Memory, NPCConfig, OCEANProfile
+from .observability import bus
 from .pipeline.consolidation import (
     check_contradictions,
     consolidate,
@@ -78,6 +81,24 @@ class NPCAgent:
         else:
             self._init_backstory()
 
+        p = self.config.profile
+        bus.emit(
+            "session_init_npc",
+            npc_id=config.npc_id,
+            npc_name=config.name,
+            persona=config.persona,
+            baseline_ocean={"O": p.O, "C": p.C, "E": p.E, "A": p.A, "N": p.N},
+            initial_memory_count=len(self.memory_manager.all_memories),
+            config={
+                "retrieval_threshold": engram_config.RETRIEVAL_THRESHOLD,
+                "top_k": engram_config.TOP_K_RETRIEVAL,
+                "session_window": engram_config.SESSION_WINDOW,
+                "evict_batch": engram_config.EVICT_BATCH,
+                "key_memory_percentile": engram_config.KEY_MEMORY_PERCENTILE,
+                "decay_rate": engram_config.DECAY_RATE,
+            },
+        )
+
     # ------------------------------------------------------------------
     @property
     def profile(self) -> OCEANProfile:
@@ -89,8 +110,12 @@ class NPCAgent:
 
     def run_turn(self, player_input: str) -> str:
         """Process one player input through the full 6-stage pipeline."""
+        bus.emit("turn_start", turn=self.turn_count, player_input=player_input)
+        t_start = time.perf_counter()
+
         # Embed once; reused by threat assessment + scored retrieval.
         query_embedding = self.llm.embed(player_input)
+        bus.emit("embedding_done")
 
         # Stage 1 — threat assessment (§3.1)
         assessment = assess_threat(
@@ -104,6 +129,15 @@ class NPCAgent:
         # Stage 2 + 3 — scored retrieval drives mode selection (§3.2 / §3.3)
         if assessment.is_threat:
             self.profile.apply_fight_flight(assessment.threat_magnitude)
+            bus.emit(
+                "fight_flight_applied",
+                magnitude=assessment.threat_magnitude,
+                deltas={
+                    "dN": self.profile._dN,
+                    "dA": self.profile._dA,
+                    "dE": self.profile._dE,
+                },
+            )
             mode = "fight_flight"
             retrieved = scored_retrieve(query_embedding, self.memory_manager)
         else:
@@ -113,6 +147,8 @@ class NPCAgent:
             else:
                 mode = "instinct"
                 retrieved = tag_retrieve(player_input, self.memory_manager, self.llm)
+
+        bus.emit("mode_selected", mode=mode)
 
         # Stage 4 — response generation (§3.3) — standard mode also gets
         # the OCEAN-biased long-term summaries (§3.3).
@@ -130,6 +166,7 @@ class NPCAgent:
             llm=self.llm,
             summaries=summaries,
         )
+        bus.emit("response_generated", text=response, attempt=1)
 
         # Stage 5 — post-response Prolog contradiction check (paper §3.4).
         # Extract facts from the NPC's own response, query the keystore,
@@ -143,6 +180,7 @@ class NPCAgent:
         if response and self.profile.O < 0.5:
             response_conflicts = check_contradictions(
                 response, self.config, self.memory_manager.keystore, self.llm,
+                _emit_stage="post",
             )
             if response_conflicts:
                 response = generate_response(
@@ -158,6 +196,7 @@ class NPCAgent:
                     prior_attempt=response,
                     prior_attempt_conflicts=response_conflicts,
                 )
+                bus.emit("response_generated", text=response, attempt=2)
 
         # Stage 6 — consolidation (§3.5)
         new_memory = consolidate(
@@ -170,12 +209,19 @@ class NPCAgent:
             memory_id=str(uuid.uuid4()),
         )
         self.session_memories.append(new_memory)
+        bus.emit("consolidated", memory_id=new_memory.id, text=new_memory.text)
 
         # Bookkeeping — fight/flight delta decay
         self.profile.decay(DECAY_RATE)
+        bus.emit("profile_decay", effective=self.profile.effective)
         self.turn_count += 1
         self.history.append({"player": player_input, "npc": response})
 
+        bus.emit(
+            "turn_end",
+            turn=self.turn_count,
+            duration_ms=round((time.perf_counter() - t_start) * 1000.0, 4),
+        )
         return response
 
     # ------------------------------------------------------------------
@@ -194,6 +240,7 @@ class NPCAgent:
         )
         self.save_state()
         self.session_memories = []
+        bus.emit("session_end_npc", npc_id=self.config.npc_id)
 
     # ------------------------------------------------------------------
     # Backstory initialisation (first run only)

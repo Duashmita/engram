@@ -7,6 +7,7 @@ import re
 from typing import TYPE_CHECKING
 
 from ..config import KEY_MEMORY_PERCENTILE
+from ..observability import bus
 
 if TYPE_CHECKING:
     from ..models import Memory, OCEANProfile
@@ -107,6 +108,7 @@ class KeyStore:
         if not all_memories:
             self._key_memories = []
             self._write_pl()
+            bus.emit("key_promoted", memory_ids=[], count=0)
             return []
 
         scored = sorted(
@@ -119,6 +121,11 @@ class KeyStore:
         top_n = max(1, math.ceil(len(scored) * (1.0 - KEY_MEMORY_PERCENTILE)))
         self._key_memories = scored[:top_n]
         self._write_pl()
+        bus.emit(
+            "key_promoted",
+            memory_ids=[m.id for m in self._key_memories],
+            count=len(self._key_memories),
+        )
         return list(self._key_memories)
 
     # ------------------------------------------------------------------

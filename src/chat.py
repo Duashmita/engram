@@ -19,6 +19,8 @@ In-chat slash commands:
 from __future__ import annotations
 
 import argparse
+import datetime
+import json
 import os
 import re
 import shutil
@@ -39,13 +41,24 @@ if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 
 from engram.config import (  # noqa: E402
+    DECAY_RATE,
+    EVICT_BATCH,
     GEMINI_API_KEY as _ENV_API_KEY,
     GEMINI_CHAT_MODEL as _DEFAULT_CHAT,
+    KEY_MEMORY_PERCENTILE,
+    RETRIEVAL_THRESHOLD,
+    SESSION_WINDOW,
+    TOP_K_RETRIEVAL,
 )
 from engram.llm.client import GeminiClient  # noqa: E402
 from engram.models import NPCConfig, OCEANProfile  # noqa: E402
 from engram.npc import NPCAgent  # noqa: E402
+from engram.observability import bus  # noqa: E402
 from engram.presets import PRESETS, get_preset, list_presets  # noqa: E402
+
+
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_DOCS_SESSIONS = os.path.join(_REPO_ROOT, "docs", "sessions")
 
 
 # ---------------------------------------------------------------------------
@@ -63,6 +76,13 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--model", default=None, help="override Gemini chat model")
     p.add_argument("--fresh", action="store_true", help="wipe saved state for this NPC before starting")
     p.add_argument("--list-presets", action="store_true", help="show available presets and exit")
+    p.add_argument("--viz", action="store_true",
+                   help="record session to docs/sessions/ for the static replay viz")
+    p.add_argument("--viz-path", default=None,
+                   help="override the default viz log path (implies --viz)")
+    p.add_argument("--group", default=None,
+                   help="tag this session with a group id so the viz can compare it side-by-side "
+                        "with other sessions sharing the same id")
     return p
 
 
@@ -216,6 +236,74 @@ def _build_config_from_name(name: str, data_dir: str) -> NPCConfig:
 
 
 # ---------------------------------------------------------------------------
+# Viz logging helpers
+# ---------------------------------------------------------------------------
+
+def _default_viz_path(npc_id: str) -> str:
+    os.makedirs(_DOCS_SESSIONS, exist_ok=True)
+    ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    return os.path.join(_DOCS_SESSIONS, f"{npc_id}-{ts}.ndjson")
+
+
+def _build_viz_header(config: NPCConfig) -> dict:
+    """Built before agent construction so session_init_npc + initial memory_added
+    events from NPCAgent.__init__ are captured."""
+    p = config.profile
+    return {
+        "npc_id": config.npc_id,
+        "npc_name": config.name,
+        "persona": config.persona,
+        "baseline_ocean": {"O": p.O, "C": p.C, "E": p.E, "A": p.A, "N": p.N},
+        "initial_memory_count": -1,  # filled in by session_init_npc once memories load
+        "config": {
+            "retrieval_threshold": RETRIEVAL_THRESHOLD,
+            "top_k": TOP_K_RETRIEVAL,
+            "session_window": SESSION_WINDOW,
+            "evict_batch": EVICT_BATCH,
+            "key_memory_percentile": KEY_MEMORY_PERCENTILE,
+            "decay_rate": DECAY_RATE,
+        },
+    }
+
+
+def _append_to_manifest(viz_path: str, agent: NPCAgent, group: str | None) -> None:
+    """Append (or replace) the entry for *viz_path* in docs/sessions/manifest.json."""
+    manifest_path = os.path.join(_DOCS_SESSIONS, "manifest.json")
+    try:
+        if os.path.exists(manifest_path):
+            with open(manifest_path, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+        else:
+            data = {"sessions": []}
+    except (json.JSONDecodeError, OSError):
+        data = {"sessions": []}
+
+    sessions = data.setdefault("sessions", [])
+    file_name = os.path.basename(viz_path)
+    session_id = file_name.removesuffix(".ndjson")
+    entry = {
+        "id": session_id,
+        "npc_id": agent.config.npc_id,
+        "npc_name": agent.config.name,
+        "file": file_name,
+        "group": group,
+    }
+    # Replace existing entry with the same id, else append.
+    for i, s in enumerate(sessions):
+        if s.get("id") == session_id:
+            sessions[i] = entry
+            break
+    else:
+        sessions.append(entry)
+
+    try:
+        with open(manifest_path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2, ensure_ascii=False)
+    except OSError as exc:
+        print(f"  [viz] failed to update manifest: {exc}", file=sys.stderr)
+
+
+# ---------------------------------------------------------------------------
 # Chat loop
 # ---------------------------------------------------------------------------
 
@@ -334,10 +422,26 @@ def main() -> None:
     llm = GeminiClient(api_key=api_key, chat_model=chat_model)
 
     print(f"  [init] loading {config.name}...")
+
+    viz_enabled = bool(args.viz or args.viz_path)
+    viz_path: str | None = None
+    if viz_enabled:
+        viz_path = args.viz_path or _default_viz_path(config.npc_id)
+        bus.start_session(viz_path, header=_build_viz_header(config))
+        rel = os.path.relpath(viz_path, _REPO_ROOT)
+        print(f"  [viz] logging → {rel}"
+              + (f"  group={args.group}" if args.group else ""))
+
     agent = NPCAgent(config, llm, data_dir=data_dir)
     print(f"  [init] {len(agent.memory_manager.all_memories)} memories loaded.\n")
 
-    _chat(agent)
+    try:
+        _chat(agent)
+    finally:
+        if viz_enabled and viz_path is not None:
+            bus.end_session()
+            _append_to_manifest(viz_path, agent, args.group)
+            print(f"  [viz] log → {os.path.relpath(viz_path, _REPO_ROOT)}")
 
 
 if __name__ == "__main__":

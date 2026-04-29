@@ -9,6 +9,7 @@ import numpy as np
 
 from ..config import RETRIEVAL_THRESHOLD, TOP_K_RETRIEVAL
 from ..models import Memory, OCEANProfile
+from ..observability import bus
 from .session import SessionMemory
 from .longterm import LongTermMemory
 from .keystore import KeyStore
@@ -39,6 +40,26 @@ def _cosine(a: list[float], b: list[float]) -> float:
 # Personality-weighted scoring
 # ---------------------------------------------------------------------------
 
+def _score_components(
+    memory: Memory, query_embedding: list[float], profile: OCEANProfile
+) -> tuple[float, float, float]:
+    """Compute (score, rag, ocean_sum) so callers can emit observability data
+    without recomputing.
+
+    Formula (from paper):
+        score = (rag_score * 2) * sum(t_mem / t_agent for each trait) * importance
+    """
+    rag = _cosine(query_embedding, memory.embedding)
+    traits = ("O", "C", "E", "A", "N")
+    eff = profile.effective
+    ocean_sum = sum(
+        min(5.0, (memory.tags.ocean.get(t, 3) / 5.0) / max(0.05, eff[t]))
+        for t in traits
+    )
+    score = (rag * 2) * ocean_sum * memory.tags.importance
+    return score, rag, ocean_sum
+
+
 def _score(memory: Memory, query_embedding: list[float], profile: OCEANProfile) -> float:
     """Compute the personality-weighted retrieval score for *memory*.
 
@@ -52,14 +73,8 @@ def _score(memory: Memory, query_embedding: list[float], profile: OCEANProfile) 
         ratio      = capped at 5.0 per trait
         importance = memory.tags.importance (1–10)
     """
-    rag = _cosine(query_embedding, memory.embedding)
-    traits = ("O", "C", "E", "A", "N")
-    eff = profile.effective
-    ocean_sum = sum(
-        min(5.0, (memory.tags.ocean.get(t, 3) / 5.0) / max(0.05, eff[t]))
-        for t in traits
-    )
-    return (rag * 2) * ocean_sum * memory.tags.importance
+    score, _rag, _ocean_sum = _score_components(memory, query_embedding, profile)
+    return score
 
 
 # ---------------------------------------------------------------------------
@@ -102,6 +117,14 @@ class MemoryManager:
         """Append *memory* to the full memory list and persist."""
         self.all_memories.append(memory)
         self.save_memories()
+        bus.emit(
+            "memory_added",
+            id=memory.id,
+            source=memory.source,
+            importance=memory.tags.importance,
+            text=memory.text[:120],
+            tags=memory.tags.to_dict(),
+        )
 
     # ------------------------------------------------------------------
     # Session management
@@ -130,9 +153,13 @@ class MemoryManager:
         Returns ``[]`` when no memory qualifies — the caller is expected to
         fall back to instinct-mode tag retrieval (paper §3.3).
         """
+        # Score every memory once; keep components so observability can
+        # report them without recomputing.
+        all_scored: list[tuple[float, Memory, float, float]] = []
         qualified: list[tuple[float, Memory]] = []
         for mem in self.all_memories:
-            s = _score(mem, query_embedding, self.profile)
+            s, rag, ocean_sum = _score_components(mem, query_embedding, self.profile)
+            all_scored.append((s, mem, rag, ocean_sum))
             if s >= RETRIEVAL_THRESHOLD:
                 qualified.append((s, mem))
 
@@ -141,6 +168,25 @@ class MemoryManager:
         for s, mem in qualified[:top_k]:
             mem.score = s
             output.append(mem)
+
+        bus.emit(
+            "retrieval_scored",
+            mode="scored",
+            scored=[
+                {
+                    "id": m.id,
+                    "text": m.text[:120],
+                    "score": s,
+                    "rag": rag,
+                    "ocean_sum": ocean_sum,
+                    "importance": m.tags.importance,
+                    "qualified": s >= RETRIEVAL_THRESHOLD,
+                }
+                for s, m, rag, ocean_sum in all_scored
+            ],
+            threshold=RETRIEVAL_THRESHOLD,
+            selected_ids=[m.id for m in output],
+        )
         return output
 
     def retrieve_by_tag_vector(
@@ -153,14 +199,40 @@ class MemoryManager:
         Used for instinct-mode retrieval (social/emotional tag matching).
         """
         if not self.all_memories:
+            bus.emit(
+                "retrieval_scored",
+                mode="tag",
+                scored=[],
+                threshold=None,
+                selected_ids=[],
+            )
             return []
 
-        scored = sorted(
-            self.all_memories,
-            key=lambda m: _cosine(query_vec, m.tags.to_vector()),
-            reverse=True,
+        scored_pairs: list[tuple[float, Memory]] = [
+            (_cosine(query_vec, m.tags.to_vector()), m) for m in self.all_memories
+        ]
+        scored_pairs.sort(key=lambda t: t[0], reverse=True)
+        output = [m for _s, m in scored_pairs[:top_k]]
+
+        bus.emit(
+            "retrieval_scored",
+            mode="tag",
+            scored=[
+                {
+                    "id": m.id,
+                    "text": m.text[:120],
+                    "score": s,
+                    "rag": s,
+                    "ocean_sum": None,
+                    "importance": m.tags.importance,
+                    "qualified": True,
+                }
+                for s, m in scored_pairs
+            ],
+            threshold=None,
+            selected_ids=[m.id for m in output],
         )
-        return scored[:top_k]
+        return output
 
     def retrieve_top_scored(
         self,
@@ -175,12 +247,40 @@ class MemoryManager:
         salient, not just the most semantically similar text.
         """
         if not self.all_memories:
+            bus.emit(
+                "retrieval_scored",
+                mode="top_scored",
+                scored=[],
+                threshold=None,
+                selected_ids=[],
+            )
             return []
-        scored = [
-            (_score(m, query_embedding, self.profile), m) for m in self.all_memories
-        ]
-        scored.sort(key=lambda t: t[0], reverse=True)
-        return [m for _s, m in scored[:top_k]]
+        all_scored: list[tuple[float, Memory, float, float]] = []
+        for m in self.all_memories:
+            s, rag, ocean_sum = _score_components(m, query_embedding, self.profile)
+            all_scored.append((s, m, rag, ocean_sum))
+        all_scored.sort(key=lambda t: t[0], reverse=True)
+        output = [m for _s, m, _r, _o in all_scored[:top_k]]
+
+        bus.emit(
+            "retrieval_scored",
+            mode="top_scored",
+            scored=[
+                {
+                    "id": m.id,
+                    "text": m.text[:120],
+                    "score": s,
+                    "rag": rag,
+                    "ocean_sum": ocean_sum,
+                    "importance": m.tags.importance,
+                    "qualified": True,
+                }
+                for s, m, rag, ocean_sum in all_scored
+            ],
+            threshold=None,
+            selected_ids=[m.id for m in output],
+        )
+        return output
 
     # ------------------------------------------------------------------
     # Key memory promotion
