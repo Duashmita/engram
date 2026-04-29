@@ -102,7 +102,7 @@ class Memory:
     text: str
     tags: EventTags
     embedding: list[float]
-    source: str              # backstory|session|longterm|key
+    source: str              # backstory|session
     timestamp: float = field(default_factory=time.time)
     score: float = 0.0       # personality-weighted retrieval score
 
@@ -129,7 +129,6 @@ class ThreatAssessment:
     is_threat: bool
     threat_magnitude: float  # 0.0 to 1.0
     reasoning: str
-    response_mode: str       # standard|fight_flight|instinct
 
 
 @dataclass

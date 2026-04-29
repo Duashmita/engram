@@ -123,31 +123,22 @@ class MemoryManager:
         query_embedding: list[float],
         top_k: int = TOP_K_RETRIEVAL,
     ) -> list[Memory]:
-        """Personality-weighted retrieval.
+        """Personality-weighted retrieval (paper Eq. 1, §3.2).
 
-        Returns up to *top_k* memories whose score >= RETRIEVAL_THRESHOLD,
-        sorted by score descending.
-
-        If no memory qualifies (instinct-mode fallback), returns the top-k
-        by raw cosine similarity instead.
+        Returns up to *top_k* memories whose personality-weighted score is
+        at or above ``RETRIEVAL_THRESHOLD``, sorted by score descending.
+        Returns ``[]`` when no memory qualifies — the caller is expected to
+        fall back to instinct-mode tag retrieval (paper §3.3).
         """
-        scored: list[tuple[float, Memory]] = []
+        qualified: list[tuple[float, Memory]] = []
         for mem in self.all_memories:
             s = _score(mem, query_embedding, self.profile)
-            scored.append((s, mem))
+            if s >= RETRIEVAL_THRESHOLD:
+                qualified.append((s, mem))
 
-        qualified = [(s, m) for s, m in scored if s >= RETRIEVAL_THRESHOLD]
-
-        if qualified:
-            qualified.sort(key=lambda t: t[0], reverse=True)
-            result = qualified[:top_k]
-        else:
-            # Instinct-mode fallback: pure cosine similarity, no threshold.
-            scored.sort(key=lambda t: _cosine(query_embedding, t[1].embedding), reverse=True)
-            result = scored[:top_k]
-
+        qualified.sort(key=lambda t: t[0], reverse=True)
         output: list[Memory] = []
-        for s, mem in result:
+        for s, mem in qualified[:top_k]:
             mem.score = s
             output.append(mem)
         return output
@@ -171,24 +162,25 @@ class MemoryManager:
         )
         return scored[:top_k]
 
-    def retrieve_top_by_embedding(
+    def retrieve_top_scored(
         self,
         query_embedding: list[float],
         top_k: int = 3,
     ) -> list[Memory]:
-        """Raw cosine similarity on full embeddings — no score threshold.
+        """Top-K by personality-weighted score — no threshold.
 
-        Used during threat assessment to surface contextually similar memories.
+        Same scoring formula as `retrieve()` (paper Eq. 1, §3.2) but without
+        the ≥15 gate. Used by threat assessment so the context memories the
+        LLM sees are the ones this agent's personality + tag profile makes
+        salient, not just the most semantically similar text.
         """
         if not self.all_memories:
             return []
-
-        scored = sorted(
-            self.all_memories,
-            key=lambda m: _cosine(query_embedding, m.embedding),
-            reverse=True,
-        )
-        return scored[:top_k]
+        scored = [
+            (_score(m, query_embedding, self.profile), m) for m in self.all_memories
+        ]
+        scored.sort(key=lambda t: t[0], reverse=True)
+        return [m for _s, m in scored[:top_k]]
 
     # ------------------------------------------------------------------
     # Key memory promotion

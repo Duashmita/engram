@@ -38,7 +38,7 @@ warnings.filterwarnings("ignore", ".*NotOpenSSLWarning.*")   # urllib3 LibreSSL 
 warnings.filterwarnings("ignore", ".*ssl.*")
 
 import logging as _logging  # noqa: E402  (needed before engram imports)
-_logging.getLogger("engram").setLevel(_logging.ERROR)  # silence KeyStore/PrologEngine INFO/WARN
+_logging.getLogger("engram").setLevel(_logging.ERROR)  # silence KeyStore INFO/WARN
 
 # Ensure src/ is on sys.path
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -122,13 +122,13 @@ def _build_parser() -> argparse.ArgumentParser:
 # ---------------------------------------------------------------------------
 
 def _require_api_key() -> str:
-    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    key = (_ENV_API_KEY or os.environ.get("GEMINI_API_KEY", "")).strip()
     if not key:
         print(
-            "\n  error: GEMINI_API_KEY is not set.\n\n"
-            "  Export it before running:\n\n"
-            "      export GEMINI_API_KEY=your_key_here\n"
-            "      python src/demo.py\n",
+            "\n  error: GEMINI_API_KEY not found.\n\n"
+            "  Add it to .env at the project root:\n\n"
+            "      GEMINI_API_KEY=your_key_here\n\n"
+            "  or export it in this shell, then re-run.\n",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -139,7 +139,11 @@ def _require_api_key() -> str:
 # Engram imports (after arg parsing so --help / --version always work)
 # ---------------------------------------------------------------------------
 
-from engram.config import GEMINI_CHAT_MODEL as _DEFAULT_CHAT, GEMINI_EMBED_MODEL as _DEFAULT_EMBED  # noqa: E402
+from engram.config import (  # noqa: E402
+    GEMINI_API_KEY as _ENV_API_KEY,
+    GEMINI_CHAT_MODEL as _DEFAULT_CHAT,
+    GEMINI_EMBED_MODEL as _DEFAULT_EMBED,
+)
 from engram.llm.client import GeminiClient  # noqa: E402
 from engram.models import NPCConfig, OCEANProfile  # noqa: E402
 from engram.npc import NPCAgent  # noqa: E402

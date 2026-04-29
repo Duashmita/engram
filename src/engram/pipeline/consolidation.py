@@ -1,27 +1,66 @@
 """
-Stage 6 — Memory Consolidation
+Stage 4 + Stage 6 — Prolog contradiction checking & memory consolidation.
 
-Two entry points:
+Three entry points:
+
+check_contradictions()
+    Stage 4 (paper §3.4) — runs before response generation. Extracts
+    candidate facts from the player input, checks each against the NPC's
+    Prolog keystore, and returns the list of (new_fact, old_fact) pairs
+    so the response prompt can flag the contradiction to the LLM.
 
 consolidate()
-    Called after every NPC turn.  Encodes the exchange as a Memory, stores it
-    in the session window, and triggers the MemoryManager's eviction / summary
-    logic when the window fills.
+    Stage 6a — called after every NPC turn. Encodes the exchange as a
+    Memory, stores it in the session window, and triggers the
+    MemoryManager's eviction / summary logic when the window fills.
 
 post_session_fact_check()
-    Called at session end.  Extracts Prolog facts from recent memories and
-    reconciles them with the NPC's key-memory fact base, gated by Openness:
-    high-O NPCs accept belief revision; low-O NPCs reject it.
+    Stage 6b — called at session end. Reconciles new facts with the
+    Prolog key-memory base, gated by Openness: high-O NPCs accept belief
+    revision; low-O NPCs reject it.
 """
 
 from __future__ import annotations
 
+import re
 import time
 
 from ..llm.client import GeminiClient
 from ..llm.tagging import extract_facts, tag_event
 from ..memory.manager import MemoryManager
 from ..models import Memory, NPCConfig, OCEANProfile
+
+
+# ---------------------------------------------------------------------------
+# Stage 4 — pre-response contradiction check (paper §3.4)
+# ---------------------------------------------------------------------------
+
+def check_contradictions(
+    text: str,
+    config: NPCConfig,
+    keystore,
+    llm: GeminiClient,
+) -> list[tuple[str, str]]:
+    """Detect contradictions between facts extracted from *text* and the
+    NPC's Prolog fact base.
+
+    Used for both:
+    - **Pre-generation** check on the player's input (so the response prompt
+      can flag a player's contradictory claim and let the NPC push back).
+    - **Post-generation** check on the NPC's own response (so a hallucinated
+      claim that conflicts with the fact base triggers a re-roll, paper §3.4).
+
+    Returns ``(new_fact, conflicting_old_fact)`` tuples; empty list = clean.
+    """
+    extracted = extract_facts(text, config.npc_id, config.persona, llm)
+    candidates = _to_prolog_strings(extracted)
+
+    contradictions: list[tuple[str, str]] = []
+    for fact_str in candidates:
+        found, old_fact = keystore.check_contradiction(fact_str)
+        if found:
+            contradictions.append((fact_str, old_fact))
+    return contradictions
 
 
 # ---------------------------------------------------------------------------
@@ -199,12 +238,9 @@ def _slugify(value: str) -> str:
     """Normalise a string to a safe Prolog atom.
 
     Prolog atoms must start with a lowercase letter or underscore; digits at
-    the start are invalid without quoting.  We prefix those with 'a_'.
+    the start need quoting, so we prefix those with 'a_'.
     """
-    import re
-    value = str(value).lower().strip()
-    value = re.sub(r"[^a-z0-9_]+", "_", value)
-    value = value.strip("_")
+    value = re.sub(r"[^a-z0-9_]+", "_", str(value).lower().strip()).strip("_")
     if not value:
         return "unknown"
     if value[0].isdigit():

@@ -38,33 +38,22 @@ def _safe_atom(text: str) -> str:
     return text.replace("'", "\\'")
 
 
-def _cosine(a: list[float], b: list[float]) -> float:
-    if not a or not b:
-        return 0.0
-    dot = sum(x * y for x, y in zip(a, b))
-    mag_a = math.sqrt(sum(x * x for x in a))
-    mag_b = math.sqrt(sum(x * x for x in b))
-    if mag_a == 0.0 or mag_b == 0.0:
-        return 0.0
-    return dot / (mag_a * mag_b)
-
-
 def _personality_score(memory: "Memory", profile: "OCEANProfile") -> float:
-    """Personality-weighted score — identical formula used in MemoryManager."""
+    """Personality × importance ranking used at key-memory promotion time.
+
+    Same formula as `MemoryManager._score` but with the RAG term fixed at
+    1.0 — promotion has no current query, so the score collapses to a
+    pure personality × importance ordering of the corpus.
+    """
     if not memory.embedding:
         return 0.0
-    # rag_score is cosine vs the zero vector when we have no query; use
-    # the memory's stored score as a proxy, or fall back to importance only.
-    # During update() we call this without a query embedding, so we treat the
-    # rag component as 1.0 (pure personality × importance ranking).
-    rag = 1.0
     traits = ("O", "C", "E", "A", "N")
     eff = profile.effective
     ocean_sum = sum(
         min(5.0, (memory.tags.ocean.get(t, 3) / 5.0) / max(0.05, eff[t]))
         for t in traits
     )
-    return (rag * 2) * ocean_sum * memory.tags.importance
+    return 2.0 * ocean_sum * memory.tags.importance
 
 
 # ---------------------------------------------------------------------------
@@ -126,16 +115,11 @@ class KeyStore:
             reverse=True,
         )
 
-        cutoff = max(1, math.ceil(len(scored) * KEY_MEMORY_PERCENTILE))
-        # KEY_MEMORY_PERCENTILE = 0.75 means *top 25%*, i.e. the top quarter
-        # sits at or above the 75th percentile.
+        # KEY_MEMORY_PERCENTILE = 0.75 → top 25% are promoted.
         top_n = max(1, math.ceil(len(scored) * (1.0 - KEY_MEMORY_PERCENTILE)))
-        key = scored[:top_n]
-
-        self._key_memories = key
+        self._key_memories = scored[:top_n]
         self._write_pl()
-
-        return list(key)
+        return list(self._key_memories)
 
     # ------------------------------------------------------------------
     # Contradiction checking
