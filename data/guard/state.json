@@ -1,0 +1,52 @@
+{
+  "turn_count": 10,
+  "history": [
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "You think... you think I have it."
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "Don't think I will."
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": ""
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": ""
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": ""
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "(no response)"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "(no response)"
+    }
+  ],
+  "profile_deltas": {
+    "_dO": 0.0,
+    "_dC": 0.0,
+    "_dE": 0.0,
+    "_dA": 0.0,
+    "_dN": 0.0
+  }
+}
