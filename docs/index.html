@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -32,6 +33,7 @@
   <div id="live-picker" class="live-picker hidden">
     <label for="live-npc-select">NPC</label>
     <select id="live-npc-select"></select>
+    <button id="btn-ocean" class="ctrl" title="Tune OCEAN personality">OCEAN ▾</button>
     <button id="live-start" class="ctrl primary" title="Start session">Start session</button>
   </div>
 
@@ -128,6 +130,54 @@
   <span class="spacer"></span>
   <span class="muted" id="event-counter">0/0 events</span>
 </footer>
+
+<dialog id="loading-dialog" class="loading-dialog">
+  <div class="loading-inner">
+    <p class="loading-status" id="loading-status">Starting session…</p>
+    <canvas id="dino-canvas" width="560" height="152"></canvas>
+  </div>
+</dialog>
+
+<dialog id="ocean-dialog" class="settings-dialog">
+  <form method="dialog">
+    <header class="settings-header">
+      <h2>OCEAN Personality</h2>
+      <button id="ocean-close" class="ctrl" type="button" title="Close">×</button>
+    </header>
+    <p class="muted settings-hint">Sliders initialise to the selected NPC's baseline. Adjust any trait before starting — changes are applied at session start.</p>
+    <div class="ocean-sliders-panel">
+      <div class="ocean-slider-row">
+        <label for="slider-O"><span class="trait-key">O</span> Openness</label>
+        <input type="range" id="slider-O" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-O">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-C"><span class="trait-key">C</span> Conscientiousness</label>
+        <input type="range" id="slider-C" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-C">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-E"><span class="trait-key">E</span> Extraversion</label>
+        <input type="range" id="slider-E" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-E">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-A"><span class="trait-key">A</span> Agreeableness</label>
+        <input type="range" id="slider-A" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-A">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-N"><span class="trait-key">N</span> Neuroticism</label>
+        <input type="range" id="slider-N" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-N">0.50</span>
+      </div>
+    </div>
+    <div class="settings-actions">
+      <button id="ocean-reset" class="ctrl" type="button">Reset to preset</button>
+      <button id="ocean-done"  class="ctrl primary" type="button">Done</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog id="settings-dialog" class="settings-dialog">
   <form method="dialog">

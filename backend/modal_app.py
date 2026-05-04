@@ -103,6 +103,7 @@ _RATE: dict[str, list[float]] = {}
 class StartReq(BaseModel):
     npc_id: str
     gemini_key: Optional[str] = None
+    ocean: Optional[dict] = None  # {"O": 0.0–1.0, "C": ..., "E": ..., "A": ..., "N": ...}
 
 
 class TurnReq(BaseModel):
@@ -267,6 +268,17 @@ async def start(body: StartReq, request: Request, x_gemini_key: Optional[str] = 
     data_dir_root = _make_data_dir(session_id, body.npc_id)
 
     config = get_preset(body.npc_id)
+
+    if body.ocean:
+        for trait in ('O', 'C', 'E', 'A', 'N'):
+            if trait in body.ocean:
+                try:
+                    val = float(body.ocean[trait])
+                except (TypeError, ValueError):
+                    raise HTTPException(400, f"ocean.{trait} must be a number")
+                if not 0.0 <= val <= 1.0:
+                    raise HTTPException(400, f"ocean.{trait} must be in [0, 1]")
+                setattr(config.profile, trait, round(val, 3))
 
     # Run agent construction OUTSIDE the live event bus — backstory init can
     # emit dozens of memory_added events that would otherwise race the SSE

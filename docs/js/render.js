@@ -55,6 +55,88 @@ export function initRadar(canvas) {
       },
     },
   });
+  wireRadarDrag(canvas);
+}
+
+let _radarInteractCallback = null;
+
+export function setRadarInteractCallback(fn) {
+  _radarInteractCallback = fn;
+}
+
+function wireRadarDrag(canvas) {
+  const TRAIT_COUNT = 5;
+  let dragging = false;
+  let activeIdx = -1;
+
+  function spokeAngle(i) {
+    return (2 * Math.PI * i / TRAIT_COUNT) - Math.PI / 2;
+  }
+
+  function nearestSpoke(angle) {
+    let best = -1, bestDist = Infinity;
+    for (let i = 0; i < TRAIT_COUNT; i++) {
+      let a = spokeAngle(i);
+      let diff = Math.abs(((angle - a + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+      if (diff < bestDist) { bestDist = diff; best = i; }
+    }
+    return bestDist < Math.PI / TRAIT_COUNT ? best : -1;
+  }
+
+  function valFromPos(x, y, idx) {
+    const scale = radarChart?.scales?.r;
+    if (!scale) return null;
+    const angle = spokeAngle(idx);
+    const dx = x - scale.xCenter, dy = y - scale.yCenter;
+    const proj = dx * Math.cos(angle) + dy * Math.sin(angle);
+    return Math.max(0, Math.min(1, proj / scale.drawingArea));
+  }
+
+  function clientXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  }
+
+  function startDrag(e) {
+    const scale = radarChart?.scales?.r;
+    if (!scale) return;
+    const { x, y } = clientXY(e);
+    const angle = Math.atan2(y - scale.yCenter, x - scale.xCenter);
+    const idx = nearestSpoke(angle);
+    if (idx === -1) return;
+    dragging = true;
+    activeIdx = idx;
+    updateVal(x, y);
+    e.preventDefault();
+  }
+
+  function moveDrag(e) {
+    if (!dragging) return;
+    const { x, y } = clientXY(e);
+    updateVal(x, y);
+    e.preventDefault();
+  }
+
+  function endDrag() { dragging = false; activeIdx = -1; }
+
+  function updateVal(x, y) {
+    if (activeIdx === -1 || !radarChart) return;
+    const val = valFromPos(x, y, activeIdx);
+    if (val === null) return;
+    radarChart.data.datasets[1].data[activeIdx] = val;
+    radarChart.update('none');
+    if (_radarInteractCallback) _radarInteractCallback(TRAITS[activeIdx], val);
+  }
+
+  canvas.style.cursor = 'crosshair';
+  canvas.addEventListener('mousedown',  startDrag);
+  canvas.addEventListener('mousemove',  moveDrag);
+  canvas.addEventListener('mouseup',    endDrag);
+  canvas.addEventListener('mouseleave', endDrag);
+  canvas.addEventListener('touchstart', startDrag, { passive: false });
+  canvas.addEventListener('touchmove',  moveDrag,  { passive: false });
+  canvas.addEventListener('touchend',   endDrag);
 }
 
 export function renderRadar(state) {

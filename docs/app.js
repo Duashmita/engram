@@ -64,7 +64,7 @@ async function boot() {
   );
 
   // pick mode from localStorage (default replay)
-  const initial = localStorage.getItem(MODE_KEY) === 'live' ? 'live' : 'replay';
+  const initial = localStorage.getItem(MODE_KEY) === 'replay' ? 'replay' : 'live';
   await switchMode(initial, /*persist=*/false);
 }
 

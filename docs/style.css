@@ -114,15 +114,15 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 .layout-single {
   display: grid;
   grid-template-columns: 300px 1fr 380px;
-  grid-template-rows: 1fr 200px;
+  grid-template-rows: 1fr 260px;
   gap: 10px;
   padding: 10px;
   height: 100%;
 }
 .panel-a { grid-column: 1; grid-row: 1; }
-.panel-b { grid-column: 2; grid-row: 1; }
+.panel-b { grid-column: 1 / span 2; grid-row: 2; }
 .panel-c { grid-column: 3; grid-row: 1 / span 2; }
-.panel-d { grid-column: 1 / span 2; grid-row: 2; }
+.panel-d { grid-column: 2; grid-row: 1; }
 
 .panel {
   background: var(--surface);
@@ -526,13 +526,22 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   border: 1px solid var(--border); border-radius: var(--r-md);
   padding: 5px 10px; font-size: 12px; min-width: 180px;
 }
-#live-start {
+#live-start, #btn-ocean {
   width: auto;
   padding: 0 12px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.3px;
 }
+#live-start:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ---------- OCEAN slider dialog ---------- */
+.ocean-sliders-panel { display: flex; flex-direction: column; gap: 10px; }
+.ocean-slider-row { display: flex; align-items: center; gap: 10px; }
+.ocean-slider-row label { width: 145px; font-size: 12px; color: var(--text); flex: 0 0 auto; }
+.ocean-slider-row label .trait-key { font-weight: 700; color: var(--accent); margin-right: 5px; }
+.ocean-slider-row input[type=range] { flex: 1; accent-color: var(--accent); cursor: pointer; }
+.ocean-slider-row .slider-val { width: 36px; font-size: 12px; color: var(--muted); font-family: var(--mono, monospace); text-align: right; flex: 0 0 auto; }
 
 /* ---------- composer (panel D footer) ---------- */
 .composer {
@@ -596,6 +605,34 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 .composer textarea:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ---------- loading dialog (dino game) ---------- */
+.loading-dialog {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  padding: 20px 24px 18px;
+  box-shadow: 0 16px 56px rgba(0,0,0,0.6);
+}
+.loading-dialog::backdrop {
+  background: rgba(5, 8, 14, 0.75);
+  backdrop-filter: blur(3px);
+}
+.loading-inner { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.loading-status {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+#dino-canvas {
+  display: block;
+  border-radius: var(--r-md);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
 }
 
 /* ---------- settings dialog ---------- */

@@ -14,15 +14,17 @@
 
 import { BACKEND_URL } from '../config.js';
 import { freshState } from './state.js';
+import { setRadarInteractCallback } from './render.js';
+import { DinoGame } from './dino.js';
 
-// NPC presets shown in the picker. Names come from the existing personas.
+// NPC presets shown in the picker. ocean values mirror presets.py.
 const NPC_PRESETS = [
-  { id: 'jeanie',   name: 'Jeanie' },
-  { id: 'guard',    name: 'Paranoid Guard' },
-  { id: 'merchant', name: 'Friendly Merchant' },
-  { id: 'clerk',    name: 'Rigid Clerk' },
-  { id: 'maya',     name: 'Maya' },
-  { id: 'hale',     name: 'Hale' },
+  { id: 'jeanie',   name: 'Jeanie',           ocean: { O: 0.65, C: 0.85, E: 0.40, A: 0.65, N: 0.85 } },
+  { id: 'guard',    name: 'Paranoid Guard',    ocean: { O: 0.20, C: 0.50, E: 0.30, A: 0.20, N: 0.90 } },
+  { id: 'merchant', name: 'Friendly Merchant', ocean: { O: 0.50, C: 0.50, E: 0.90, A: 0.80, N: 0.20 } },
+  { id: 'clerk',    name: 'Rigid Clerk',       ocean: { O: 0.10, C: 0.90, E: 0.30, A: 0.50, N: 0.40 } },
+  { id: 'maya',     name: 'Maya',              ocean: { O: 0.90, C: 0.20, E: 0.85, A: 0.80, N: 0.40 } },
+  { id: 'hale',     name: 'Inspector Hale',    ocean: { O: 0.40, C: 0.85, E: 0.30, A: 0.20, N: 0.25 } },
 ];
 
 // Module-local state ----------------------------------------------------------
@@ -34,6 +36,9 @@ let currentSessionId = null;
 let npcId            = null;
 let inFlight         = false; // one /turn at a time
 let beaconInstalled  = false;
+// Pending OCEAN overrides. null = use preset baseline; set when user edits sliders.
+let pendingOcean     = null;
+let dinoGame         = null;
 
 // LocalStorage keys
 const LS_SESSION = 'engram_live_session_id';
@@ -56,6 +61,21 @@ export function enterLive({ stateRef: sRef, applyFn: aFn, renderFn: rFn }) {
   wireComposer();
   wireStartButton();
   wireSettingsDialog();
+  wireOceanDialog();
+
+  // Sync radar drag → sliders
+  setRadarInteractCallback((trait, val) => {
+    const slider = document.getElementById(`slider-${trait}`);
+    const label  = document.getElementById(`val-${trait}`);
+    if (slider) slider.value = Math.round(val * 100);
+    if (label)  label.textContent = val.toFixed(2);
+    pendingOcean = readSliders();
+  });
+
+  // Auto-show OCEAN dialog when no session is active so users set personality first
+  if (!currentSessionId) {
+    setTimeout(() => document.getElementById('ocean-dialog')?.showModal(), 80);
+  }
 
   // Try to resume a previous session if one was persisted.
   const savedSession = localStorage.getItem(LS_SESSION);
@@ -98,6 +118,13 @@ function showLiveUI() {
         opt.textContent = p.name;
         sel.appendChild(opt);
       }
+      // Reset slider values to first preset's baseline
+      resetSlidersToPreset(NPC_PRESETS[0].id);
+      // On NPC change, reset sliders to that preset's baseline
+      sel.addEventListener('change', () => {
+        pendingOcean = null;
+        resetSlidersToPreset(sel.value);
+      });
     }
   }
 
@@ -132,6 +159,33 @@ function wireStartButton() {
   btn.addEventListener('click', startSession);
 }
 
+function setStartLoading(loading, statusMsg = 'Starting session…') {
+  const btn = document.getElementById('live-start');
+  if (btn) {
+    btn.disabled = loading;
+    btn.textContent = loading ? 'Starting…' : 'Start session';
+  }
+
+  const dlg = document.getElementById('loading-dialog');
+  if (!dlg) return;
+
+  if (loading) {
+    document.getElementById('loading-status').textContent = statusMsg;
+    if (!dinoGame) {
+      dinoGame = new DinoGame(document.getElementById('dino-canvas'));
+    }
+    dinoGame.start();
+    if (!dlg.open) dlg.showModal();
+  } else {
+    const status = document.getElementById('loading-status');
+    if (status) status.textContent = 'Session ready!';
+    setTimeout(() => {
+      if (dlg.open) dlg.close();
+      dinoGame?.stop();
+    }, 700);
+  }
+}
+
 function wireComposer() {
   const send  = document.getElementById('composer-send');
   const input = document.getElementById('composer-input');
@@ -151,6 +205,73 @@ function wireComposer() {
       input.style.height = Math.min(input.scrollHeight, max) + 'px';
     });
   }
+}
+
+function wireOceanDialog() {
+  const openBtn  = document.getElementById('btn-ocean');
+  const dlg      = document.getElementById('ocean-dialog');
+  const doneBtn  = document.getElementById('ocean-done');
+  const resetBtn = document.getElementById('ocean-reset');
+  const closeBtn = document.getElementById('ocean-close');
+  if (!dlg) return;
+
+  if (openBtn && !openBtn._wired) {
+    openBtn._wired = true;
+    openBtn.addEventListener('click', () => dlg.showModal());
+  }
+  // Wire each slider to update its readout and write pendingOcean
+  for (const t of ['O', 'C', 'E', 'A', 'N']) {
+    const slider = document.getElementById(`slider-${t}`);
+    if (slider && !slider._wired) {
+      slider._wired = true;
+      slider.addEventListener('input', () => {
+        document.getElementById(`val-${t}`).textContent = sliderToFloat(slider.value).toFixed(2);
+        pendingOcean = readSliders();
+      });
+    }
+  }
+  if (doneBtn && !doneBtn._wired) {
+    doneBtn._wired = true;
+    doneBtn.addEventListener('click', () => { dlg.close(); startSession(); });
+  }
+  if (resetBtn && !resetBtn._wired) {
+    resetBtn._wired = true;
+    resetBtn.addEventListener('click', () => {
+      const sel = document.getElementById('live-npc-select');
+      pendingOcean = null;
+      resetSlidersToPreset(sel?.value ?? NPC_PRESETS[0].id);
+    });
+  }
+  if (closeBtn && !closeBtn._wired) {
+    closeBtn._wired = true;
+    closeBtn.addEventListener('click', () => dlg.close());
+  }
+}
+
+function sliderToFloat(val) {
+  return Math.round(parseFloat(val)) / 100;
+}
+
+function resetSlidersToPreset(presetId) {
+  const preset = NPC_PRESETS.find(p => p.id === presetId) ?? NPC_PRESETS[0];
+  for (const t of ['O', 'C', 'E', 'A', 'N']) {
+    const slider = document.getElementById(`slider-${t}`);
+    const label  = document.getElementById(`val-${t}`);
+    if (!slider || !label) continue;
+    const v = preset.ocean[t] ?? 0.5;
+    slider.value = Math.round(v * 100);
+    label.textContent = v.toFixed(2);
+  }
+  pendingOcean = null;
+}
+
+function readSliders() {
+  const ocean = {};
+  for (const t of ['O', 'C', 'E', 'A', 'N']) {
+    const slider = document.getElementById(`slider-${t}`);
+    if (slider) ocean[t] = sliderToFloat(slider.value);
+  }
+  return Object.keys(ocean).length === 5 ? ocean : null;
 }
 
 function wireSettingsDialog() {
@@ -218,29 +339,51 @@ async function startSession() {
   const chosen = sel?.value ?? NPC_PRESETS[0].id;
 
   setStatus('starting session…');
+  setStartLoading(true);
   setComposerEnabled(false);
 
   const headers = { 'Content-Type': 'application/json' };
   const key = localStorage.getItem(LS_KEY);
   if (key) headers['X-Gemini-Key'] = key;
-  const body = JSON.stringify({ npc_id: chosen, ...(key ? { gemini_key: key } : {}) });
+
+  const ocean = readSliders();
+  const bodyObj = {
+    npc_id: chosen,
+    ...(key    ? { gemini_key: key } : {}),
+    ...(ocean  ? { ocean }           : {}),
+  };
 
   let res;
   try {
-    res = await fetch(`${BACKEND_URL}/start`, { method: 'POST', headers, body });
+    res = await fetch(`${BACKEND_URL}/start`, { method: 'POST', headers, body: JSON.stringify(bodyObj) });
   } catch (err) {
-    setStatus(`network error starting: ${err.message}`);
+    setStatus(`network error — check your connection (${err.message})`);
+    setStartLoading(false);
     return;
   }
 
   if (res.status === 429) {
     const j = await safeJSON(res);
     setStatus(`rate limited — try again in ${j?.retry_after_s ?? '?'}s`);
+    setStartLoading(false);
     return;
   }
-  if (res.status === 503) { setStatus('server has no API key configured (set yours in Settings)'); return; }
-  if (res.status === 400) { setStatus('unknown NPC preset'); return; }
-  if (!res.ok)            { setStatus(`start failed: ${res.status}`); return; }
+  if (res.status === 503) {
+    setStatus('no API key — paste yours in Settings (⚙)');
+    setStartLoading(false);
+    return;
+  }
+  if (res.status === 400) {
+    const j = await safeJSON(res);
+    setStatus(`bad request: ${j?.detail ?? res.status}`);
+    setStartLoading(false);
+    return;
+  }
+  if (!res.ok) {
+    setStatus(`start failed: ${res.status}`);
+    setStartLoading(false);
+    return;
+  }
 
   const data = await res.json();
   currentSessionId = data.session_id;
@@ -248,11 +391,11 @@ async function startSession() {
   localStorage.setItem(LS_SESSION, currentSessionId);
   localStorage.setItem(LS_NPC,     npcId);
 
-  // Reset state and inject session_init from the header payload.
   stateRef.state = freshState(data.header);
   applyFn(stateRef.state, { t: 0, type: 'session_init', payload: data.header });
   renderFn(stateRef.state);
 
+  setStartLoading(false);
   setStatus(`live with ${data.header?.npc_name ?? npcId} — say something`);
   setComposerEnabled(true);
   document.getElementById('composer-input')?.focus();
