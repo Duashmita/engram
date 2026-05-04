@@ -4,3 +4,7 @@ QUESTIONS.md
 CLAUDE.md
 ARCHITECTURE.md
 refrences/
+.venv/
+.llm_cache/
+__pycache__/
+*.pyc

@@ -59,7 +59,7 @@ class BaselineAgent:
         self,
         config: NPCConfig,
         llm,
-        backstory_memories: list[Memory] | None = None,
+        backstory_memories: list = None,
     ) -> None:
         self.config = config
         self.llm = llm
@@ -169,7 +169,7 @@ def main() -> None:
 
     # ── Build the client stack. ─────────────────────────────────────────────
     # gemini-1.5-flash: 1,500 RPD free tier (vs 20 for gemini-2.5-flash).
-    base_llm = GeminiClient(chat_model="gemini-2.0-flash")
+    base_llm = GeminiClient(chat_model="gemini-2.5-flash-lite")
     llm = CachedGeminiClient(
         base_llm,
         cache_dir=LLM_CACHE_DIR,

@@ -52,7 +52,7 @@ _load_dotenv()
 # gemini-1.5-flash: 1,500 RPD free tier — use for development and eval runs.
 # gemini-2.5-flash: 20 RPD free tier   — use only when quality uplift matters
 #                                         AND you have billing enabled.
-GEMINI_CHAT_MODEL  = "gemini-2.0-flash"
+GEMINI_CHAT_MODEL  = "gemini-2.5-flash-lite"
 GEMINI_EMBED_MODEL = "gemini-embedding-2"
 GEMINI_API_KEY     = os.environ.get("GEMINI_API_KEY", "")
 
