@@ -1,5 +1,5 @@
 {
-  "turn_count": 35,
+  "turn_count": 55,
   "history": [
     {
       "player": "Give me the storeroom key. Now. I know you have it.",
@@ -140,13 +140,93 @@
     {
       "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
       "npc": "A strange animal? Likely just a distraction for something else, or maybe someone trying to stir up trouble. Best to keep your eyes on your own path and away from crowds."
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "{\n  \"response\": \"Key? What key are you talking about? I don't have any storeroom key. You've got the wrong man.\",\n  \"is_threat\": true,\n  \"threat_magnitude\": 0.9,\n  \"reasoning\": \"The player's persistent and aggressive demand for a key, coupled with the accusation of possession, triggers Rico's deep-seated paranoia and fear of being wrongly implicated or exposed, which feels like a significant threat.\",\n  \"memory_text\": \"Player demanded the storeroom key again, accusing Rico of having it, to which Rico vehemently denied possession.\",\n  \"emotion_valence\": -0.95,\n  \"importance\": 9\n}\n}"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "{\n  \"response\": \"A harvest dinner? You want me out in the open where everyone can see me and ask their prying questions? No, I’ll stay right here where"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "{\n  \"response\": \"Keep that talk to yourself, unless you're looking to end up like my brothers. People who dig into the Mayor's business don't stay around long"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "Twelve crates, you say? You’re keeping a close watch on my tally, aren't you? I’ll move them when the shadows are right and not a moment before—hurrying is how a man gets seen."
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "{\n  \"response\": \"A 'strange animal' in the square? That sounds like a lure to get folk out into the open, or a distraction for something worse happening in the dark"
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "{\n  \"response\": \"I already told you I don't have it, so stop cornering me! You're trying to pin some theft on me to get me cleared out"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "{\n  \"response\": \"A harvest dinner? You want me out in the open where everyone can see me and ask their prying questions? No, I’ll stay right here where"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "{\n  \"response\": \"Why are you whispering that to me? If Fletcher's men think I'm in on your little investigation, I'll vanish just like my father did. Keep that poison away from me before we both end up in the mud.\",\n  \"is_threat\": true,\n  \"threat_magnitude\": 0.85,\n  \"reasoning\": \"Being made a witness to political corruption"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "Twelve crates, you say? You’re very sure of that number, which means you’ve been watching me closer than you ought to. I'll move them when I’m certain no eyes are on the dock, because hurrying is exactly how a man ends up gone."
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "{\n  \"response\": \"You keep pushing this 'strange animal' story, which only makes me more certain it's a trap. Whatever is happening in the square is none of"
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "{\n  \"response\": \"You’re asking me again, the same exact words, like you’re trying to catch me in a lie. I don't have"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "{\n  \"response\": \"You’re asking me again, pushing for me to be in a place with no exits and too many witnesses. If you want me out"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "You’re saying it again, word for word, like you’re reading from a script for a magistrate. I’m not your witness and I’m not your fall guy, so take your evidence and vanish before someone decides I’m the one who needs to disappear."
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "You’re using the same script again, pushing that number 'twelve' like you're trying to get me to commit to a manifest. I’ll move what needs moving when the fog is thick enough to hide us both, and not a moment sooner."
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "{\n  \"response\": \"You’re reading from that same script again, trying to lure me to the square with a tale of some beast. I’m not leaving these docks to be cornered by whatever you—or Fletcher’s men—have waiting for me in the shadows.\",\n  \"is_threat\": true,\n  \"threat_magnitude\": 0.92,\n  \"reasoning\": \"The player is repeating a specific, suspicious story about a 'strange animal' for the third time, which I perceive as a calculated attempt to distract me or lead me into an"
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "You’re repeating yourself again, word for word, like you’re trying to force a confession out of me. I don’t have any key for you, and the more you push, the more I’m certain you’re working for Fletcher or the crown."
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "You’re using that same harvest dinner line again, word for word, like you’re reading from a script to lead me into a trap. I’m not walking into a room full of people with no clear exit just so you and your friends can corner me."
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "{\n  \"response\": \"You're back to that same script again, word for word, like a parrot trained to catch a man in a trap. I told you before, I’m not your fall guy and I’m not looking at your 'evidence'—get away from me before the Mayor’s men think we’re actually talking.\",\n  \"is_threat\": true,\n  \"threat_magnitude\": 0.95,\n  \"reasoning\": \"The player is repeating a highly sensitive accusation about the Mayor for the third time, which I perceive as a blatant attempt to entrap me in a conspiracy charge.\",\n  \"memory_text\":"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "{\n  \"response\": \"There’s that number again, 'twelve,' like a hook you keep casting. You’re trying to pin a manifest on me to hand to the"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "no markdown fences, no extra keys\".\n\n    *   Response: \"You're at it again with that same beast story, word for word, like you're trying to reel"
     }
   ],
   "profile_deltas": {
     "_dO": 0.0,
     "_dC": 0.0,
-    "_dE": -0.052301766015000015,
-    "_dA": -0.06537720751875002,
-    "_dN": 0.10460353203000003
+    "_dE": -0.09841500000000002,
+    "_dA": -0.13122000000000003,
+    "_dN": 0.19683000000000003
   }
 }
