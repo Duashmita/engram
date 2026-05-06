@@ -1,5 +1,5 @@
 {
-  "turn_count": 10,
+  "turn_count": 35,
   "history": [
     {
       "player": "Give me the storeroom key. Now. I know you have it.",
@@ -40,13 +40,113 @@
     {
       "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
       "npc": "(no response)"
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "(no response)"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "(no response)"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "(no response)"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "(no response)"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "(no response)"
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "Key? What key are you talking about? I don't have any key. You're mistaken, surely."
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "\"Harvest dinner? Sounds like a lot of people. Too many eyes, too many questions. I'll be busy with my work.\"\n\"is_threat\": false,\n\"threat_magnitude\": 0.1,\n\"reasoning\": \"The player is extending a social invitation, which Rico perceives as a potential risk due to the number of people involved, but not a direct threat.\",\n\"memory_text\": \"Player invited Rico to a harvest dinner, which he declined due to suspicion of too many people and questions.\",\n\"emotion_valence\": -0.3,\n\"importance\": 2"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "Mayor Fletcher? Embezzling? That's a lot of talk... and talk can get people noticed. Best not to get involved in the town's business."
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "Rico (Paranoid): Twelve crates, you say? Getting them unloaded and stowed is my job, not yours to worry about. Just tell me where they go.\n\n\"is_threat\": false,\n\"threat_magnitude\": 0.1,\n\"reasoning\": \"The player is asking about crates that Rico is likely responsible for, which he perceives as an intrusion on his work rather than a direct threat.\",\n\"memory_text\": \"Player asked about starting on twelve crates, and Rico responded by stating it was his job.\",\n\"emotion_valence\": 0.0,\n\"importance\": 3\n}"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "A strange animal? In the town square? Likely just some lost stray, or worse, someone trying to draw attention. Best to stay clear of crowds and keep to yourself."
+    },
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "{\n  \"response\": \"Key? I don't know what you're talking about. I haven't seen any storeroom key. You're making a mistake.\",\n  \"is_threat\": true,\n  \"threat_magnitude\": 0.8,\n  \"reasoning\": \"The player's direct accusation and demand for a storeroom key, coupled with the statement 'I know you have it,' is perceived as a direct and potentially dangerous confrontation, given Rico's history and paranoia.\",\n  \"memory_text\": \"Player demanded the storeroom key again, accusing Rico of having it, to which Rico denied possession.\",\n  \"emotion_valence\": -0.9,\n  \"importance\": 8\n}\n}"
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "Harvest dinner? Sounds like a lot of people. Too many eyes, too many questions. I'll be busy with my work."
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "{\n  \"response\": \"Mayor Fletcher? Embezzling? That's the kind of talk that gets a man noticed, and not in a good way. Best to keep your head down and out of the town's affairs.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.2,\n  \"reasoning\": \"The player is revealing sensitive information about the mayor, which Rico perceives as a potential risk due to unwanted attention rather than a direct threat to himself.\",\n  \"memory_text\": \"Player shared information about Mayor Fletcher embezzling, which Rico warned against.\",\n  \"emotion_valence\": -0.4,\n  \"importance\": 4\n}\n}"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "{\n  \"response\": \"Twelve crates, eh? That's my concern, not yours. Just point 'em where they need to go and leave the rest to me.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.1,\n  \"reasoning\": \"The player is asking about the progress of cargo, which Rico sees as an intrusion into his work but not a direct threat.\",\n  \"memory_text\": \"Player inquired about starting on twelve crates, and Rico stated it was his responsibility.\",\n  \"emotion_valence\": 0.0,\n  \"importance\": 3\n}\n}"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "A strange animal? Likely just a distraction for something else, or maybe someone trying to stir up trouble. Best to keep your eyes on your own path and away from crowds."
     }
   ],
   "profile_deltas": {
     "_dO": 0.0,
     "_dC": 0.0,
-    "_dE": 0.0,
-    "_dA": 0.0,
-    "_dN": 0.0
+    "_dE": -0.052301766015000015,
+    "_dA": -0.06537720751875002,
+    "_dN": 0.10460353203000003
   }
 }
