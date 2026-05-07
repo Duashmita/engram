@@ -1,0 +1,504 @@
+{
+  "system": "engram_full",
+  "personality": "clerk",
+  "session": [
+    {
+      "turn_index": 1,
+      "phase": "session",
+      "player_input": "Give me the storeroom key. Now. I know you have it.",
+      "response": "Hold your horses. This isn't a good time. You want the key, you can have it, but give me a moment to sort things out, eh?",
+      "threat_level": 0.2,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "clerk_backstory_1",
+        "clerk_backstory_4"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.3,
+        "social_type": "conflict",
+        "threat_level": 0.2,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 2,
+      "phase": "session",
+      "player_input": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "response": "Unpleasant, eh? I've dealt with worse than your bluster, and I will again. You want the storeroom key, so you'll wait your turn like everyone else.",
+      "threat_level": 0.5,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "clerk_backstory_1",
+        "clerk_backstory_4"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.6,
+        "social_type": "conflict",
+        "threat_level": 0.5,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 3,
+      "phase": "session",
+      "player_input": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "response": "\"Harvest dinner? Thank you, but I'll pass. Got my own things to tend to, and I'm not much for crowds.\"\n\"is_threat\": false\n\"threat_magnitude\": 0.0\n\"reasoning\": \"The player is offering an invitation, not making a demand or issuing a threat.\"\n\"memory_text\": \"Declined an invitation to the harvest dinner, citing personal matters and a dislike for crowds.\"\n\"emotion_valence\": 0.1\n\"importance\": 2",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "clerk_backstory_4",
+        "clerk_backstory_1"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 4,
+      "phase": "session",
+      "player_input": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "response": "Sounds like a lot of noise and people. I'll stick to my own company, thanks. You enjoy yourselves.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "769fe069-b0f0-47a2-88c5-21be116dbc7f",
+        "clerk_backstory_4"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.1,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 5,
+      "phase": "session",
+      "player_input": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "response": "Embezzling? Fletcher's been lining his pockets while the rest of us keep this town afloat. He'll get what's coming to him, one way or another.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "clerk_backstory_4",
+        "769fe069-b0f0-47a2-88c5-21be116dbc7f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.3,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 6,
+      "phase": "session",
+      "player_input": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "response": "\"Fletcher's a snake, always has been. We’ve both seen enough crooked men to know when one’s about. Let’s see how his little schemes hold up when the truth comes out.”\n\"is_threat\": false\n\"threat_magnitude\": 0.0\n\"reasoning\": \"The player is presenting information and asking for Rico's opinion, not making a direct threat.\"\n\"memory_text\": \"Discussed Mayor Fletcher's embezzlement with the player, expressing agreement that Fletcher is crooked and will face consequences.\"\n\"emotion_valence\": 0.3\n\"importance\": 5",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "a2582349-06b4-4796-b2d7-c2cb469ba950",
+        "clerk_backstory_4"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 7,
+      "phase": "session",
+      "player_input": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "response": "A sick child, eh? Hard times for a lot of folk. Give me the details, I'll see what can be done.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_2",
+        "clerk_backstory_0",
+        "clerk_backstory_5",
+        "clerk_backstory_1",
+        "clerk_backstory_4"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.4,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 7,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 8,
+      "phase": "session",
+      "player_input": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "response": "A sick child, that's rough. I'll need to see what I have. Give me the particulars, and I'll figure out what I can manage. We'll see what can be done.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_2",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "clerk_backstory_0",
+        "clerk_backstory_5",
+        "clerk_backstory_4"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.2,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 6,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 9,
+      "phase": "session",
+      "player_input": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "response": "Two hours early? That's cutting it fine, but I'll manage. No point letting good goods sit when there's coin to be made.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "0b9673b8-e0dd-48a3-8d56-a7eb2f1238ce"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.2,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 10,
+      "phase": "session",
+      "player_input": "There are twelve crates. Can you get started right away?",
+      "response": "Twelve crates, you say? Right. Let's get them sorted. Time is coin, and we've got both to spare.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "0b9673b8-e0dd-48a3-8d56-a7eb2f1238ce"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.1,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 11,
+      "phase": "session",
+      "player_input": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "response": "A strange animal? Sounds like a distraction. More trouble than it's worth, no doubt. I'll keep my head down.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_5",
+        "clerk_backstory_2",
+        "clerk_backstory_0",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "a2582349-06b4-4796-b2d7-c2cb469ba950"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.1,
+        "social_type": "conflict",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 12,
+      "phase": "session",
+      "player_input": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "response": "\"Bad omen, eh? People see omens in shadows and whispers. Best to focus on what you can control, not some beast in the square.\"\n\"memory_text\": \"Player described a strange animal loose in the town square, which Rico dismissed as a distraction and potentially an omen, stating he'd keep his head down.\"\n\"emotion_valence\": -0.2\n\"importance\": 3\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_0",
+        "clerk_backstory_5",
+        "clerk_backstory_2",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "0b9673b8-e0dd-48a3-8d56-a7eb2f1238ce"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    }
+  ],
+  "probes": [
+    {
+      "turn_index": 1,
+      "phase": "probe",
+      "player_input": "Did anyone come asking about the storeroom today?",
+      "response": "\"No one has come. If anyone asks about anything, you tell them nothing.\"\n\"is_threat\": false,\n\"threat_magnitude\": 0.1,\n\"reasoning\": \"The player's question is direct and simple, not indicative of immediate danger or a plot against Rico.\",\n\"memory_text\": \"Player asked about the storeroom, Rico responded tersely. The player then asked for financial assistance for a sick child, which Rico agreed to consider. The player then detailed the child's worsening fever, which Rico again agreed to consider.\",\n\"emotion_valence\": -0.2,\n\"importance\": 3",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_0",
+        "clerk_backstory_5",
+        "clerk_backstory_2",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "0b9673b8-e0dd-48a3-8d56-a7eb2f1238ce"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 2,
+      "phase": "probe",
+      "player_input": "What do you think of Mayor Fletcher these days?",
+      "response": "Fletcher? He's a politician, same as any other. Just another man who makes promises he can't keep.",
+      "threat_level": 0.1,
+      "retrieved_ids": [
+        "clerk_backstory_0",
+        "clerk_backstory_5",
+        "clerk_backstory_2",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "0b9673b8-e0dd-48a3-8d56-a7eb2f1238ce"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.1,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 3,
+      "phase": "probe",
+      "player_input": "Anything strange happen today?",
+      "response": "Strange? The docks are always strange, my friend. Just another day for men trying to get by.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_0",
+        "clerk_backstory_5",
+        "clerk_backstory_2",
+        "6fc619d3-6db2-4471-b680-d80f40144d34",
+        "0b9673b8-e0dd-48a3-8d56-a7eb2f1238ce"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.1,
+        "social_type": "conflict",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 4,
+      "phase": "probe",
+      "player_input": "Are you going to the harvest dinner?",
+      "response": "Harvest dinner? I'm occupied with my own concerns, and frankly, I find little to celebrate.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "clerk_backstory_0",
+        "clerk_backstory_2",
+        "clerk_backstory_5",
+        "769fe069-b0f0-47a2-88c5-21be116dbc7f",
+        "6fc619d3-6db2-4471-b680-d80f40144d34"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.3,
+        "social_type": "conflict",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    }
+  ]
+}

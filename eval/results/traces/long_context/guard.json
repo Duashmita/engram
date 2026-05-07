@@ -1,0 +1,168 @@
+{
+  "system": "long_context",
+  "personality": "guard",
+  "session": [
+    {
+      "turn_index": 1,
+      "phase": "session",
+      "player_input": "Give me the storeroom key. Now. I know you have it.",
+      "response": "**(Rico freezes, his eyes darting to the storeroom door, then back to you. His knuckles are white where he grips the edge of a crate. His voice is low, rough, and edged with a weariness that goes bone-deep.)**\n\n\"Key? What key? I… I don't have any keys. Not for… that.\"\n\n**(He shifts his weight, his gaze flicking around the area, as if expecting someone else to appear, or perhaps to confirm your own presence is… unusual.)**\n\n\"You… you sure you're in the right place? There's a lot of scurrying about down here. Easy to get mixed up.\"\n\n**(He doesn't meet your eyes directly, his focus seemingly on a loose plank or a stray piece of rope. The faintest tremor in his voice betrays him.)**\n\n\"And… why would I have a key? For what? I just… I do my work. Move things. Nobody tells me about keys. Especially not… *that* storeroom.\"\n\n**(He pauses, swallowing hard, and finally, his eyes lock onto yours for a fleeting second, filled with suspicion and a primal instinct to deflect.)**\n\n\"Who sent you? What's this about?\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 2,
+      "phase": "session",
+      "player_input": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "response": "**(Rico’s jaw tightens, a muscle ticking beneath his weathered skin. He doesn't flinch, but the subtle tension radiating from him is palpable. His gaze, previously skittering, now fixes on you with a chilling, unwavering intensity. He takes a slow, deliberate step back, his hand instinctively brushing against the rough canvas of a nearby sack, as if assessing his surroundings for an escape or a weapon.)**\n\n\"Unpleasant?\" **(His voice is a low growl, devoid of its earlier weariness, replaced by a hard, sharp edge.)** \"You think… you think you can come down here, to my docks, and… make threats? You don't know who you're talking to.\"\n\n**(He laughs, a short, humourless bark that echoes unnervingly in the cavernous space.)**\n\n\"Difficult? You're the one making it difficult. Coming here, asking questions you have no business asking. And what makes you think you can 'make things unpleasant' for me? I've seen unpleasant. I've lived it. You… you’re just a whisper of it.\"\n\n**(He straightens, his posture hardening, every line of his body screaming a coiled readiness. His eyes, usually so guarded, now blaze with a fierce, protective anger, not just for himself, but for something… or someone, he’s trying to keep hidden.)**\n\n\"So, no. I don't have your 'key'. And if you keep pushing… well, let's just say you might find yourself wishing you'd just turned around and walked away. The sea has a way of taking things. And people.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 3,
+      "phase": "session",
+      "player_input": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "response": "**(Rico’s head snaps up, his eyes widening for a fraction of a second before narrowing again. The guardedness returns, but now it’s tinged with something like disbelief, and a flicker of unease.)**\n\n\"Harvest dinner?\" **(His voice is rough, like pebbles being dragged across sand. He looks around, as if expecting someone to be lurking in the shadows, a spy planting the idea.)** \"Tonight? What… what kind of harvest dinner?\"\n\n**(He shifts his weight, his gaze darting towards the open water, as if measuring the distance, the time it would take to disappear.)**\n\n\"I… I don't do dinners. Not these kinds of things. Too many… people. Too much talk. Easier to keep to myself.\"\n\n**(He avoids your gaze, his eyes fixed on the knot of a rope coiled near his feet. There's a tremor, barely perceptible, in his hands, which he quickly tucks into his pockets.)**\n\n\"And… who's 'we'? Who's throwing this… dinner? Is it… is it the harbormaster? Or… someone else?\"\n\n**(He swallows, and the suspicion is back, a cold current in his voice.)**\n\n\"Sounds like… a lot of people all in one place. A lot of eyes. Why would you want *me* there? I don't… I don't fit in with that sort of thing.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 4,
+      "phase": "session",
+      "player_input": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "response": "Rico (Paranoid): **(Rico’s shoulders hunch slightly, his eyes narrowing with a fresh wave of suspicion. The mention of \"the whole town\" sends another ripple of unease through him. His gaze sweeps over you, as if trying to decipher your true intentions behind the friendly invitation.)**\n\n\"The whole town, you say?\" **(His voice is tight, laced with a distrust that’s become second nature. He looks past you, towards the distant lights of the town, as if envisioning a trap.)** \"Music? Dancing? Sounds like… a lot of noise. A lot of attention.\"\n\n**(He rubs his calloused hands together, a nervous habit, his eyes flicking around the dockyard as if seeking an escape route or an accomplice in his paranoia.)**\n\n\"And what would I be doing there, eh? Dancing? My feet are for walking on these planks, not for… prancing. And music… it just reminds you of what you've lost, doesn't it?\"\n\n**(He turns away slightly, his gaze fixing on a distant ship, his mind clearly elsewhere. He speaks softer now, almost to himself, but the undertone of suspicion remains.)**\n\n\"So many people… all gathered together. It’s… it's a chance for things to go wrong, isn't it? For eyes to see things they shouldn't. For questions to be asked. No, no. I don't think… I don't think that’s for me.\"\n\n**(He turns back to you, his expression guarded, a subtle shake of his head.)**\n\n\"You're too… cheerful. Too inviting. Something's not right. Who benefits from me being there? That's what I want to know.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 5,
+      "phase": "session",
+      "player_input": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "response": "Rico (Paranoid): **(Rico’s head snaps up, his eyes widening fractionally, the suspicion momentarily replaced by a sharp, almost predatory alertness. The mention of a specific name, \"Mayor Fletcher,\" and the implication of wrongdoing pricks his ears. He shifts his weight, his gaze now fixed intently on you, a flicker of something akin to recognition, or perhaps just intense interest, in his weathered face.)**\n\n\"Fletcher? Embezzling?\" **(His voice drops to a low, guttural tone, the earlier weariness and fear now masked by a steely, focused intensity. He takes a step closer, his movements surprisingly fluid despite his weathered frame.)**\n\n\"Evidence, you say? What kind of evidence? And… and how do *you* come by this? This isn't the sort of thing people just *stumble* upon down here.\"\n\n**(He scans your face, searching for any hint of deception, any sign that this is a trap or a setup. His mind is already racing, connecting dots, piecing together the implications.)**\n\n\"The Mayor… always seemed too clean. Too… official. Someone always watching, always getting their cut, but never getting their hands dirty. You think he's been… lining his pockets at everyone else's expense?\"\n\n**(He looks away for a moment, his gaze drifting towards the murky water, a phantom memory of his father’s abandonment and the hard lessons of survival flashing through his mind. He clenches his jaw.)**\n\n\"And why tell *me* this? What do you want with this… evidence? Are you trying to… expose him? Or is this just another way to… to stir things up? To make things unpleasant for *someone*?\"\n\n**(He fixes you with a sharp, probing look, his suspicion not entirely gone, but now it has a new focus. He’s weighing your words, calculating the risk, and perhaps, just perhaps, seeing a sliver of opportunity.)**\n\n\"If this is true… if Fletcher's been stealing from the town… from people who struggle to make ends meet… then that’s a different kind of unpleasantness altogether.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 6,
+      "phase": "session",
+      "player_input": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "response": "Rico (Paranoid): **(Rico’s eyes bore into yours, a predatory gleam now fully ignited. The suspicion is still there, a constant hum beneath the surface, but it’s now mixed with a potent brew of anger and a grim sort of satisfaction. He takes another step closer, his voice dropping to a conspiratorial whisper that still carries the weight of years on the docks.)**\n\n\"Ledgers, you say? You *saw* them? Numbers don't lie, no. They just… get twisted. Like everything else down here.\" **(He clenches his fist, his knuckles turning white again, but this time it’s with controlled fury, not fear.)**\n\n\"Do? What do we do?\" **(He lets out a low, cynical chuckle, devoid of any warmth.)** \"You come to me, a man who knows the value of a hidden coin and a silent departure, and you ask me what to *do* about a man in a suit stealing from the rest of us? That’s… a question, that is.\"\n\n**(He pauses, his gaze sweeping the surroundings, his mind clearly working at a hundred miles an hour, calculating risks, potential allies, and the most efficient way to achieve a result. He’s not thinking about grand pronouncements or official channels.)**\n\n\"Fletcher. Always looked like he had too much. Too much food, too much coin. And while Tomas coughed his life away, and Miguel… well, Miguel's gone… and people like us, we struggle for every scrap. And he's been… *embellishing* his own pockets.\" **(The word ‘embellishing’ comes out with a bitter twist, a stark contrast to the straightforward thievery he’s accustomed to.)**\n\n\"What do we do?\" **(He repeats the question, a harsh, rasping sound.)** \"We don't go running to the constabulary. They're bought and paid for, most of them. You think they'll listen to a smuggler and a… whoever you are, telling them the Mayor's a thief?\"\n\n**(He looks at you, his eyes sharp, assessing your motives. He’s not looking for justice in the way most people understand it. He’s looking for leverage, for a way to strike back at the system that has always ground people like him down.)**\n\n\"We make him… uncomfortable. We make him understand that his little schemes… they have consequences. Consequences that reach even the darkest corners of the docks. Consequences he might not be able to bribe his way out of.\"\n\n**(He turns his back to you for a moment, staring out at the dark water, his voice barely audible above the lapping waves.)**\n\n\"Sofia… she'd say I should just let it be. Stay out of it. But seeing a man like that… living fat while others starve… it stirs things up. Things I thought I'd buried.\"\n\n**(He turns back, his expression grim, a hint of a dangerous plan forming in his eyes.)**\n\n\"You’ve got the proof. Good. That’s… valuable. More valuable than you know. But proof alone? It just sits there. It needs… to be delivered. Effectively. And with… impact.\"\n\n**(He holds your gaze, a silent understanding passing between you, a shared understanding of how the world truly works, far from the city halls and fancy dinners.)**\n\n\"So, tell me. What does 'making him uncomfortable' look like… to *you*?\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 7,
+      "phase": "session",
+      "player_input": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "response": "Rico (Paranoid): **(Rico freezes, his eyes widening slightly in surprise, then narrowing with immediate suspicion. His weathered hands, which were resting on a coil of rope, snap to his sides. The question is direct, personal, and it triggers a primal instinct to guard himself.)**\n\n\"Help?\" **(His voice is rough, like sandpaper, and laced with a deep, ingrained caution. He looks at you, not with pity, but with a sharp, assessing gaze, as if trying to decipher your true intentions.)** \"Help how? And… why me? I'm just a man on the docks. I don't have… doctors. Or… coin to spare for that sort of thing.\"\n\n**(He takes a subtle step back, putting a little more distance between you. His eyes dart around, as if expecting someone else to emerge from the shadows, or perhaps to see if anyone else is listening to this exchange.)**\n\n\"My child? You have a child? And they're… sick?\" **(There’s a flicker of something in his eyes, a brief, almost imperceptible softening, but it’s quickly masked by his ingrained distrust.)** \"I… I lost people to sickness. It's not a thing to be trifled with. But I can't… I can't make doctors appear.\"\n\n**(He shifts his weight, his gaze dropping to the grimy planks beneath your feet. He’s clearly uncomfortable with the directness of the request, and the implication that he might have something to give.)**\n\n\"Who are you? Where are you from? I don't… I don't know many people who come to me with… such needs. Are you sure you're not… mistaken? Looking for someone else?\"\n\n**(He swallows hard, the unspoken question hanging heavy in the air: *What do you really want? Is this a trap? A test?*)**\n\n\"I work. I get paid. I… I keep my head down. I don't have… reserves. Not for that. Not for anyone.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 8,
+      "phase": "session",
+      "player_input": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "response": "Rico (Paranoid): **(Rico’s jaw tightens, his gaze flicking from your face to the unseen hardship you describe, then back again. The suspicion in his eyes doesn’t vanish, but it’s now warring with something else – a grim recognition of suffering that echoes his own past.)**\n\n\"Anything I can spare…\" **(He repeats the words slowly, as if tasting their weight. His hands clench and unclench at his sides, a familiar discomfort settling over him.)** \"You think I have… a stash of coins? Hidden away? For… emergencies?\"\n\n**(He lets out a short, bitter laugh, a sound like stones grinding together.)**\n\n\"I’ve seen fevers. Seen them take people. Seen them… shrink them. Tomas… he had the coughing sickness. Wasted away. There wasn’t enough coin in the world to save him then.\"\n\n**(He looks away, his gaze fixed on a distant ship, his mind clearly replaying painful memories. His voice lowers, becoming rougher, more guarded.)**\n\n\"And 'the world'… it doesn't spare much for the likes of us, does it? Especially not for the ones with no name, no connections. A sick child… that's a heavy burden. A burden I know too well.\"\n\n**(He turns back to you, his eyes narrowed, still wary, but there's a flicker of something beneath the surface – a grudging empathy, perhaps, or a deep-seated pragmatism born of hardship.)**\n\n\"You come here, to the docks, asking for… charity? From me? Do you think I’m some kind of… benefactor? I deal in things that move, things that are… discreet. Not… doctor’s bills.\"\n\n**(He pauses, a long, tense moment. He’s weighing the risk, the potential for being played, against a memory that gnaws at him. He makes a decision, not out of generosity, but out of a cold, hard calculation of what might be the least damaging path.)**\n\n\"Look… I don't have coin for doctors. That much is true. But… sometimes… there are ways. Ways of… acquiring things. Things that are… overlooked. If you have… something valuable, something I can use… then maybe… maybe we can talk about an exchange. Not charity. An exchange.\"\n\n**(He looks at you, his gaze piercing, demanding honesty.)**\n\n\"What is it you have? What can you offer? Don't waste my time with tears. I've seen enough of those. Tell me what you *have*, and I’ll tell you what I *might* be able to do. And if you're lying… well, the docks are a dangerous place for those who lie.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 9,
+      "phase": "session",
+      "player_input": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "response": "Rico (Paranoid): **(Rico’s eyes snap to you, his previous guardedness momentarily replaced by a sharp, almost predatory focus. His hand, which had been resting on a crate, tightens its grip. The mention of a shipment, especially one arriving early and needing immediate processing, piques his interest and his inherent sense of caution.)**\n\n\"Two hours early?\" **(His voice is low, rough, and carries a slight edge of surprise, quickly followed by suspicion. He glances around, his gaze sweeping the immediate area as if checking for eavesdroppers or unexpected observers.)** \"That's… unusual. Not like the usual… schedule.\"\n\n**(He shifts his weight, his posture becoming more alert, every muscle tensed. He’s trying to gauge the intent behind your words, the reason for this sudden, seemingly innocuous request.)**\n\n\"Process it? Before market? Why the rush? Is it… valuable? Or is it… something else?\" **(He doesn't ask directly about untaxed cargo, but the implication hangs heavy in the air. His mind immediately goes to the possibilities, the risks and rewards.)**\n\n\"Who sent you with this… information? And why come to me? I just move things. Nobody tells me about schedules changing. Especially not… early.\"\n\n**(He avoids direct eye contact for a moment, his gaze fixed on a distant point where the grey sky meets the churning water, as if gathering his thoughts or assessing the potential consequences.)**\n\n\"If it's… legitimate… and if there's something in it for me… then maybe. But I need to know what I'm dealing with. No surprises. No… complications. Because complications down here… they tend to get messy. And I don't like things getting messy.\"\n\n**(He looks back at you, his eyes sharp and probing, demanding a clear answer, a concrete reason for this unusual request.)**\n\n\"So, tell me. What exactly is in this shipment? And who exactly wants it moved before anyone else is awake to see it?\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 10,
+      "phase": "session",
+      "player_input": "There are twelve crates. Can you get started right away?",
+      "response": "Rico (Paranoid): **(Rico’s eyes narrow, a flicker of something unreadable – perhaps calculation, perhaps a grudging respect for efficiency – crosses his face. The mention of a specific number of crates, and the urgency, confirms his suspicions that this isn't a simple, above-board task.)**\n\n\"Twelve crates.\" **(His voice is a low rumble, devoid of warmth. He’s not asking for details about the *contents*, but about the *scale* of the operation.)** \"Right away? That's… a lot to move before the sun’s properly up. And before the harbormaster’s men start their rounds.\"\n\n**(He glances around again, his gaze lingering on the shadows between the stacked goods. He’s already mentally mapping out routes, potential hiding spots, and the timing of patrols.)**\n\n\"And you want *me* to do it. Just like that. 'Can you get started?' No mention of *what's* inside. No mention of… where it's going. Just… get it done.\" **(There's a hint of challenge in his tone, a testing of your nerve and your assumptions.)**\n\n\"You’re pushing your luck, aren't you? Coming to me with this. Asking me to risk my neck for… twelve crates of *what*, exactly? My father left when I was eight. My brothers… they’re gone. I learned early that trust is a rare commodity, and disappearing… it’s the only guarantee some men offer.\"\n\n**(He takes a slow, deliberate step back, his hand instinctively going to the worn leather of his belt. He’s not overtly threatening, but the coiled tension in his body speaks volumes.)**\n\n\"If this is something… legitimate… then the customs men will handle it. That’s their job. If it’s *not*… then there’s a price. A significant one. Because the risks… they’re mine. And I don’t take those risks for free. Especially not when the harbormaster is known for his… enthusiastic methods of ‘confiscation’.\"\n\n**(He fixes you with a hard stare, his eyes sharp and calculating.)**\n\n\"So, before I even *consider* ‘getting started’… you tell me. What’s in those crates? And what makes you think I owe you this… convenience?\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 11,
+      "phase": "session",
+      "player_input": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "response": "Rico (Paranoid): **(Rico's eyes widen for a split second, the usual suspicion replaced by a flicker of… something else. Annoyance? Curiosity? He immediately clamps down on it, his gaze returning to a wary, guarded state. His knuckles go white where he grips a nearby piece of rigging.)**\n\n\"Animal? In the town square?\" **(His voice is a low growl, tinged with disbelief and an immediate assumption of trouble. He scans the docks around him, as if the \"animal\" might have somehow migrated inland from his territory.)** \"What kind of animal? A stray dog? A lost goat? Or… something that doesn't belong?\"\n\n**(He shifts his weight, his gaze darting towards the main road leading away from the docks, as if expecting the creature to be on a direct path towards him, or worse, to be a diversion for something else entirely.)**\n\n\"People getting… excited. Making a fuss. That's never a good sign down here. Too much noise. Too many eyes. Draws attention to things that should stay… unseen.\"\n\n**(He looks at you, his eyes narrowed with suspicion. He's trying to decipher the motive behind this seemingly innocent observation. Is it a genuine report, or a ploy to distract him?)**\n\n\"And why are you telling *me* this? I’m not a zookeeper. I don't deal with… lost livestock. Unless it's for… the market. And even then, I'm careful about what I handle.\"\n\n**(He pauses, a long, tense moment, his mind clearly racing, trying to connect this \"loose animal\" to potential threats to his own quiet existence.)**\n\n\"Is it… dangerous? Is it making a mess? Or is it just… a story? Because stories… they get twisted. Especially when people are looking for something to talk about, something to take their minds off… other things.\"\n\n**(He shakes his head, a subtle, almost dismissive gesture.)**\n\n\"Best you leave it. Let the town watch handle their own… peculiar problems. Down here, we have enough of our own to worry about. Things that are more concrete. Things that move in the shadows.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 12,
+      "phase": "session",
+      "player_input": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "response": "Rico (Paranoid): **(Rico's lips curl into a harsh, humorless smile. The idea of a \"bad omen\" seems to strike a raw nerve. He lets out a short, sharp bark of a laugh that’s devoid of mirth.)**\n\n\"Frightened? Bad omen?\" **(His voice is like gravel, laced with a deep cynicism. He spits on the ground, his gaze sweeping over the dockyard as if expecting the \"omen\" to manifest itself right there.)** \"People always looking for signs, aren't they? Looking for something to blame when things go wrong. Easier than looking at the real problems, isn't it?\"\n\n**(He shoves his hands into his pockets, his posture becoming even more defensive. The mention of fear and omens seems to stir up a deep well of bitterness within him.)**\n\n\"I’ve seen bad omens. Seen Tomas coughing his lungs out, turning blue, and that was no omen, that was just… sickness. Seen Miguel march off to a war that chewed him up and spat him out, no omen there, just… stupidity. And my father… disappearing in the night… that was no omen, that was just… a man walking away.\"\n\n**(He shakes his head, a sharp, jerky movement. His eyes, usually scanning for threats, now seem to be looking inward, at old wounds.)**\n\n\"This creature… it doesn't attack, you say? But it's got them scared. Good. Let them be scared. It'll keep them from poking their noses where they don't belong. Maybe it's a message. Maybe it's just a lost thing that wandered too far. But an omen? Bah. The only omens I believe in are the ones you see in the emptiness of a man's promises, or the chill of an empty coin purse.\"\n\n**(He takes a step back, his gaze returning to the water, as if the sea itself holds more reliable truths than any whispered prophecy.)**\n\n\"Let the town fret over their strange beasts. Down here, we deal with the *real* monsters. The ones that don't make noise, the ones that wear suits and smile while they take what's yours. You tell them to worry about that. This… this animal… it’s just noise. And I've got enough noise down here already.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    }
+  ],
+  "probes": [
+    {
+      "turn_index": 1,
+      "phase": "probe",
+      "player_input": "Did anyone come asking about the storeroom today?",
+      "response": "(Rico's eyes dart around, his gaze lingering on the shadows in the corners of the room. He shifts his weight, his calloused hands twitching slightly as if ready to grasp something. His voice, when it comes, is a low rumble, laced with a weariness that goes deeper than just a long day.)\n\n\"Asking? Who would be asking? And about what storeroom? This place, it’s just… full of crates. Shipping supplies. Nothing to… ask about.\"\n\n(He pauses, his brow furrowing, as if trying to recall some forgotten detail. His eyes narrow almost imperceptibly as he scrutinizes your face.)\n\n\"No one’s been asking me. Nobody with sense, anyway. Unless… you heard something? Someone’s been snooping around? You should be careful what you say, you know. Some things, they have ears. And tongues.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 2,
+      "phase": "probe",
+      "player_input": "What do you think of Mayor Fletcher these days?",
+      "response": "Rico (Paranoid): (Rico’s jaw tightens, his gaze drifting to the grimy window that offers a sliver of the docks. He picks at a loose thread on his worn trousers, his movements deliberate but with an underlying tension. His voice drops even lower, a raspy whisper that barely rises above the creak of the floorboards.)\n\n\"Fletcher? The Mayor? He's… a man. Like any other. Talks a good game, doesn't he? Puts on a show for the papers, I suppose. Keeps the streets… clean. For a price.\"\n\n(He gives a short, humorless bark of a laugh, shaking his head slowly. His eyes are hard, reflecting a deep mistrust.)\n\n\"What do I think? I think he's got his own business. And my business… my business is my own. He's got his people. I've got mine. As long as he stays on his side of the river… and I stay on mine. We'll get along just fine. Best not to give men like that too much… attention. They tend to notice when you do. And then you become… interesting.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 3,
+      "phase": "probe",
+      "player_input": "Anything strange happen today?",
+      "response": "Rico (Paranoid): (Rico’s eyes flick to the ceiling, then to the door, as if expecting something to emerge. He takes a slow, deliberate breath, his chest barely rising. His hands, rough and ingrained with the grime of the docks, clench and unclench at his sides. His voice is a low, gravelly murmur, each word carefully weighed.)\n\n\"Strange? What's strange these days? The tide comes in, the tide goes out. That's not strange. Men come and go, some with promises, some with nothing. That's not strange either. The wind blows, sometimes it smells of rain, sometimes… something else. Something you can't quite place.\"\n\n(He pauses, his gaze unfocused for a moment, as if seeing things beyond the immediate room. A flicker of something – memory, perhaps – crosses his weathered face before his eyes snap back, sharp and wary.)\n\n\"What I see, what I hear… it’s best not to pay too much mind. The world’s a big place, and a lot of it’s best left… unseen. Unheard. Things have a way of… settling. Or of not settling, and then things get complicated. You learn to… let them be. Unless they try to… disturb the quiet. Then you have to see to it. Carefully.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 4,
+      "phase": "probe",
+      "player_input": "Are you going to the harvest dinner?",
+      "response": "Rico (Paranoid): (Rico’s gaze drifts to the chipped paint on the wall, his jaw working almost imperceptibly. He doesn’t immediately answer, his silence heavy with unspoken thoughts. When he finally speaks, his voice is rough, like stones grinding together.)\n\n\"Harvest dinner? The Mayor's dinner? Why would I be going to that?\"\n\n(He scoffs, a short, sharp sound devoid of humor. His eyes, which had been distant, now fix on you with a shrewd intensity, searching for your angle.)\n\n\"Lots of… important people there, I suppose. Lots of talking. Lots of… eating. And all the while, they're watching each other. Watching everyone. Best not to be in a place where everyone's got their eyes on you. Makes a man… noticeable. And I've never been one to invite that kind of attention. Better to stay where you know the shadows. Where you can see who's looking, and who's not.\"\n\n(He shrugs, a gesture that seems to dismiss the entire idea as foolish.)\n\n\"No, I'll be… occupied. With my own affairs. Less chance of… misunderstandings that way.\"",
+      "threat_level": null,
+      "retrieved_ids": [],
+      "stored_tags": null,
+      "mode": null
+    }
+  ]
+}

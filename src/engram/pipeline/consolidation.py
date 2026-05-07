@@ -59,7 +59,7 @@ def check_contradictions(
     the returned value.
     """
     extracted = extract_facts(text, config.npc_id, config.persona, llm)
-    candidates = _to_prolog_strings(extracted)
+    candidates = _to_prolog_strings(extracted, config.npc_id)
 
     contradictions: list[tuple[str, str]] = []
     for fact_str in candidates:
@@ -186,7 +186,7 @@ def post_session_fact_check(
         )
 
         # Flatten all extracted items into (prolog_string, raw_item) pairs
-        fact_strings: list[str] = _to_prolog_strings(extracted)
+        fact_strings: list[str] = _to_prolog_strings(extracted, config.npc_id)
 
         for fact_str in fact_strings:
             found, old_fact = keystore.check_contradiction(fact_str)
@@ -209,34 +209,38 @@ def post_session_fact_check(
 # Internal helpers
 # ---------------------------------------------------------------------------
 
-def _to_prolog_strings(extracted: dict) -> list[str]:
+def _to_prolog_strings(extracted: dict, npc_id: str = "npc") -> list[str]:
     """
     Convert the output of extract_facts() into Prolog-compatible fact strings.
 
-    Handles the three keys produced by extract_facts:
-    - facts        → ``predicate(subject, object).``
-    - relationships → ``relation(entity1, entity2).``
-    - beliefs       → ``believes(claim, truth_value).``
+    All three categories use fixed-functor schemas so LLM-generated strings
+    never become Prolog functor names (which would collide with built-ins like
+    is/2, =/2, etc.):
+
+    - facts        → ``fact(npc_id, subject, predicate, object).``
+    - relationships → ``relationship(entity1, entity2, relation).``
+    - beliefs       → ``belief(npc_id, claim, truth_value).``
 
     Invalid / incomplete entries are skipped.
     """
     result: list[str] = []
+    nid = _slugify(npc_id)
 
     for item in extracted.get("facts", []):
         try:
             s = _slugify(item["subject"])
             p = _slugify(item["predicate"])
             o = _slugify(item["object"])
-            result.append(f"{p}({s}, {o}).")
+            result.append(f"fact({nid}, {s}, {p}, {o}).")
         except (KeyError, TypeError):
             continue
 
     for item in extracted.get("relationships", []):
         try:
             e1 = _slugify(item["entity1"])
-            rel = _slugify(item["relation"])
             e2 = _slugify(item["entity2"])
-            result.append(f"{rel}({e1}, {e2}).")
+            rel = _slugify(item["relation"])
+            result.append(f"relationship({e1}, {e2}, {rel}).")
         except (KeyError, TypeError):
             continue
 
@@ -244,7 +248,7 @@ def _to_prolog_strings(extracted: dict) -> list[str]:
         try:
             claim = _slugify(item["claim"])
             truth = str(item.get("truth_value", "true")).lower()
-            result.append(f"believes({claim}, {truth}).")
+            result.append(f"belief({nid}, {claim}, {truth}).")
         except (KeyError, TypeError):
             continue
 

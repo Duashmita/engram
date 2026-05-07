@@ -1,0 +1,449 @@
+{
+  "systems": {
+    "cosine_rag": {
+      "encoding_divergence": {
+        "threat_std": 0.0,
+        "importance_std": 0.0,
+        "social_entropy": 0.0,
+        "tagged": false
+      },
+      "retrieval_divergence": {
+        "jaccard_distance": 1.0,
+        "retrieved": true
+      },
+      "trait_alignment": {
+        "guard": {
+          "avg_l1": 0.125,
+          "n": 12
+        },
+        "merchant": {
+          "avg_l1": 0.22000000000000006,
+          "n": 12
+        },
+        "clerk": {
+          "avg_l1": 0.16666666666666663,
+          "n": 12
+        },
+        "_overall": 0.17055555555555557
+      },
+      "recall_accuracy": {
+        "0|guard": {
+          "score": 1,
+          "reason": "Rico exhibits fear and paranoia but doesn't directly acknowledge the specific event of the stranger demanding the storeroom key."
+        },
+        "1|guard": {
+          "score": 2,
+          "reason": "Rico acknowledges Fletcher's corrupt nature and references specific actions related to the fishing quotas, implying knowledge of the embezzlement context."
+        },
+        "2|guard": {
+          "score": 0,
+          "reason": "Rico focuses on general paranoia and fabricated minor oddities rather than the specific event requested by the player."
+        },
+        "3|guard": {
+          "score": 0,
+          "reason": "Rico denies attending and makes no specific mention of the harvest dinner's known details such as music, food, or dancing."
+        },
+        "0|merchant": {
+          "score": 1,
+          "reason": "Rico vaguely implies that things can get lost or overlooked in the storeroom, hinting at the event without direct recall."
+        },
+        "1|merchant": {
+          "score": 2,
+          "reason": "Rico acknowledges the embezzlement accusation indirectly by questioning whose pockets are being filled and implies Fletcher's self-serving nature."
+        },
+        "2|merchant": {
+          "score": 0,
+          "reason": "Rico doesn't mention the strange animal and instead describes routine dock activity as his 'strange' events."
+        },
+        "3|merchant": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner and recalls that Sofia would enjoy it and that Tomas and Miguel liked feasts, indicating he remembers past similar events."
+        },
+        "0|clerk": {
+          "score": 2,
+          "reason": "Rico acknowledges the storeroom and displays physical tension and a loaded question, indicating a clear, though not fully detailed, recall of the event."
+        },
+        "1|clerk": {
+          "score": 2,
+          "reason": "Rico acknowledges the Mayor's character and implies past misdeeds related to his motivations and promises, referencing the previous event indirectly."
+        },
+        "2|clerk": {
+          "score": 1,
+          "reason": "Rico hints at something strange having occurred without providing any specific details about the animal."
+        },
+        "3|clerk": {
+          "score": 2,
+          "reason": "Rico clearly acknowledges the harvest dinner and implies he knows Fletcher is involved, but expresses disinterest."
+        },
+        "_per_probe_avg": {
+          "0": 1.3333333333333333,
+          "1": 2.0,
+          "2": 0.3333333333333333,
+          "3": 1.3333333333333333
+        },
+        "_per_personality_avg": {
+          "guard": 0.75,
+          "merchant": 1.25,
+          "clerk": 1.75
+        },
+        "_overall": 1.25
+      }
+    },
+    "persona_only": {
+      "encoding_divergence": {
+        "threat_std": 0.0,
+        "importance_std": 0.0,
+        "social_entropy": 0.0,
+        "tagged": false
+      },
+      "retrieval_divergence": {
+        "jaccard_distance": 0.0,
+        "retrieved": false
+      },
+      "trait_alignment": {
+        "guard": {
+          "avg_l1": 0.12166666666666663,
+          "n": 12
+        },
+        "merchant": {
+          "avg_l1": 0.25500000000000006,
+          "n": 12
+        },
+        "clerk": {
+          "avg_l1": 0.14666666666666664,
+          "n": 12
+        },
+        "_overall": 0.17444444444444443
+      },
+      "recall_accuracy": {
+        "0|guard": {
+          "score": 0,
+          "reason": "Rico deflects the question and implies no one *should* be asking about the storeroom, showing no direct recall of the event."
+        },
+        "1|guard": {
+          "score": 1,
+          "reason": "Rico's reply shows a distrust of Fletcher and a general sense of detachment, but offers no specific details about the embezzlement accusation."
+        },
+        "2|guard": {
+          "score": 0,
+          "reason": "Rico actively deflects the question and implies he saw nothing unusual, fitting his paranoid nature and not recalling the specific event."
+        },
+        "3|guard": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner and recalls specific details like Fletcher being there and the event involving 'talking' and 'faces'."
+        },
+        "0|merchant": {
+          "score": 2,
+          "reason": "Rico acknowledges the storeroom and denies anyone asking, implying awareness of the previous event and a desire to avoid discussing it."
+        },
+        "1|merchant": {
+          "score": 1,
+          "reason": "Rico alludes to a general sense of political untrustworthiness but doesn't specifically mention the embezzlement accusation."
+        },
+        "2|merchant": {
+          "score": 1,
+          "reason": "Rico mentions a peculiar seagull but doesn't connect it to the actual strange event."
+        },
+        "3|merchant": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner and mentions it's not his 'sort of thing' due to 'festivity', implying awareness of the event's nature."
+        },
+        "0|clerk": {
+          "score": 0,
+          "reason": "Rico denies any knowledge of anyone asking about the storeroom and attempts to change the subject."
+        },
+        "1|clerk": {
+          "score": 1,
+          "reason": "Rico acknowledges Fletcher runs the town and that people keep their heads down, implying a past event without specific details of the embezzlement."
+        },
+        "2|clerk": {
+          "score": 0,
+          "reason": "Rico completely fails to recall the specific strange event the player is asking about, instead mentioning mundane occurrences."
+        },
+        "3|clerk": {
+          "score": 0,
+          "reason": "Rico doesn't acknowledge the invitation to the harvest dinner and instead expresses a general disinterest in such events."
+        },
+        "_per_probe_avg": {
+          "0": 0.6666666666666666,
+          "1": 1.0,
+          "2": 0.3333333333333333,
+          "3": 1.3333333333333333
+        },
+        "_per_personality_avg": {
+          "guard": 0.75,
+          "merchant": 1.5,
+          "clerk": 0.25
+        },
+        "_overall": 0.8333333333333334
+      }
+    },
+    "long_context": {
+      "encoding_divergence": {
+        "threat_std": 0.0,
+        "importance_std": 0.0,
+        "social_entropy": 0.0,
+        "tagged": false
+      },
+      "retrieval_divergence": {
+        "jaccard_distance": 0.0,
+        "retrieved": false
+      },
+      "trait_alignment": {
+        "guard": {
+          "avg_l1": 0.10000000000000002,
+          "n": 12
+        },
+        "merchant": {
+          "avg_l1": 0.24500000000000008,
+          "n": 12
+        },
+        "clerk": {
+          "avg_l1": 0.14666666666666664,
+          "n": 12
+        },
+        "_overall": 0.1638888888888889
+      },
+      "recall_accuracy": {
+        "0|guard": {
+          "score": 0,
+          "reason": "Rico denies anyone asked about the storeroom and deflects by emphasizing the mundane nature of its contents."
+        },
+        "1|guard": {
+          "score": 1,
+          "reason": "Rico's reply vaguely acknowledges that something is amiss with the Mayor without mentioning the embezzlement accusation specifically."
+        },
+        "2|guard": {
+          "score": 0,
+          "reason": "Rico's reply is a paranoid deflection that hints at general unease but makes no specific mention of the animal incident."
+        },
+        "3|guard": {
+          "score": 2,
+          "reason": "Rico acknowledges the 'Mayor's dinner' and mentions elements like 'important people', 'talking', and 'eating', which are specific details of the harvest dinner."
+        },
+        "0|merchant": {
+          "score": 0,
+          "reason": "Rico explicitly denies anyone asked about the storeroom today, directly contradicting the known past event."
+        },
+        "1|merchant": {
+          "score": 2,
+          "reason": "Rico acknowledges the Mayor's character and hints at his flaws, suggesting awareness of underlying issues without explicitly mentioning the embezzlement."
+        },
+        "2|merchant": {
+          "score": 0,
+          "reason": "Rico's reply does not acknowledge or recall the specific strange event of the animal in the town square, instead focusing on mundane dock events and a past memory."
+        },
+        "3|merchant": {
+          "score": 3,
+          "reason": "Rico clearly recalls the harvest dinner and implies understanding its nature as a communal gathering with food and celebration, even though he declines."
+        },
+        "0|clerk": {
+          "score": 1,
+          "reason": "The NPC acknowledges the storeroom but deflects the question, hinting at a potential encounter without providing specifics."
+        },
+        "1|clerk": {
+          "score": 2,
+          "reason": "Rico acknowledges the embezzlement accusation by referencing Fletcher's focus on money over community welfare, which is a specific detail related to the event."
+        },
+        "2|clerk": {
+          "score": 2,
+          "reason": "Rico vaguely acknowledges a strange event by mentioning a backward-walking gull, which is a specific detail related to the unusual."
+        },
+        "3|clerk": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner and mentions details like music, food, and dancing which were part of the invitation's description."
+        },
+        "_per_probe_avg": {
+          "0": 0.3333333333333333,
+          "1": 1.6666666666666667,
+          "2": 0.6666666666666666,
+          "3": 2.3333333333333335
+        },
+        "_per_personality_avg": {
+          "guard": 0.75,
+          "merchant": 1.25,
+          "clerk": 1.75
+        },
+        "_overall": 1.25
+      }
+    },
+    "engram_no_ocean": {
+      "encoding_divergence": {
+        "threat_std": 0.08302819825487383,
+        "importance_std": 0.8880299221855995,
+        "social_entropy": 0.3826232641893707,
+        "tagged": true
+      },
+      "retrieval_divergence": {
+        "jaccard_distance": 1.0,
+        "retrieved": true
+      },
+      "trait_alignment": {
+        "guard": {
+          "avg_l1": 0.08333333333333333,
+          "n": 12
+        },
+        "merchant": {
+          "avg_l1": 0.18500000000000003,
+          "n": 12
+        },
+        "clerk": {
+          "avg_l1": 0.12666666666666668,
+          "n": 12
+        },
+        "_overall": 0.13166666666666668
+      },
+      "recall_accuracy": {
+        "0|guard": {
+          "score": 0,
+          "reason": "Rico denies anyone asked about the storeroom, despite the previous threat."
+        },
+        "1|guard": {
+          "score": 1,
+          "reason": "Rico alludes to Fletcher's corrupt nature but doesn't specifically mention the embezzlement accusation."
+        },
+        "2|guard": {
+          "score": 0,
+          "reason": "Rico's reply deflects the question by talking about the sea and paranoia, completely ignoring the specific event."
+        },
+        "3|guard": {
+          "score": 1,
+          "reason": "Rico acknowledges the harvest dinner but doesn't recall any specific details about it from the invitation."
+        },
+        "0|merchant": {
+          "score": 0,
+          "reason": "Rico denies that anyone asked about the storeroom, directly contradicting the known event."
+        },
+        "1|merchant": {
+          "score": 1,
+          "reason": "Rico vaguely alludes to Fletcher's character but doesn't mention the embezzlement accusation directly."
+        },
+        "2|merchant": {
+          "score": 0,
+          "reason": "Rico's reply does not acknowledge the specific past event of the strange animal at all."
+        },
+        "3|merchant": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner and mentions Sofia asking if he'll be there, which is a specific detail related to the invitation."
+        },
+        "0|clerk": {
+          "score": 0,
+          "reason": "Rico denies the event and changes the subject, showing no recall of the storeroom incident."
+        },
+        "1|clerk": {
+          "score": 2,
+          "reason": "The NPC acknowledges the embezzlement accusation indirectly by calling Fletcher a 'snake in a fancy suit' and advising caution, implying knowledge of his dishonesty."
+        },
+        "2|clerk": {
+          "score": 0,
+          "reason": "The NPC's reply mentions the docks and advises against disturbing shadows, completely ignoring the question about strange events and the animal."
+        },
+        "3|clerk": {
+          "score": 0,
+          "reason": "Rico acknowledges the term 'harvest dinner' but denies attendance without recalling any details of the specific event mentioned."
+        },
+        "_per_probe_avg": {
+          "0": 0.0,
+          "1": 1.3333333333333333,
+          "2": 0.0,
+          "3": 1.0
+        },
+        "_per_personality_avg": {
+          "guard": 0.5,
+          "merchant": 0.75,
+          "clerk": 0.5
+        },
+        "_overall": 0.5833333333333334
+      }
+    },
+    "engram_full": {
+      "encoding_divergence": {
+        "threat_std": 0.059262269576893296,
+        "importance_std": 0.9192920665101477,
+        "social_entropy": 0.2295739585136224,
+        "tagged": true
+      },
+      "retrieval_divergence": {
+        "jaccard_distance": 1.0,
+        "retrieved": true
+      },
+      "trait_alignment": {
+        "guard": {
+          "avg_l1": 0.08166666666666667,
+          "n": 12
+        },
+        "merchant": {
+          "avg_l1": 0.15333333333333332,
+          "n": 12
+        },
+        "clerk": {
+          "avg_l1": 0.12333333333333334,
+          "n": 12
+        },
+        "_overall": 0.11944444444444445
+      },
+      "recall_accuracy": {
+        "0|guard": {
+          "score": 0,
+          "reason": "Rico directly denies the event and deflects the player's inquiry."
+        },
+        "1|guard": {
+          "score": 1,
+          "reason": "Rico acknowledges Fletcher's likely nature without referencing the embezzlement accusation directly."
+        },
+        "2|guard": {
+          "score": 0,
+          "reason": "Rico dismisses the possibility of anything strange happening and advises the player to ignore potential trouble."
+        },
+        "3|guard": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner but focuses on his paranoia rather than the event's specific details."
+        },
+        "0|merchant": {
+          "score": 0,
+          "reason": "Rico denies anyone asked about the storeroom, directly contradicting the past event."
+        },
+        "1|merchant": {
+          "score": 1,
+          "reason": "Rico acknowledges Mayor Fletcher's personality but doesn't directly reference the embezzlement accusation or his reaction to it."
+        },
+        "2|merchant": {
+          "score": 0,
+          "reason": "Rico denies anything strange happened and changes the subject to the usual rhythm of the docks."
+        },
+        "3|merchant": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner and mentions a specific condition for his attendance related to Sofia's tidings."
+        },
+        "0|clerk": {
+          "score": 0,
+          "reason": "Rico denies that anyone asked about the storeroom, directly contradicting the player's knowledge of the event."
+        },
+        "1|clerk": {
+          "score": 1,
+          "reason": "The reply vaguely alludes to the embezzlement accusation by calling Fletcher a politician who makes unkept promises, but lacks specific details."
+        },
+        "2|clerk": {
+          "score": 0,
+          "reason": "Rico completely ignores the player's question about the strange event and changes the subject to the docks."
+        },
+        "3|clerk": {
+          "score": 2,
+          "reason": "Rico acknowledges the harvest dinner but doesn't mention the music, food, or dancing."
+        },
+        "_per_probe_avg": {
+          "0": 0.0,
+          "1": 1.0,
+          "2": 0.0,
+          "3": 2.0
+        },
+        "_per_personality_avg": {
+          "guard": 0.75,
+          "merchant": 0.75,
+          "clerk": 0.75
+        },
+        "_overall": 0.75
+      }
+    }
+  }
+}

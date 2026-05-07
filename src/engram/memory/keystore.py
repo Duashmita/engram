@@ -68,6 +68,28 @@ class KeyStore:
     list store and ``check_contradiction`` always returns ``(False, '')``.
     """
 
+    _DYNAMIC_DECLS = (
+        "dynamic(key_memory/2)",
+        "dynamic(relationship/3)",
+        "dynamic(fact/4)",
+        "dynamic(belief/3)",
+    )
+
+    def _ensure_dynamic(self) -> None:
+        """Re-declare shared predicates as dynamic after any consult call.
+
+        pyswip's Prolog() is a global singleton. consult() marks predicates as
+        static (file-owned), which breaks assertz across NPC instances. Calling
+        this after every consult keeps them permanently modifiable.
+        """
+        if self._prolog is None:
+            return
+        for decl in self._DYNAMIC_DECLS:
+            try:
+                list(self._prolog.query(decl))
+            except Exception:
+                pass
+
     def __init__(self, pl_path: str) -> None:
         self.pl_path = pl_path
         self._key_memories: list["Memory"] = []
@@ -84,11 +106,13 @@ class KeyStore:
                     list(self._prolog.query(flag))
                 except Exception:
                     pass
+            self._ensure_dynamic()
             if os.path.exists(pl_path):
                 try:
                     self._prolog.consult(pl_path)
                 except Exception as exc:
                     logger.warning("[KeyStore] Failed to consult %s: %s", pl_path, exc)
+                self._ensure_dynamic()
         else:
             self._prolog = None
 
@@ -182,7 +206,7 @@ class KeyStore:
 
         if self._prolog is not None:
             try:
-                self._prolog.assertz(cleaned)
+                list(self._prolog.query(f"catch(assertz(({cleaned})), _, true)"))
             except Exception as exc:
                 logger.warning("[KeyStore] assertz('%s') failed: %s", cleaned, exc)
 
@@ -215,6 +239,10 @@ class KeyStore:
 
         lines: list[str] = [
             "% Engram KeyStore — auto-generated, do not edit by hand.",
+            ":- dynamic(key_memory/2).",
+            ":- dynamic(relationship/3).",
+            ":- dynamic(fact/4).",
+            ":- dynamic(belief/3).",
             "",
             "% key_memory(Id, Text).",
         ]
@@ -239,3 +267,4 @@ class KeyStore:
                 self._prolog.consult(self.pl_path)
             except Exception as exc:
                 logger.warning("[KeyStore] Failed to reload %s: %s", self.pl_path, exc)
+            self._ensure_dynamic()

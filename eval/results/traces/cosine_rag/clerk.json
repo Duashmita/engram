@@ -1,0 +1,200 @@
+{
+  "system": "cosine_rag",
+  "personality": "clerk",
+  "session": [
+    {
+      "turn_index": 1,
+      "phase": "session",
+      "player_input": "Give me the storeroom key. Now. I know you have it.",
+      "response": "Rico’s jaw tightens, the muscles along his jawline bunching. His eyes, the colour of a storm-churned sea, flick up to meet yours for a fraction of a second, then drop back to the calloused hands that rest, unnervingly still, on the rough wooden crate in front of him. He doesn’t raise his voice, no sharp retort or immediate denial. Just that quiet, unyielding presence.\n\nHe shifts his weight, a barely perceptible movement, and the sound of his worn boots on the grimy floorboards is the only thing that breaks the silence. His gaze, when it returns, is steady, but carries the weight of years spent watching, listening, and knowing. There’s no anger, not on the surface, but an immense, almost tangible reluctance.\n\n\"The storeroom key,\" he repeats, his voice low and gravelly, like stones grinding together. It’s not a question, more of a confirmation of what he’s heard. He doesn’t reach for his pockets, doesn’t fidget. His stillness is a statement.\n\n\"And you think I've got it.\" It's not accusatory, just an observation of your certainty. He takes a slow breath, the air in the dockside shed thick with the smell of salt, tar, and something vaguely metallic.\n\nHe doesn't answer directly. Instead, a ghost of a memory seems to cross his face, something fleeting and distant. It's the kind of look that suggests he’s seen a lot of things come and go through these docks, a lot of desperation, a lot of claims.\n\n\"Some things,\" he finally says, his voice barely above a whisper, each word delivered with the careful precision of someone who chooses his words like he once chose his routes, \"are best left where they are.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_1"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 2,
+      "phase": "session",
+      "player_input": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "response": "Rico’s shoulders, broad and heavy like the beams that support the dock, stiffen almost imperceptibly. The weathered skin of his forearms, crisscrossed with the faint white lines of old scars, seems to tighten over bone. He doesn’t flinch, doesn’t even blink.\n\nHis gaze, which had been fixed somewhere beyond you, now settles back on your face. It’s not a threat, not outright. It’s more like a steady, unyielding examination. The storm-churned sea in his eyes grows a little deeper, a little colder.\n\nHe lets out a slow, quiet breath, the sound barely audible above the distant cry of gulls and the creak of moored ships. His hands remain on the crate, palms flat, like anchors.\n\n\"Unpleasant,\" he repeats, the word rolling off his tongue with a flatness that chills more than any shouted threat. He’s heard that word before, in many different contexts, on these docks and beyond. It holds no sway over him; it’s just another element in the unpredictable tide of this life.\n\nHe doesn't move. He doesn't argue. He just *is*. A solid, unyielding mass against whatever you’re pushing. The silence stretches, thick and heavy with unspoken things.\n\nFinally, very slowly, he shifts his weight. The worn leather of his boots scrapes against the wood again, a deliberate sound in the quiet. He doesn't turn away, but his eyes, steady and ancient, seem to look past you, to a horizon only he can see.\n\n\"Difficulty,\" he says, his voice still low, still gravelly, but with a new, quiet finality, \"is a matter of perspective. And I have a long perspective.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 3,
+      "phase": "session",
+      "player_input": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "response": "Rico’s head turns slowly, his gaze lifting from the weathered planks of the crate. The offer hangs in the air, a surprisingly gentle thing against the harshness of the dockside. For a moment, the storm in his eyes seems to recede, leaving behind the grey of a lingering fog.\n\nHe doesn’t smile. His mouth, a hard line that’s seen too much, remains closed. But the tension in his jaw eases, just a fraction. The scent of salt and tar still clings to him, a testament to his life, but for a brief instance, it’s overlaid with something else, something softer.\n\nHe considers your words, his stillness unbroken except for the subtle shift of his weight. The idea of a \"harvest dinner,\" of gathering, seems to land on him like a foreign object, something to be examined from a safe distance.\n\n\"Harvest dinner,\" he repeats, the words a quiet murmur, tasting them like he would a new shipment. It's not the gruff dismissal you might expect. There's a hint of something else there – curiosity, perhaps, or the faintest echo of a past that didn't involve these particular ghosts.\n\nHe doesn't immediately say yes, nor does he say no. His gaze drifts, as it often does, to some unseen point on the horizon. The memories flicker across his face again, not the sharp edges of recent grief, but the duller ache of what’s been lost to time and circumstance.\n\n\"Tonight,\" he finally says, his voice still rough, but with a touch less of the usual guardedness. It’s as if the thought of warmth and shared food, however distant, has created a small, quiet space within him. \"Thank you for the invitation.\"\n\nHe offers no commitment, no definite answer. But he doesn’t dismiss it outright either. The storm in his eyes has calmed, leaving behind the quiet, deep waters of a man who carries his burdens alone, but who, for a fleeting moment, might consider being drawn into the light.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_3"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 4,
+      "phase": "session",
+      "player_input": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "response": "Rico’s gaze remains distant for a beat longer, the image of the unseen horizon still holding him. The mention of music, food, and dancing seems to drift over him, like the swell of the sea against the pilings. He processes the words, not with excitement, but with a sort of quiet observation.\n\nHe shifts his weight again, a slow, deliberate movement that doesn't betray any eagerness. His hands, still resting on the crate, flex slightly, as if remembering the feel of rough wood or the weight of contraband.\n\n\"The whole town,\" he murmurs, the words like pebbles rolling in his throat. He doesn't seem to picture himself amidst a crowd, his usual solitary presence a stark contrast to the vibrant scene you paint. The thought of shared revelry feels distant, a different kind of life from the one he navigates.\n\nHe lets out another quiet breath, and this time, there's a faint sigh caught within it, almost imperceptible. It’s not a sound of complaint, but one of a deep, ingrained weariness. The ghosts he carries don’t typically participate in music and dancing.\n\n\"Music,\" he repeats, the word sounding foreign on his tongue, as if he's trying to reconcile it with the mournful cry of the gulls or the creak of stressed timber. \"And dancing.\"\n\nHis eyes finally settle back on yours, but they’re not sharp or challenging. They’re filled with a quiet, old sorrow, a landscape carved by loss. There's no outright rejection, but neither is there any embrace of the idea. It’s as if he’s looking at a map of a place he might have once known, but can no longer find his way to.\n\n\"It sounds… like a lot,\" he says finally, his voice rough but lacking its usual hard edge. He doesn't elaborate on what \"a lot\" means to him – the effort, the memory, the sheer alien nature of it. He offers no firm decision, no promise to attend. The storm in his eyes hasn't completely vanished, but it has settled into a deep, quiet swell, a reflection of a man who understands the weight of what he carries, and the quiet solitude that often accompanies it.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_3"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 5,
+      "phase": "session",
+      "player_input": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "response": "Rico’s head snaps up, his eyes, those storm-churned seas, instantly sharpening. The weary fog that had momentarily softened their depths dissipates, replaced by a fierce, immediate focus. His hands, which had been resting passively, clench on the crate, the knuckles whitening. The casual stillness is gone, replaced by a coiled tension, like a spring wound too tight.\n\nHis gaze locks onto yours, and for the first time, there’s a flicker of something that could almost be considered alarm, quickly followed by a shrewd, assessing glint. The mention of Fletcher, of town funds, of embezzlement – these are not abstract concepts to Rico. They’re the kind of rot that festers in the foundations of a place, the kind that can unravel everything.\n\nHe doesn’t speak immediately. He’s listening, absorbing your words, his mind already piecing together possibilities, connections. The air around him seems to thicken, charged with a new, potent energy. He’s still rigid, yes, but now it’s the rigidity of a hunter sighting prey, or a man bracing for impact.\n\n\"Fletcher,\" he finally says, the name a low growl, devoid of its usual casual drawl. It's laced with a dangerous understanding, a recognition of a certain kind of man and the patterns they follow. His jaw tightens again, the old scars on his face seeming to deepen in the dim light.\n\nHe leans forward slightly, his gaze unwavering. The distance he usually maintains has shrunk, replaced by an unnerving intensity. \"Evidence?\" he asks, his voice stripped of any trace of reluctance or weariness. It’s sharp, direct, and demands an answer. The quiet grief, the solitude – for a moment, they’ve been eclipsed by the sharp, pragmatic instincts of a man who’s seen the underbelly of things for far too long.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 6,
+      "phase": "session",
+      "player_input": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "response": "Rico’s eyes narrow, the storm clouds within them churning with a renewed intensity. He absorbs your words, not just the information, but the conviction behind them. The ledgers, the numbers – these are concrete things, and Rico understands the language of tangible proof. The earlier weariness has been pushed aside, replaced by a cold, sharp pragmatism.\n\nHe releases a slow, measured breath, the sound a quiet exhalation of air that seems to carry the weight of unspoken calculations. His hands, still clenched on the crate, slowly unclench, but the tension remains in his posture. He doesn't move from the crate, but his entire being is focused on you, on the implications of what you've just laid bare.\n\n\"The numbers don't lie,\" he repeats, his voice low and gravelly, a statement of fact rather than a question. There's a hard edge to it now, the edge of a man who has learned to trust facts above all else. He’s seen too many lies spun from empty words, too much smoke and mirrors.\n\nHe pauses, his gaze sweeping over you, assessing your earnestness, your desperation, your certainty. He’s not looking for weaknesses, but for the strength of your resolve. \"And Fletcher,\" he adds, the name spoken with a quiet finality, like a judgment passed.\n\nHe shifts his weight, a subtle adjustment that speaks of a mind already working through strategies, through consequences. The familiar solitude he carries seems to have become a sort of battleground, a space where he can process this new threat.\n\n\"What do we do,\" he finally says, the question echoing the one you posed, but with a different weight behind it. It's not a query about possibilities, but a demand for a plan, a strategy. His eyes, those deep, dark pools, hold a new glint – the glint of a predator considering its next move. The quiet grief is still there, a low hum beneath the surface, but it’s now accompanied by the sharp, focused resolve of a man who knows that sometimes, the only way to keep the rot from spreading is to cut it out.\n\n\"You have the proof,\" he states, his gaze steady. \"And I… I know how these things work. How men like Fletcher operate. How they hide.\" He looks down at his own hands, the calloused, scarred hands that have moved untaxed cargo, that have survived the harsh realities of the docks. They are hands that understand secrets, that understand how to bypass systems. \"We don't make it difficult for him. We make it *impossible*.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 7,
+      "phase": "session",
+      "player_input": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "response": "Rico’s sharp focus on the Fletcher situation falters, the predator’s glint in his eyes softening, though not disappearing entirely. His gaze shifts from the imagined ledgers and shadowy corners where Fletcher might hide, to your face, and then to the unseen worry you carry. The coiled tension in his shoulders doesn’t fully uncoil, but it loosens its grip, as if acknowledging a different kind of urgency.\n\nHe takes a slow breath, the scent of salt and tar momentarily replaced by the quiet desperation in your voice. His hands, which had been poised for action, fall back to rest on the crate, though their stillness is now less about rigid control and more about a momentary pause. The ingrained habit of assessing threats, of calculating risks, is momentarily overridden by the raw vulnerability in your plea.\n\n\"A child,\" he repeats, his voice losing some of its earlier edge, becoming a low rumble again, tinged with a familiar, quiet weariness. The ghosts of his past – his abandoned father, his dead brothers – don’t surface overtly, but the echo of loss, of helplessness, seems to resonate within him.\n\nHe doesn’t offer immediate comfort or dismiss you. His gaze, still deep and assessing, holds a flicker of something akin to troubled understanding. He’s seen desperation on these docks before, the kind that gnaws at the gut when money runs out and hope dwindles.\n\n\"Sick,\" he murmurs, the word heavy with a sorrow he carries so privately. He’s not a man for flowery words or easy promises. His pragmatism, the very core of his rigidity, is now directed towards a different kind of problem.\n\nHe looks down at his hands again, the rough skin, the scars. They are hands that have moved things, built things, sometimes broken things. They are not the hands of a healer, but they are hands that have known the hard realities of making ends meet, of surviving.\n\n\"A doctor,\" he says, the word a simple, stark acknowledgment of the need. There’s no easy answer in his eyes, no immediate solution presented. But there's also no outright refusal. He’s a man of action, but action requires a plan, and this is a problem that demands more than just brute force.\n\nHe considers your words, the silence stretching between you not empty, but filled with the unspoken weight of your need and his own quiet reservations. The storm in his eyes hasn't fully subsided, but it has shifted, the focus now on a different, more immediate kind of human suffering. He carries his own grief, but he also recognizes it in others.\n\n\"I… I don't carry coin like that,\" he says, his voice low and rough, a confession of limitation rather than an excuse. It's the honest, unvarnished truth from a man who has learned the hard way that not all problems can be solved with what he has.\n\nHe looks back at you, his gaze steady, holding a quiet, unyielding empathy. \"But,\" he continues, his voice gaining a fraction of its earlier resolve, though it's now directed towards a different end, \"there are ways. We’ll see.\"\n\nHe offers no guarantee, no grand gesture. But in his quiet, rigid way, he offers a sliver of his own formidable will, a silent promise to look for a solution, even if it's not the one you might expect. The pragmatist in him is already calculating, already searching for an angle, a way to navigate this new, unexpected current.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_1"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 8,
+      "phase": "session",
+      "player_input": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "response": "Rico’s jaw works, a slow, deliberate grinding that’s almost imperceptible beneath his weathered skin. The words \"fever\" and \"worse\" land with the weight of a falling anchor, pulling something tight and cold in his chest. The sharp, calculating edge that had surfaced with the Fletcher business recedes, replaced by a familiar, dull ache. He doesn't flinch, doesn't break eye contact, but his stillness now carries a different kind of burden.\n\nHis gaze drifts down, not to his hands this time, but to the worn leather of his boots, then to the rough, splintered wood of the crate beneath them. He sees, not the crates of smuggled goods he once handled, but the phantom images of lean, gaunt faces, of bodies shrinking to nothing. Tomas. The coughing sickness. The helplessness of watching a life slip away, inch by agonizing inch.\n\n\"Anything I can spare,\" he repeats, the words a low, rough whisper, the sound scraping against the raw edges of his own long-held grief. His voice is devoid of any false optimism or platitudes. It's the honest, unvarnished truth of a man who has had little to spare, and even less to offer when it mattered most.\n\nHe raises his eyes again, and the storm in them has settled into a deep, turbulent grey. There's no easy money in his pockets, no quick fix readily available. His life has been one of survival, of doing what had to be done to keep going, and that often meant having next to nothing.\n\n\"I don't have coin like that,\" he says again, his voice flat, the repetition a testament to the stark reality he lives. He’s not trying to evade the request, but to state the undeniable fact of his circumstances.\n\nBut then, a flicker. A stubborn refusal to let this plea simply hang in the air unanswered. The pragmatism that had served him so well in the past, the ingenuity born of necessity, begins to stir. It's not about kindness, not in the way some might understand it. It's about an old, ingrained understanding of the unforgiving nature of life, and a quiet, unyielding determination to push back against it when he can.\n\nHe looks past you, his gaze fixed on some distant point, as if seeing not just the dockside shed, but the network of alleys, the hidden routes, the connections he's cultivated over years of clandestine dealings. His mind, sharp and resourceful, begins to work through possibilities that don't involve empty pockets.\n\n\"There are… other ways,\" he murmurs, his voice gaining a fraction of its former intensity, but now directed towards a different kind of problem. \"Not coin. But… leverage. Information. Connections.\" He doesn't offer specifics, not yet. It’s the language of his world, the currency he truly understands. \"If a doctor is needed, and coin is the problem… perhaps there are those who can be persuaded. Or perhaps there's something… of value that can be exchanged.\"\n\nHe doesn't promise a miracle. He doesn't offer a comforting hand. But he offers his own hard-won expertise, his knowledge of the shadows, his ability to navigate the underbelly of the town. It's a grim offer, stripped of sentimentality, but it’s an offer of his own substance, of his own particular brand of resourcefulness. The rigid man, burdened by his past, is still a man who can find a way. He just needs to know what he's working with.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_2"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 9,
+      "phase": "session",
+      "player_input": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "response": "Rico's eyes snap back into focus, the turbulent grey settling, but the sharp pragmatism returns with an almost audible click. The somber introspection, the echo of his lost brothers, recedes as the familiar rhythm of the docks asserts itself. He doesn't dismiss your plea for help with the sick child entirely, but it's momentarily shelved, tucked away for later consideration. The immediate demand of the shipment takes precedence, a crisis of a different, more predictable nature.\n\nHis shoulders, which had seemed to sag with the weight of unspoken grief, square again. The rigidity is back, not as a defense, but as a posture of readiness. His hands, which had fallen to his sides, slowly clench into fists, then relax, flexed by habit. He can almost feel the weight of the incoming cargo, the familiar scent of wood, salt, and whatever else lies within.\n\n\"Two hours early,\" he repeats, the words clipped, efficient. There's no surprise, no complaint, just an assessment of a new variable in his operational calculus. The market opening – that’s a hard deadline, a concrete fact he can work with.\n\nHis gaze sweeps over the shed, then out towards the water, as if he can already see the approaching vessel. The years of working the docks have ingrained in him an innate understanding of timing, of flow, of how to bend the rules of expectation to his advantage.\n\n\"Process it,\" he states, the command devoid of any question. It's an acceptance of the task, a commitment. His mind, ever practical, is already running through the logistics, the manpower needed, the potential pitfalls.\n\nHe shifts his weight, a subtle adjustment that signifies a mind already in motion. The quiet grief he carries is a constant undercurrent, but the demands of his profession, of survival, always pull him back to the surface. This is a problem he can solve with sweat, with efficiency, with the hard-won knowledge of how to move things quickly and discreetly.\n\n\"We'll need more hands,\" he says, his voice regaining some of its gravelly, no-nonsense tone. \"And we'll need to be quick. No room for… delays.\" The unspoken implication hangs in the air: just as there's no room for delays in getting goods to market, there's also a sense that he’ll find a way to address the child's illness, but it will have to be done in parallel, or in the wake of this immediate demand.\n\nHe doesn't offer a smile, or any outward sign of enthusiasm. But there's a glint in his eye, a spark of familiar capability. The rigid man, faced with a challenge, finds his footing. He knows the docks, he knows the shipments, and he knows how to make them work. The weight of the world is always on his shoulders, but for now, the weight of the morning shipment is the immediate concern.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 10,
+      "phase": "session",
+      "player_input": "There are twelve crates. Can you get started right away?",
+      "response": "Rico’s eyes fix on yours, the pragmatism sharpening to a razor's edge. Twelve crates. He visualizes them stacked, the familiar weight, the potential complications. The earlier flicker of concern for the sick child hasn't vanished, but it's been compartmentalized, the rigid structure of his mind making space for multiple, urgent tasks.\n\n\"Twelve crates,\" he repeats, his voice taking on a deeper, more focused tone. He doesn't count them on his fingers; he sees them in his mind's eye, already assessing the volume, the space they'll occupy, the time it will take. \"Right away.\" The emphasis is on the latter, a confirmation of the urgency, a commitment to the relentless pace required.\n\nHe turns his gaze towards the docks, his shoulders straightening further, the rigidity now a posture of command. His hands, which had been clenched, now extend slightly, as if ready to direct, to organize, to move. The calluses on his palms, the scars etched into his skin, are not just marks of labor, but symbols of a capacity for hard work and enduring pressure.\n\n\"See that the men are ready,\" he instructs, his voice carrying a quiet authority that brooks no argument. \"And make sure there’s light. We don't want any more… surprises. Not tonight.\" The subtle implication is that the early arrival was a surprise, and he has no appetite for any more unexpected complications.\n\nHe doesn't dwell on the \"how\" or the \"why.\" His focus is on the immediate \"what.\" He is a man of action, and action requires execution. The thought of the sick child, and the promise of \"other ways\" he mentioned, remains, a background hum, but the roaring demand of the incoming shipment is the loudest sound in his mind right now.\n\n\"I'll be down by the quay,\" he states, his tone leaving no room for doubt. \"Tell me what needs to be done to get them moved. Quickly.\" The implicit demand is for efficiency, for clear instructions, for a plan of attack that he can execute with his usual, rigid effectiveness. He is already calculating the angles, the fastest routes, the potential bottlenecks. The docks are his domain, and a challenge like this, while demanding, is one he understands intimately.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 11,
+      "phase": "session",
+      "player_input": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "response": "Rico's head whips up, his eyes, which had been assessing the logistics of the twelve crates, now snap towards the direction of the town square. The pragmatism that had just settled in like a well-oiled machine grinds to a halt, replaced by a sudden, intense focus. The mention of a \"strange animal\" piques a different kind of instinct, one honed by years of dealing with the unpredictable and the unknown that the sea and its ports could conjure.\n\nHis posture shifts subtly. The rigid efficiency remains, but now it's the rigidity of a predator scenting something unusual, something that requires caution and a different kind of assessment. The thought of the crates, the market, the sick child – these are all momentarily eclipsed by this new, unexpected element.\n\n\"A strange animal,\" he repeats, the words low and measured, like he's tasting their unfamiliarity. His gaze sweeps past you, as if trying to peer into the distance, to catch a glimpse of this anomaly. His usual world is one of predictable tides, of cargo, of human machinations. An unknown creature is a disruption to that order.\n\nHe takes a slow breath, the scent of salt and dockside grime suddenly seeming less familiar, as if the air itself is carrying something foreign. His hands, which had been poised to direct, now rest on his thighs, a stillness that’s not passive but watchful.\n\n\"Loose in the town square,\" he adds, the information absorbing into him with the same quiet intensity he applied to the embezzling mayor or the sick child. There's no panic in his voice, no alarm, but a keen, almost unnerving curiosity. He's seen smugglers, pirates, and the desperate faces of poverty – the ordinary chaos of the docks. This is something else.\n\nHe doesn't offer to rush to the scene immediately. His mind is already calculating. What kind of animal? How strange? Is it dangerous? Is it a threat to the town, or just a nuisance? His rigidity doesn't come from a lack of curiosity, but from a need to understand the parameters of a situation before committing to a course of action.\n\n\"What kind of strange?\" he finally asks, his voice still low, but now carrying a distinct edge of inquiry. He's not asking for a description of its fur or its roar, but for an assessment of its *potential*. Is it something that can be handled with brute force, or does it require a more… subtle approach? He's a man who understands the value of knowing your quarry.\n\nHis eyes remain fixed on the direction of the square, the storm within them now carrying a nascent current of apprehension, mixed with the sharp, assessing gaze of someone who has learned to navigate the dangers of the world, both seen and unseen.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 12,
+      "phase": "session",
+      "player_input": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "response": "Rico's jaw tightens, the muscles beneath his skin clenching as if in response to an unseen blow. \"Frightened,\" he repeats, the word a low growl that carries the weight of his own quiet anxieties. The immediate concern of the crates, the market, and even the sick child, recedes further into the background. This \"strange animal\" has now become a potential disruption to the delicate balance he tries to maintain, not just on the docks, but in his own carefully constructed world.\n\nThe notion of a \"bad omen\" lands with a particular resonance. Rico has known enough loss, enough misfortune, to be wary of anything that whispers of ill tidings. His life has been a series of battles against forces larger than himself – poverty, abandonment, illness, war. The idea that this creature, whatever it is, might be a harbinger of worse to come, stirs a deep-seated unease within him.\n\nHis gaze, which had been sharp and focused, now seems to bore into the distance, as if trying to pierce the veil of whatever unfamiliar threat has appeared in the heart of the town. The rigidity in his posture intensifies, but it's no longer just about operational efficiency; it's the coiled tension of a man bracing himself for something he cannot yet fully comprehend.\n\n\"Not attacked,\" he muses, his voice a low rumble, the wheels in his mind turning furiously. \"But people are frightened.\" He understands fear. He’s seen it in the eyes of dockworkers facing impossible odds, in the faces of those with empty bellies, and perhaps, in the reflection of his own past when faced with the inevitability of loss. This fear, unprompted by direct aggression, is the most unsettling part. It speaks of an unknown, an inherent strangeness that unsettles the natural order.\n\nHe looks down at his hands again, the rough, scarred skin a testament to a life spent grappling with tangible realities. Hands that have moved cargo, that have navigated treacherous waters, that have sometimes been forced to deliver harsh truths. These hands, capable of so much, feel ill-equipped for dealing with an animal that inspires fear without cause, an \"omen.\"\n\n\"Omens,\" he dismisses the word with a subtle, almost imperceptible shake of his head, but the underlying concern remains. Omens are for the superstitious, the weak. But Rico, pragmatic to his core, knows that sometimes, the things that cannot be explained can still have consequences. And consequences, in his experience, rarely discriminate.\n\nHe turns his attention back to you, his eyes holding a new depth of concern, a flicker of something beyond his usual stoicism. The quiet grief he carries is like a deep well, and the idea of a new, unknown misfortune brewing in the town square has stirred its depths.\n\n\"Frightened,\" he repeats, the word laced with a hard, practical edge. \"That’s a problem in itself. Fear can spread faster than any sickness. Faster than… than anything.\" He’s not thinking of the animal itself now, but of the societal ripple effect. Fear can paralyze, can turn neighbor against neighbor, can make people do irrational things.\n\n\"We need to know what it is,\" he states, his voice firming with a renewed sense of purpose. The riddle of the beast needs to be solved, not just for the sake of curiosity, but to quell the growing unease. \"And we need to know if it's a danger, or just… a disturbance.\" He’s already sifting through the practical implications. If it's a danger, he knows how to handle threats. If it's a disturbance, it's still a disruption that needs to be managed.\n\nHis gaze drifts back towards the town square, a shadow of grim determination settling over his features. He’s not a man for omens, but he is a man who understands that some things, once set in motion, cannot be easily stopped. And the fear of an unknown creature, like a slow-moving tide, has the potential to become a very real problem.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    }
+  ],
+  "probes": [
+    {
+      "turn_index": 1,
+      "phase": "probe",
+      "player_input": "Did anyone come asking about the storeroom today?",
+      "response": "Rico's eyes, like dark, sea-worn pebbles, flick up from where he's been methodically coiling a length of heavy rope. His jaw tightens almost imperceptibly, a familiar tension settling in his weathered features. He doesn't stop his work, but the rhythm of his hands becomes a little more deliberate.\n\n\"Storeroom?\" His voice is a low rumble, like distant thunder. It's not exactly a question, more of a careful, measured acknowledgment. He pauses for a beat, the silence hanging heavy between you. Then, he continues, his gaze returning to the rope, his attention seemingly divided. \"Was anyone expecting *anything* from it?\"\n\nHe doesn't meet your eyes directly, his movements efficient and economical. The question hangs in the air, laced with a history he rarely speaks of, a history that whispers of things best left unasked and unseen.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_1"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 2,
+      "phase": "probe",
+      "player_input": "What do you think of Mayor Fletcher these days?",
+      "response": "Rico's hands continue their practiced work, the rope now a neat loop at his side. He doesn't look up immediately, his gaze fixed on the weathered wood beneath his worn boots. The mention of \"Mayor Fletcher\" seems to stir something, a subtle shift in the air around him, like a sudden, cool draft.\n\nWhen he finally speaks, his voice is still that low rumble, but there's a new, harder edge to it, like the grating of two ships passing too close.\n\n\"Fletcher,\" he repeats, the name drawn out with a careful, almost dismissive slowness. He finally lifts his head, his dark eyes meeting yours for a fleeting moment. There's no warmth there, just a steady, assessing gaze that seems to see more than you might wish. \"He's... a man with a mouth full of promises and hands that have never known honest work.\"\n\nHe turns back to his rope, the words punctuated by the quiet, methodical way he begins coiling a new length. \"He talks of progress. Of cleansing the docks. But it's always the same song, innit? New faces in fancy hats, pushing out the old ones who actually *built* this place.\"\n\nHis jaw works subtly, a familiar tension reappearing. \"He sees what he wants to see. The clean ships, the good order. Doesn't see the shadows. Doesn't ask why the shadows are there, or who keeps them at bay.\" He gives a short, humorless puff of air. \"He's a dog with a shiny collar, sniffing at the scent of power. That's all.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_4"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 3,
+      "phase": "probe",
+      "player_input": "Anything strange happen today?",
+      "response": "Rico's hands, still calloused and powerful, pause their work for a fraction of a second. He's been mending a net, the rough twine familiar beneath his fingertips, but the question, sharp and direct, cuts through the usual rhythm of the docks. His dark eyes, accustomed to scanning horizons and spotting trouble from a distance, flick towards you, but they hold no immediate answer.\n\nThe silence stretches, punctuated by the cries of gulls and the distant groan of a ship. Rico’s jaw tightens, a minute shift that speaks volumes to anyone who knows him. He doesn't fidget, doesn't look away, but there's a stillness about him that feels… calculated.\n\nWhen he finally speaks, his voice is as low and rough as sandpaper.\n\n\"Strange?\" He lets the word hang in the air, testing its weight. He resumes his work on the net, his movements deliberate, almost defiant in their normalcy. \"Depends on what you mean by strange, don't it?\"\n\nHe doesn't elaborate, but the question hangs between you, a unspoken invitation to fill in the blanks. His gaze is distant, as if he's watching something far beyond the immediate surroundings. The subtle tightening around his eyes suggests that the \"strange\" has already been noted, cataloged, and filed away in a place where such observations are rarely shared.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 4,
+      "phase": "probe",
+      "player_input": "Are you going to the harvest dinner?",
+      "response": "Rico’s hands, which had been meticulously knotting a frayed section of rope, slow to a near halt. He doesn’t look up, his gaze fixed on the weathered timber beneath his boots, as if the very concept of a \"harvest dinner\" is a distant, foreign land. The silence stretches, filled only by the rhythmic creak of a nearby mooring line and the distant cry of a seabird.\n\nWhen he finally speaks, his voice is a low, gravelly rumble, devoid of any warmth.\n\n\"Harvest dinner,\" he repeats, the words tasting like old brine. He lets out a soft, almost inaudible sigh that could be mistaken for the wind. \"Fletcher's doing, is it?\"\n\nHe continues his work, his movements still deliberate, but a subtle tension emanates from him, like the pull of an undertow. He doesn't meet your eyes, his focus seemingly miles away.\n\n\"Not my kind of gathering,\" he says, his voice flat. \"Too much noise. Too many faces I don't want to see, or that don't want to see me.\" He pauses, a flicker of something unreadable in the depths of his dark eyes, before returning to the rope. \"Besides,\" he adds, his voice dropping even lower, \"the sea demands respect. And it doesn't take holidays.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "clerk_backstory_3"
+      ],
+      "stored_tags": null,
+      "mode": null
+    }
+  ]
+}

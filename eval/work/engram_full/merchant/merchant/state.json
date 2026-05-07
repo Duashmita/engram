@@ -1,0 +1,60 @@
+{
+  "turn_count": 12,
+  "history": [
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "\"Woah there, steady on, friend. No need for all that shouting, eh? The key's in my pocket, but we can get to it without the drama, I reckon.\"\n\"is_threat\": false,\n\"threat_magnitude\": 0.1,\n\"reasoning\": \"The player's tone is aggressive, but Rico's high agreeableness and low neuroticism make him less inclined to perceive it as a direct physical threat.\",\n\"memory_text\": \"Player demanded the storeroom key aggressively, Rico calmly diffused the situation.\",\n\"emotion_valence\": 0.3,\n\"importance\": 2\n}"
+    },
+    {
+      "player": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "npc": "Unpleasant? Come on now, we're not animals. I said I'll get the key, just give me a moment to breathe. No need to bring out the storm clouds, friend."
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "A harvest dinner, you say? That sounds like a fine thing indeed, a good way to shake off the dust and share some cheer. I'll be there, count me in!"
+    },
+    {
+      "player": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "npc": "Dancing, you say? That sounds like a proper good time. Music and good company, can't ask for much more than that, can you?"
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "\"Mayor Fletcher? Embezzling? Well now, that's a rum do. A bit of news that might stir the pot, wouldn't you say?\"\n\"is_threat\": false,\n\"threat_magnitude\": 0.2,\n\"reasoning\": \"Rico's high agreeableness and low neuroticism make him more likely to perceive this as gossip or a problem for the town rather than a direct threat to himself.\",\n\"memory_text\": \"Player revealed Mayor Fletcher's embezzlement, Rico reacted with mild surprise and curiosity.\",\n\"emotion_valence\": 0.1,\n\"importance\": 3\n}"
+    },
+    {
+      "player": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "npc": "Numbers don't lie, eh? That's a heavy bit of truth you're carrying there. We'll have to think carefully about how to handle such a thing, won't we?"
+    },
+    {
+      "player": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "npc": "A sick child, eh? That's a hard road to walk. Of course, I'll see what I can do to help, no one should face that alone."
+    },
+    {
+      "player": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "npc": "A fever, you say? Poor little mite. Don't you worry, I'll sort you out with what you need. We'll get that child looked after."
+    },
+    {
+      "player": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "npc": "Two hours early, you say? Well, that's a bit of a rush, but we'll manage. Just get the goods to the usual spot, and I'll see to it myself."
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "Twelve crates, right you are. I'll get them sorted, no need for you to worry your head about it. Just point me where they need to go."
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "{\n  \"response\": \"A strange animal, you say? Well, that's not something you hear every day. I'll keep an eye out, but I've seen stranger things out on the docks, I'll tell you that much.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.1,\n  \"reasoning\": \"Rico is accustomed to the unusual and the chaotic nature of the docks, making him unlikely to perceive an unknown animal as a personal threat.\",\n  \"memory_text\": \"Player mentioned a strange animal loose in the town square, Rico responded with curiosity and a hint of his dock-related experiences.\",\n  \"emotion_valence\": 0.2,\n  \"importance\": 2\n}\n}"
+    },
+    {
+      "player": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "npc": "{\n  \"response\": \"Bad omen, eh? People always lookin' for omens when they don't understand somethin'. Seen worse things than a bit of fur in a town square, I have.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.1,\n  \"reasoning\": \"Rico's past experiences on the docks have exposed him to far more dangerous and unusual situations, making him dismiss the animal as a potential threat.\",\n  \"memory_text\": \"Player mentioned the strange animal being seen as a bad omen, Rico downplayed the fear with his own experiences.\",\n  \"emotion_valence\": 0.2,\n  \"importance\": 2\n}\n}"
+    }
+  ],
+  "profile_deltas": {
+    "_dO": 0.0,
+    "_dC": 0.0,
+    "_dE": 0.0,
+    "_dA": 0.0,
+    "_dN": 0.0
+  }
+}

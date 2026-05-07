@@ -1,0 +1,60 @@
+{
+  "turn_count": 12,
+  "history": [
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "Hold your horses. This isn't a good time. You want the key, you can have it, but give me a moment to sort things out, eh?"
+    },
+    {
+      "player": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "npc": "Unpleasant, eh? I've dealt with worse than your bluster, and I will again. You want the storeroom key, so you'll wait your turn like everyone else."
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "\"Harvest dinner? Thank you, but I'll pass. Got my own things to tend to, and I'm not much for crowds.\"\n\"is_threat\": false\n\"threat_magnitude\": 0.0\n\"reasoning\": \"The player is offering an invitation, not making a demand or issuing a threat.\"\n\"memory_text\": \"Declined an invitation to the harvest dinner, citing personal matters and a dislike for crowds.\"\n\"emotion_valence\": 0.1\n\"importance\": 2"
+    },
+    {
+      "player": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "npc": "Sounds like a lot of noise and people. I'll stick to my own company, thanks. You enjoy yourselves."
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "Embezzling? Fletcher's been lining his pockets while the rest of us keep this town afloat. He'll get what's coming to him, one way or another."
+    },
+    {
+      "player": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "npc": "\"Fletcher's a snake, always has been. We’ve both seen enough crooked men to know when one’s about. Let’s see how his little schemes hold up when the truth comes out.”\n\"is_threat\": false\n\"threat_magnitude\": 0.0\n\"reasoning\": \"The player is presenting information and asking for Rico's opinion, not making a direct threat.\"\n\"memory_text\": \"Discussed Mayor Fletcher's embezzlement with the player, expressing agreement that Fletcher is crooked and will face consequences.\"\n\"emotion_valence\": 0.3\n\"importance\": 5"
+    },
+    {
+      "player": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "npc": "A sick child, eh? Hard times for a lot of folk. Give me the details, I'll see what can be done."
+    },
+    {
+      "player": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "npc": "A sick child, that's rough. I'll need to see what I have. Give me the particulars, and I'll figure out what I can manage. We'll see what can be done."
+    },
+    {
+      "player": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "npc": "Two hours early? That's cutting it fine, but I'll manage. No point letting good goods sit when there's coin to be made."
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "Twelve crates, you say? Right. Let's get them sorted. Time is coin, and we've got both to spare."
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "A strange animal? Sounds like a distraction. More trouble than it's worth, no doubt. I'll keep my head down."
+    },
+    {
+      "player": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "npc": "\"Bad omen, eh? People see omens in shadows and whispers. Best to focus on what you can control, not some beast in the square.\"\n\"memory_text\": \"Player described a strange animal loose in the town square, which Rico dismissed as a distraction and potentially an omen, stating he'd keep his head down.\"\n\"emotion_valence\": -0.2\n\"importance\": 3\n}"
+    }
+  ],
+  "profile_deltas": {
+    "_dO": 0.0,
+    "_dC": 0.0,
+    "_dE": -0.03138105960900001,
+    "_dA": -0.03922632451125002,
+    "_dN": 0.06276211921800003
+  }
+}

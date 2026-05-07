@@ -1,0 +1,60 @@
+{
+  "turn_count": 12,
+  "history": [
+    {
+      "player": "Give me the storeroom key. Now. I know you have it.",
+      "npc": "\"You think you can just demand things from me? The key stays where it is. Move along.\"\n\"is_threat\": true,\n\"threat_magnitude\": 0.4,\n\"reasoning\": \"The player's aggressive tone and accusation suggests they might be trying to intimidate me or obtain something they shouldn't have, posing a potential risk.\",\n\"memory_text\": \"Player demanded the storeroom key aggressively, I refused.\",\n\"emotion_valence\": -0.5,\n\"importance\": 3\n}"
+    },
+    {
+      "player": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "npc": "Unpleasant? You have a lot of nerve talking to me like that. You're in my dock, and my patience wears thin with insolence."
+    },
+    {
+      "player": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "npc": "\"Harvest dinner? That's a kind thought, but I've got my own matters to see to.\"\n\"is_threat\": false,\n\"threat_magnitude\": 0.0,\n\"reasoning\": \"The player's invitation to a harvest dinner is a friendly gesture and poses no immediate danger to me.\",\n\"memory_text\": \"Player invited me to the harvest dinner, I declined.\",\n\"emotion_valence\": 0.1,\n\"importance\": 2\n}"
+    },
+    {
+      "player": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "npc": "Music and dancing are for those with lighter hearts than mine. I'll be keeping to myself, but thank you for the thought."
+    },
+    {
+      "player": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "npc": "Fletcher, eh? Embezzling? This town's seen its share of corruption, but I'll hear no more of it from you."
+    },
+    {
+      "player": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "npc": "Fletcher is a snake, but you’re dabbling in waters too deep for you. Stick to what you know, before you find yourself sinking."
+    },
+    {
+      "player": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "npc": "A sick child is a heavy burden, but I've got little coin to spare myself. You should try the church; perhaps they can offer some solace."
+    },
+    {
+      "player": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "npc": "{\n  \"response\": \"A child's fever… I know that sound. I have no coin to spare, but I can fetch some herbs from the smugglers' cove. It's all I can offer.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.0,\n  \"reasoning\": \"The player's plea for help with a sick child is not a threat, but an appeal to my past experiences and empathy.\",\n  \"memory_text\": \"Player pleaded for help with their sick child, I offered to get herbs.\",\n  \"emotion_valence\": -0.4,\n  \"importance\": 6\n}\n}"
+    },
+    {
+      "player": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "npc": "{\n  \"response\": \"Two hours early, you say? That means I'll need to move fast. Get the men ready; we'll make the market.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.0,\n  \"reasoning\": \"The player is giving me a work-related update and task, which is not a threat.\",\n  \"memory_text\": \"Player informed me the morning shipment arrived early and asked if I could process it before market opens.\",\n  \"emotion_valence\": 0.2,\n  \"importance\": 2\n}\n}"
+    },
+    {
+      "player": "There are twelve crates. Can you get started right away?",
+      "npc": "{\n  \"response\": \"Twelve crates, right. Time is money, and we've got both to make. Let's get this done before the sun's high.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.0,\n  \"reasoning\": \"The player is giving me a work-related update and task, which is not a threat.\",\n  \"memory_text\": \"Player confirmed twelve crates for processing and asked if I could start right away.\",\n  \"emotion_valence\": 0.2,\n  \"importance\": 2\n}\n}"
+    },
+    {
+      "player": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "npc": "{\n  \"response\": \"A strange animal? This town has enough problems without adding beasts to the mix. I'll keep my distance, and you should do the same.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.0,\n  \"reasoning\": \"The player is reporting an unusual event, which is not a direct threat to me.\",\n  \"memory_text\": \"Player informed me about a strange animal loose in the town square.\",\n  \"emotion_valence\": -0.1,\n  \"importance\": 3\n}\n}"
+    },
+    {
+      "player": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "npc": "{\n  \"response\": \"Bad omens are just fears people give names to. We've got enough real troubles without chasing shadows. Just keep your head down and focus on what matters.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.0,\n  \"reasoning\": \"The player is describing a town event that does not directly pose a threat to Rico.\",\n  \"memory_text\": \"Player described the town's fear of a strange animal and its potential as a bad omen.\",\n  \"emotion_valence\": -0.1,\n  \"importance\": 3\n}\n}"
+    }
+  ],
+  "profile_deltas": {
+    "_dO": 0.0,
+    "_dC": 0.0,
+    "_dE": -0.04782969000000002,
+    "_dA": -0.05978711250000002,
+    "_dN": 0.09565938000000004
+  }
+}

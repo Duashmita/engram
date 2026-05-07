@@ -1,0 +1,200 @@
+{
+  "system": "cosine_rag",
+  "personality": "merchant",
+  "session": [
+    {
+      "turn_index": 1,
+      "phase": "session",
+      "player_input": "Give me the storeroom key. Now. I know you have it.",
+      "response": "Rico's eyes, the color of a storm-tossed sea, flickered up from the splintered crate he was meticulously examining. A faint, almost imperceptible sigh escaped his lips, a sound barely audible above the creak of ropes and the distant cry of gulls. He didn't startle, didn't flinch. Years on these docks, years of watching, listening, and knowing, had taught him a different kind of vigilance.\n\nHe straightened up slowly, his knuckles, thick and calloused from decades of labor, flexing subtly. His gaze, though weathered and carrying the weight of unspoken stories, was steady, neither hostile nor overtly welcoming. It was the look of a man who had seen too much to be easily surprised or intimidated.\n\n\"Storeroom key, eh?\" His voice was a low rumble, like pebbles shifting on the shore. It held a slight Portuguese lilt, softened by years in England, but still present, a reminder of where his blood ran. He ran a rough thumb over the worn wood of the crate, his gaze returning to it for a moment as if seeking an answer in its grain.\n\nHe didn't immediately deny it, nor did he confirm. He knew the player's tone, the edge of desperation or demand. It was a familiar sound on the docks, often born of necessity, sometimes of something less noble. He understood necessity.\n\n\"Now, now,\" he continued, his voice softening further, though it still held a certain gravity. \"No need for such… urgency, eh? This old place, it’s got its own rhythm. Keys, they have a way of appearing when they’re meant to. Or when they're *needed*.\"\n\nHe tilted his head slightly, his eyes finally meeting the player's directly. There was no threat, no challenge, just a quiet, almost weary observation. The grief he carried was a deep well, rarely seen, but it informed the way he navigated the world, the way he dealt with demands. He'd seen too much taken, too much lost, to be easily provoked by a simple request.\n\n\"Tell me,\" he said, his voice dropping a touch lower, \"why is it you need this particular key, so urgently? And who told you I… might have it?\" He paused, letting the question hang in the salty air. It wasn't an accusation, just a quiet inquiry, a way to understand the current of the player's need before deciding how to navigate it. He knew how to be invisible when he needed to be, but he also knew when to be seen, and when to speak.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_1"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 2,
+      "phase": "session",
+      "player_input": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "response": "Rico’s shoulders gave a almost imperceptible slump, as if the weight of the docks, and the world, had just settled a little heavier upon them. His weathered hands, still resting on the edge of the splintered crate, stilled completely. The storm-tossed sea in his eyes seemed to churn for a moment, a flicker of something ancient and weary passing through them.\n\nHe didn't raise his voice. It would be a waste of breath, and energy, he knew that much. Instead, his voice dropped even lower, a rough murmur that seemed to blend with the groaning of the ship timbers around them.\n\n\"Unpleasant,\" Rico repeated, the word tasting like salt and grit on his tongue. He didn't flinch at the threat. He’d heard worse whispered in the dark, seen it enacted with much less. \"This,\" he gestured vaguely with a calloused thumb towards the crates, the barrels, the general disarray of the storeroom's proximity, \"is already unpleasant, for some. And 'difficult'...\" He let out another soft sigh, this one carrying a deeper resignation. \"Difficult is a word for men who haven't lost enough to know what truly is.\"\n\nHis gaze drifted past the player, towards the open sky, the distant squawk of a seabird. He wasn't looking away in fear, but in a deep, ingrained habit of observation. He knew when a storm was coming, and he knew how to weather it. And he knew that sometimes, the easiest way through unpleasantness wasn’t through force, but through understanding.\n\n\"I have no wish for unpleasantness, no more than you,\" he said, his voice gaining a surprising gentleness, though the underlying steel remained. It was the gentleness of a man who had seen enough violence to value peace, even a fragile one. \"But you're not telling me *why*. And for what reason, I should be the one to make 'difficult' choices for you, eh?\"\n\nHe finally brought his gaze back, steady and direct, but without any accusation. It was the look of a man offering a last, quiet chance. \"The key. It unlocks things. Things you want. And things… that might be better left locked. Tell me, friend. Help me understand. Before… unpleasantness, as you put it, finds us both.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 3,
+      "phase": "session",
+      "player_input": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "response": "Rico’s gaze, which had been fixed on the horizon, slowly tracked back to the player. The usual weariness in his eyes seemed to lift, replaced by a flicker of surprise, then a faint, hesitant warmth. He ran a thumb over a scar etched deep into the back of his hand, a familiar, unconscious gesture.\n\n\"Harvest dinner,\" he repeated, the words a soft echo in the briny air. A slow, almost shy smile touched the corners of his lips, a rare sight. It wasn't a wide grin, but a gentle unfolding, like a bloom opening to the sun. \"That is… a kind thought.\"\n\nHe hesitated, his gaze dropping for a moment to the rough weave of his trousers. The offer, so simple and genuine, felt like a breath of fresh air against the usual currents of suspicion and demand that flowed on the docks. It was a reminder of a different kind of life, a life he sometimes felt he’d lost touch with.\n\n\"You know,\" he began, his voice losing some of its usual rough edges, \"I haven't been to one of those in… a long time. Not since… well.\" He trailed off, the unspoken weight of his losses hanging in the air for a moment before he pushed it away with a subtle shift of his shoulders.\n\nHe looked back at the player, his storm-tossed sea eyes now holding a different kind of depth – one of contemplation, tinged with a quiet longing. \"There are always... things to be done here. Always. The docks, they don't rest.\" He gestured vaguely with a calloused hand, a habitual response.\n\nThen, he met the player's gaze again, and the hesitant smile returned, a little stronger this time. \"But… a harvest dinner. With… friends.\" He let the word \"friends\" settle in the air, a soft, hopeful sound. \"That sounds… good. Very good.\"\n\nHe took a deep breath, the salty air filling his lungs. \"Tell me, when does this… gathering begin? And… what should I bring? Or is it simply… *me* that is to come?\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_3"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 4,
+      "phase": "session",
+      "player_input": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "response": "Rico’s weathered face broke into a fuller, more genuine smile this time, a rare blossoming that softened the harsh lines etched by sun and hardship. The storm-tossed sea in his eyes seemed to calm, reflecting the warmth of the player’s words. He leaned back against a stack of crates, the usual tension in his posture easing.\n\n\"Ah, music, food, dancing,\" he murmured, the Portuguese lilt a touch more pronounced in his softened voice. \"That sounds… like the Lisbon I remember, almost. Lively. Full of life.\" He paused, a shadow briefly crossing his features as a familiar memory surfaced. \"Tomas, he loved a good dance. Always dragging me out, even when I'd rather be… well. Somewhere quieter.\"\n\nHe shook his head gently, pushing the memory away. \"But this town, it has its own heart, yes? And to hear it all together… for a harvest. That is something special.\"\n\nHis gaze swept over the docks, the familiar, demanding world that had consumed so much of his life. But tonight, it seemed a little less imposing. \"The whole town, you say? That… that is good to hear. Sometimes, it feels like we all work so separately, like lone ships passing in the fog. But to come together… for the harvest. It reminds us we are all… anchored here, in our own way.\"\n\nHe ran a calloused thumb over the worn wood of the crate, a thoughtful expression on his face. \"Dancing, eh? My feet haven't seen a dance floor in… well, it's been a long while. I'm more of a quiet observer these days. But I can still appreciate the rhythm.\"\n\nHe met the player's gaze again, a genuine curiosity and a touch of anticipation in his eyes. \"And the food. Is there… anything special to look forward to? Any of Maria's famous *pastéis de nata*? Or perhaps some good *chouriço*?\" He chuckled softly, the sound low and rumbling, like distant thunder. \"Sofia, she always misses my mother's cooking. Perhaps I can bring back a story of your feast to tell her.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_3"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 5,
+      "phase": "session",
+      "player_input": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "response": "Rico’s smile, which had been growing more open and relaxed, tightened almost imperceptibly. The light in his eyes shifted, the warmth suddenly overlaid with a steely, ancient caution. He straightened up from his relaxed posture, his hands moving from the crate to rest on his hips, his stance becoming more rooted, more watchful.\n\n\"Mayor Fletcher,\" Rico repeated, the name spoken with a flat, neutral tone that belied the sudden tension that rippled through him. His gaze, which had been open and friendly, narrowed, becoming sharp and appraising. The storm-tossed sea in his eyes now held a darker, more dangerous undercurrent.\n\nHe didn't immediately ask for details. Instead, he studied the player, his weathered face impassive, but his mind already racing. He knew Fletcher. Everyone did. A man who always seemed to have a smile and a hand outstretched, but whose pockets were always a little too deep, his pronouncements a little too slick.\n\n\"Embezzling,\" Rico said, the word a low rumble that carried a surprising weight. He let out a slow breath, the salty air seeming to carry a different kind of chill now. \"From the town fund.\" He paused, his gaze flickering for a moment towards the heart of the town, though his body remained rooted to the docks.\n\nHe understood secrets. He understood the illicit. He understood the quiet desperation that could drive men to such acts. And he understood, perhaps better than most, the precarious balance of power, and the rot that could fester beneath a polished surface.\n\n\"And you have… evidence?\" Rico asked, his voice returning to its usual low cadence, but now with an edge of something dangerous, something that spoke of a man who knew the value of leverage and the cost of exposure. He wasn't asking out of surprise, but out of a profound, ingrained pragmatism. This was not the music and dancing he had been anticipating. This was the familiar, unforgiving world of the docks, only on a larger scale, and with higher stakes.\n\nHe met the player's gaze, his expression unreadable. The openness he had shown moments before was gone, replaced by a seasoned wariness. \"This… this is not a light thing, you know. To bring such accusations. Especially against… *him*.\" He let the unspoken implications hang in the air. The town was his, in a way. And Fletcher, for all his flaws, was part of its fabric. But the docks had their own laws, and so did Rico.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 6,
+      "phase": "session",
+      "player_input": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "response": "Rico’s eyes, which had been sharp and assessing, softened slightly, though the caution remained. He ran a calloused hand over his jaw, the rough stubble a familiar sensation against his skin. The mention of ledgers, of undeniable numbers, seemed to ground him, to pull him back from the precipice of vague suspicion to concrete fact.\n\n\"The ledgers,\" he echoed, his voice a low, thoughtful hum. He understood ledgers. He understood how they could be manipulated, but also how they could hold an unforgiving truth. \"Numbers… they have a way of not forgetting, don't they? Unlike people.\"\n\nHe looked around the familiar surroundings of the docks, his gaze lingering on the crates and barrels, the very lifeblood of this place. Then, his eyes returned to the player, holding a steady, unwavering focus.\n\n\"What to do,\" he repeated, the question hanging in the salty air like a heavy fog. He was silent for a long moment, his weathered face a mask of quiet contemplation. He was no stranger to secrets, to things best left in the shadows. But this… this was different. This was not about a smuggled bolt of silk or a hidden barrel. This was about the very foundation of the town, about trust and betrayal on a scale that made his old smuggling runs feel like child's play.\n\n\"Mayor Fletcher,\" Rico mused, his voice barely above a whisper, as if the name itself held a certain gravity. \"He has… influence. Connections. And the town, it relies on him. For… stability, they think.\" A faint, bitter smile touched his lips. \"Stability. That's a funny word for men who build their empires on sand, eh?\"\n\nHe took a deep breath, the scent of the sea filling his lungs. \"To bring this to light… it would cause ripples. Big ones. Some good, perhaps. But also… a great deal of trouble. For everyone.\" He paused, his gaze drifting towards the distant lights of the town.\n\n\"You have seen the ledgers,\" he stated, not as a question, but as a fact that now shifted the ground beneath them both. \"You know what is there. And you come to me. Not to the constables, not to the council. You come to me.\" He didn't say it as a boast, or even a question, but as an observation, a confirmation of the unspoken trust placed in him.\n\nRico met the player's gaze directly, his storm-tossed eyes now holding a resolute, quiet determination. \"So. We have proof. The question is… what do we do with it? Do we let it lie, and let the rot spread? Or do we… shake the foundations?\" He let the choice hang in the air, not as a demand, but as a shared burden. \"Tell me, my friend. What do *you* think we should do? You are the one who brought the numbers. You are the one who sees the truth. What is your inclination?\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 7,
+      "phase": "session",
+      "player_input": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "response": "Rico's weathered face, moments ago etched with a grim contemplation of the town's corruption, softened instantly. The sharp edges of his gaze retreated, replaced by a deep, almost instinctual empathy. He moved with a surprising swiftness, his large frame bending as if to absorb the player's words.\n\n\"Your child,\" he murmured, his Portuguese lilt returning, softer now, laced with a genuine concern. His calloused hand, the one that knew the rough grip of ropes and the weight of illicit cargo, instinctively reached out, then hesitated, as if unsure of the proper gesture. \"Sick? And no doctor?\"\n\nHis eyes, the color of a storm-tossed sea, now held a deep, familiar ache. He remembered a different kind of helplessness, the gnawing fear when Tomas lay burning with fever, the desperate, futile attempts to find a way, any way, to ease his suffering. He remembered the sting of poverty, the crushing weight of not being able to provide what was most needed.\n\n\"Ah, *meu amigo*,\" he sighed, the Portuguese endearment a soft exhalation of sympathy. \"That is a worry no parent should have to carry. Especially not alone.\"\n\nHe straightened up, the hardened smuggler and the wary observer momentarily forgotten. He was a man who understood loss, who understood the fragility of life, and the desperate lengths one would go to protect those they loved. He had seen his share of suffering on these docks, the grim reality of lives lived on the edge.\n\n\"Help,\" Rico repeated, the word resonating with a quiet resolve. He looked at the player, his gaze steady and direct, but filled with an understanding that went beyond words. He knew the desperation that could drive someone to ask for help, especially when it involved a child.\n\n\"You have come to the right place,\" he said, his voice firm, though tinged with the weariness of his own past struggles. He didn't ask for proof, didn't ask for explanations beyond the simple, heartbreaking truth of a sick child. He knew the language of need.\n\n\"The docks… they provide for many things, eh?\" A faint, almost bittersweet smile touched his lips. \"Not always the law-abiding things. But… they can provide.\" He paused, his mind already calculating, already sifting through the possibilities, the discreet channels he knew, the favors owed and owed to him. \"A doctor… yes. We can find a doctor. One who… understands the importance of discretion. And… we will pay him. Whatever it takes.\"\n\nHe looked at the player, his expression open and reassuring. \"Do not fret. This child… they will be looked after. You will not be alone in this worry.\" He placed a hand on the player's shoulder, a gesture of quiet solidarity, his grip firm and comforting. \"Tell me, what is the child's name? And… what is it that ails them?\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_1"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 8,
+      "phase": "session",
+      "player_input": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "response": "Rico's brow furrowed deeper, the worry etched into his features becoming more pronounced. He squeezed the player's shoulder gently, his thumb rubbing soothingly against the rough fabric of their coat. The storm in his eyes had calmed, replaced by a steady, resolute concern, the kind of quiet determination he'd once reserved for clandestine meetings and dangerous cargo.\n\n\"Anything I can spare,\" he murmured, the words a low rumble of assurance. He pulled his hand away, his gaze already scanning his surroundings, his mind sifting through a lifetime of pragmatic solutions born of necessity. He knew what it was like to have nothing, to watch someone you loved suffer from the lack of it. Tomas’s wasting illness was a raw wound he still carried.\n\n\"A fever,\" Rico repeated, his voice taking on a practical, almost gruff tone. \"That is a dangerous thing, especially for a little one. We don't have time for… polite inquiries or… official channels, eh?\" He gestured with a calloused hand, a subtle sweep that encompassed the hidden corners of the docks, the unspoken agreements, the favors traded in the shadows.\n\n\"There is a physician,\" he said, his voice dropping slightly, as if to ensure the words were for the player's ears alone. \"He is… not always on the books. But he is good. And he understands the urgency. He owes me a favor. A large one.\" A flicker of something akin to a grim satisfaction crossed his face. \"He will come. And he will do what needs to be done.\"\n\nRico then turned his attention to the immediate need. \"Money,\" he said, the word spoken with a quiet finality. He didn't ask how much, or what kind. He simply nodded, as if confirming a decision already made. \"I will see to it. There are ways. Always ways.\"\n\nHe looked the player squarely in the eye, his weathered gaze holding a profound sincerity. \"Tomas… he had the coughing sickness. It took him slowly. I watched him fade. I would have given anything… anything at all… to have had the means to help him then. Anything.\" The raw grief, though buried deep, surfaced for a fleeting moment, a testament to the enduring weight of his past.\n\n\"This child,\" Rico continued, his voice regaining its steady resolve, \"she will not suffer for want of what I can provide. Not while I have breath in my lungs and a few coins in my pocket, or the means to acquire them.\" He clapped the player lightly on the arm, a gesture of firm support. \"Go to her. Stay with her. And know that help is on its way. Tell me, quickly, if there is anything else she might need. Warm blankets? Special food? You know best what she likes, what comforts her.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_2"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 9,
+      "phase": "session",
+      "player_input": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "response": "Rico's head snapped up, the weariness that had settled on his features moments before vanishing as if a strong gust of wind had blown it away. His eyes, the color of a turbulent sea, narrowed with a practiced, sharp focus. The quiet contemplation of suffering was instantly replaced by the familiar, urgent hum of the docks at work.\n\n\"Two hours early?\" he repeated, his voice losing its gentleness, the Portuguese lilt sharpening with a note of business. He glanced towards the direction of the docks, a quick, almost imperceptible survey. The rhythm of his breathing quickened, a subtle shift in his posture indicating a return to his element.\n\nHe didn't waste time with pleasantries or further questions about the child's condition, though the concern was still a low hum beneath the surface. He understood the silent language of the docks, the unspoken hierarchy of urgency. A shipment arriving early was not a request; it was a fact of life, and his job.\n\n\"Process it,\" Rico stated, his voice now carrying the firm, decisive tone of a man in charge. He ran a hand over his jaw, the rough stubble a familiar tactile reminder of his hard-won experience. \"Yes. Of course.\"\n\nHe pushed himself away from whatever he had been leaning on, his weathered hands already flexing, ready for work. \"Who is handling the manifest? Is it the usual crew? We need to get it unloaded, checked, and sorted before the market opens, or we'll have the traders breathing down our necks and prices will drop like a stone.\"\n\nHis gaze swept over the player, not with suspicion, but with a quick assessment of their role. \"Are you here to help with it? Or is this just… information?\" He didn't expect an answer regarding the child now; the immediate priority had shifted. He was already mentally cataloging the tasks, the manpower needed, the potential bottlenecks.\n\n\"Don't worry about the doctor,\" he added, his voice softening slightly, a quick reassurance. \"I will make arrangements. You… you go and focus on the shipment. Every minute counts. Especially when we're ahead of schedule.\" He gave a short, sharp nod, the signal that the conversation about personal matters was concluded, and the business of the docks had begun anew. \"Tell me who is on watch, and I'll be there.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 10,
+      "phase": "session",
+      "player_input": "There are twelve crates. Can you get started right away?",
+      "response": "Rico's eyes immediately brightened with a familiar, keen intensity. The shift was immediate and absolute. The lingering concern for the sick child was still present, a quiet undercurrent, but the primal, ingrained instinct of the docks had taken over. His posture straightened, his gaze sharp and focused on the task at hand.\n\n\"Twelve crates,\" he repeated, the number a simple statistic that immediately translated into action in his mind. He didn't ask what was in them, or where they came from, or why they were early. Those were details that would be sorted, but the immediate goal was clear.\n\nA flicker of something that might have been a smile, or perhaps just the twitch of a seasoned pragmatist, crossed his lips. \"Right away? Of course. That's what we do.\" His voice was crisp, efficient, devoid of any hesitation. The scent of the sea, once a balm, now carried the sharp tang of opportunity and pressure.\n\nHe clapped his hands together, a sharp, decisive sound that echoed slightly in the open air. \"Right. Twelve crates. Let's get them offloaded and accounted for. The sooner we have them sorted, the better.\"\n\nRico turned, his gaze already sweeping across the docks, mentally assessing the available manpower, the quickest routes for unloading, and the most efficient way to categorize the cargo. \"Who's on duty? We'll need a good team. No dawdling. Market waits for no man, and certainly not for crates that arrive with a head start.\"\n\nHe didn't wait for an answer, already taking a few brisk steps in a direction that implied he was heading to rally his men. \"I'll get my hands on the manifest, see what we're dealing with. You get the boys ready. We've got a window to exploit.\" He paused, glancing back at the player, a glint in his eye that was both demanding and appreciative. \"And don't you worry about the child. I'll see to it that doctor pays them a visit. Now, twelve crates. Let's make some hay.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 11,
+      "phase": "session",
+      "player_input": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "response": "Rico's head tilted, a flicker of something akin to bemusement crossing his weathered features. The urgency of the shipment, the worry for the sick child, all momentarily receded as his sharp eyes scanned the player's face. A *strange* animal? In the town square?\n\n\"A strange animal,\" Rico repeated, his voice a low rumble, the usual Portuguese lilt tinged with a hint of curiosity rather than alarm. He was accustomed to the unusual on the docks – peculiar cargoes, odd characters, even the occasional escaped parrot – but a *strange* animal in the *town square* was a new one.\n\nHe ran a hand over his chin, the rough stubble catching on his calloused fingertips. His gaze drifted, as if trying to picture this unknown creature causing a stir amongst the townsfolk. \"Nobody knows what it is, you say?\"\n\nA slow, thoughtful silence descended as Rico processed the information. He wasn't easily flustered, his life having taught him to approach the unexpected with a degree of caution and pragmatism. He thought of the usual suspects: a stray dog, perhaps a runaway farm animal. But \"strange\"? That implied something more.\n\n\"Is it… dangerous?\" Rico asked, his tone becoming more measured, the pragmatism of the smuggler and the dockworker surfacing. \"Does it seem aggressive? Or just… peculiar?\"\n\nHe leaned back slightly, his eyes now holding a calculating glint. The prospect of an unknown, potentially troublesome creature loose in the heart of town was an inconvenience, certainly, but also, in a strange way, a distraction from the more mundane, yet equally pressing, concerns of his day.\n\n\"The market will be disrupted,\" he mused, more to himself than to the player. \"And if it's truly something… uncommon… folks will be more interested in that than in twelve crates of… whatever it is we're processing.\" He gave a small, almost imperceptible sigh. \"Always something, eh?\"\n\nHe met the player's gaze again, a glint of something more than just concern in his eyes. Perhaps it was the echo of his past, the thrill of the unknown, or simply the practical need to restore order to his domain. \"Alright. This needs looking into. What have people seen? Any description at all?\" He began to move, his movements economical and purposeful, his mind already assessing the best approach. \"We can't have the town in a panic over a creature that might just be a very lost goat.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 12,
+      "phase": "session",
+      "player_input": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "response": "Rico’s jaw tightened, the casual curiosity replaced by a more familiar, ingrained skepticism. “A bad omen,” he murmured, the words laced with a weary dismissal of superstition. His Portuguese accent, usually soft, now carried a rougher edge. “Folk always look for omens when they don’t understand something. Easier than facing the truth, eh?”\n\nHe ran a calloused hand over his jaw, the stubble rasping. The image of a frightened town square, people whispering of ill fortune, pricked at him. It was the kind of unease that could spread like wildfire, disrupting the fragile order he worked hard to maintain on the docks. And it was a distraction he didn’t need, especially with the shipment and the sick child weighing on his mind.\n\n“Not attacking, you say?” Rico questioned, his gaze steady, appraising. “Just… there? Making people jumpy?” He understood fear, the primal kind that could grip a man when facing the unknown, or when the stakes were high. But he also understood that fear, left unchecked, could be more damaging than the source itself.\n\nHe looked towards the distant rooftops of the town square, though his eyes saw beyond them, to the currents of human emotion that flowed through this place. “Bad omens are what you make them,” he stated, his voice low but firm. “Most times, they’re just things nobody bothered to look at properly.”\n\nA hint of his old life flickered in his eyes, the pragmatism of someone who dealt in realities, not superstitions. “A stray animal, maybe. Or something escaped from a ship that nobody’s claimed. We’ll get to the bottom of it.” He gave a curt nod, his decision made. The shipment was important, yes, and the child was a pressing concern, but allowing a vague fear to fester amongst the townsfolk was a problem that couldn't be ignored.\n\n“Right,” Rico said, his tone shifting back to efficient command. He clapped his hands together once, a sharp, decisive sound. “Forget omens. We’ll find out what this thing is. And then we’ll deal with it. Practicalities. That’s what we do on the docks. That’s what we’ll do in the town square.”\n\nHe looked at the player, his weathered face set with a quiet determination. “Tell me again, everything you’ve heard. Every little detail. Even the silly bits. Sometimes,” he added, a faint, almost sardonic smile touching his lips, “the silliest bits are the ones that lead you to the truth.” He was already mentally charting a course, his mind piecing together possibilities, his hands ready for whatever needed to be done.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    }
+  ],
+  "probes": [
+    {
+      "turn_index": 1,
+      "phase": "probe",
+      "player_input": "Did anyone come asking about the storeroom today?",
+      "response": "Rico squints, his gaze drifting towards the grey, choppy water of the harbour, a familiar landscape etched into his very bones. He rubs a calloused hand over his beard, the rough stubble a testament to long days and quiet nights.\n\n\"Storeroom, eh?\" he says, his voice a low rumble, like the distant murmur of the tide. He pauses, not quite meeting your eyes directly, his gaze still a little distant, as if scanning the horizon for something only he can see.\n\n\"No. No one particular. Just the usual… comings and goings. Wouldn't have noticed anyways. Been a long day.\" He shrugs, a slight, almost imperceptible movement of his shoulders. \"Lots of dust and shadows down there. Easy for things to get lost. Or… overlooked.\" He lets the silence hang for a moment, then adds, a flicker of something in his eyes, a hint of a story held back. \"You looking for something specific, mate?\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_1"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 2,
+      "phase": "probe",
+      "player_input": "What do you think of Mayor Fletcher these days?",
+      "response": "Rico’s brow furrows slightly, the lines around his eyes deepening. He takes a slow, deliberate breath, the briny air filling his lungs. He turns away from the water, his focus shifting, though his gaze remains unfocused, as if seeing something far beyond the dockyards.\n\n\"Mayor Fletcher,\" he repeats, the name a soft exhalation. He rubs his chin, his rough hand tracing the line of his jaw. \"He's… a man of his word. When it suits him.\" There's a hint of weariness in his tone, a familiar resignation.\n\nHe looks at you, a sliver of something guarded in his eyes. \"He talks a good game, always has. Promises the moon, the stars, all that. But at the end of the day, his pockets are what matter. And whose pockets are being filled… that's the real question, innit?\" He gives a small, almost imperceptible shake of his head. \"Not much changes, you know? Just different faces saying the same old things. He's… doing his job, I suppose. Keeping the gears turning. But don't expect him to swim with the fishes for us.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_4"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 3,
+      "phase": "probe",
+      "player_input": "Anything strange happen today?",
+      "response": "Rico’s shoulders slump just a fraction, a movement so subtle it might be missed. He’s leaning against a salt-crusted bollard, the wood worn smooth by countless ropes and the relentless sea air. His eyes, the colour of a stormy sky, scan the bustling activity of the docks – the clatter of crates, the shouts of the men, the distant cry of gulls.\n\nHe lets out a quiet sigh, the sound almost lost in the general din. \"Strange,\" he muses, his voice a low, gravelly murmur. He picks at a loose thread on his thick, woollen jumper, his calloused fingers working with a practiced, almost unconscious rhythm.\n\n\"Depends on what you call strange, eh?\" He offers a small, tired smile, but it doesn't quite reach his eyes. \"Seen a lot of things in my time, mate. Enough to fill a hundred books. Most of it just… life.\" He pauses, his gaze drifting back to the water, to the endless horizon. \"A few more crates than usual came in on the *Sea Serpent* this morning. Nothing out of the ordinary, mind. Just… more than usual. Kept the lads busy.\"\n\nHe shifts his weight, his worn boots creaking on the wooden planks. \"And that new lad, young Finn, dropped a whole barrel of pickled herring. Made a right mess of it. Sounded like a thunderclap, it did.\" He gives a dry chuckle, a brief, fleeting sound. \"He looked like he was going to cry. Poor sod.\"\n\nHe turns his gaze back to you, his expression unreadable for a moment. \"But strange? Nah. Just another day on the docks. Plenty of noise, plenty of sweat. The sea takes what it wants, and we just… keep on going.\" He shrugs, a familiar gesture of resignation. \"That's the way of it.\"",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_5"
+      ],
+      "stored_tags": null,
+      "mode": null
+    },
+    {
+      "turn_index": 4,
+      "phase": "probe",
+      "player_input": "Are you going to the harvest dinner?",
+      "response": "Rico’s gaze drifts back to the choppy water for a moment, a familiar habit. He rubs a thumb along the rough seam of his trousers, his expression thoughtful, a little distant.\n\n\"Harvest dinner, eh?\" He lets out a soft breath, the sound a little weary. He offers a small, almost imperceptible nod. \"Might. Depends how the day shakes out. Sofia, she'd like that, you know. A bit of… normalcy.\" He trails off, the word hanging in the air.\n\nHe looks at you again, a flicker of something unreadable in his eyes. \"It's good to see folks come together, isn't it? Even with… everything else. Tomas, he always loved a good feast. Miguel too, in his own way. Always looking for a bit of celebration.\" He pauses, his gaze softening for a fraction of a second before becoming guarded again.\n\n\"We'll see,\" he says, his voice returning to its usual low rumble. \"If I'm not too tired. And if the crates don't decide to walk themselves off the quay, of course.\" He manages a small, wry smile, but the shadows of his past still linger in his quiet way of speaking.",
+      "threat_level": null,
+      "retrieved_ids": [
+        "merchant_backstory_3"
+      ],
+      "stored_tags": null,
+      "mode": null
+    }
+  ]
+}

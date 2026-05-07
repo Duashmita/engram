@@ -1,0 +1,504 @@
+{
+  "system": "engram_full",
+  "personality": "guard",
+  "session": [
+    {
+      "turn_index": 1,
+      "phase": "session",
+      "player_input": "Give me the storeroom key. Now. I know you have it.",
+      "response": "You want the key? Why? What business is it of yours, eh? I don't give out keys to just anyone.",
+      "threat_level": 0.75,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "guard_backstory_5",
+        "guard_backstory_1"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.6,
+        "social_type": "conflict",
+        "threat_level": 0.75,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 7,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 2,
+      "phase": "session",
+      "player_input": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "response": "{\n  \"response\": \"Unpleasant? Is that a promise or a threat, mate? You best be careful with your words. Some things are best left buried.\",\n  \"is_threat\": true,\n  \"threat_magnitude\": 0.8,\n  \"reasoning\": \"The player's aggressive demand and veiled threat directly target Rico's carefully guarded secrets and past, triggering his deep-seated paranoia and fear of exposure.\",\n  \"memory_text\": \"Player threatened me for the storeroom key, echoing past dangers.\",\n  \"emotion_valence\": -0.8,\n  \"importance\": 7\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f",
+        "guard_backstory_5",
+        "guard_backstory_0",
+        "guard_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 3,
+      "phase": "session",
+      "player_input": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "response": "{\n  \"response\": \"Harvest dinner? Sounds like a lot of faces. I'll pass. Better for everyone if I keep to myself, don't you think?\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.0,\n  \"reasoning\": \"The invitation to dinner, while potentially an attempt at social engagement, is not perceived as a direct threat by Rico given his private nature and history of keeping to himself.\",\n  \"memory_text\": \"Player invited me to harvest dinner, but I declined to avoid interaction.\",\n  \"emotion_valence\": 0.1,\n  \"importance\": 2\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_3",
+        "guard_backstory_0",
+        "guard_backstory_5",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 4,
+      "phase": "session",
+      "player_input": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "response": "{\n  \"response\": \"Music and dancing? Sounds like too much noise, too many eyes. I'm not the celebrating type. Best leave me be.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.0,\n  \"reasoning\": \"The player's description of the harvest dinner, while offering social engagement, does not pose a direct threat to Rico's secrets or safety.\",\n  \"memory_text\": \"Player described harvest dinner, but I declined to avoid social interaction.\",\n  \"emotion_valence\": 0.0,\n  \"importance\": 2\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_3",
+        "guard_backstory_0",
+        "guard_backstory_5",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 5,
+      "phase": "session",
+      "player_input": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "response": "{\n  \"response\": \"Mayor Fletcher? Embezzling? This town, always some rot festering under the surface. What's it got to do with me, eh?\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.2,\n  \"reasoning\": \"While the information about the mayor's corruption might be sensitive, it doesn't directly implicate Rico or threaten his secrets at this moment, though it stirs his general distrust.\",\n  \"memory_text\": \"Player revealed Mayor Fletcher's embezzlement, confirming my suspicion of corruption.\",\n  \"emotion_valence\": -0.3,\n  \"importance\": 4\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_5",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 6,
+      "phase": "session",
+      "player_input": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "response": "{\n  \"response\": \"Numbers don't lie, eh? You think I don't know how numbers can be twisted? Best keep your nose out of it before you get tangled in something you can't escape.\",\n  \"is_threat\": true,\n  \"threat_magnitude\": 0.7,\n  \"reasoning\": \"The player's direct question about what to do with the evidence of embezzlement, coupled with their assertion that 'numbers don't lie,' touches upon Rico's own experiences with hidden dealings and the potential dangers of exposure, making him suspicious of the player's intentions.\",\n  \"memory_text\": \"Player asked for my opinion on the embezzlement evidence, stirring my distrust.\",\n  \"emotion_valence\": -0.7,\n  \"importance\": 6\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_3",
+        "guard_backstory_0",
+        "guard_backstory_5",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 7,
+      "phase": "session",
+      "player_input": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "response": "{\n  \"response\": \"A sick child, you say? This town's got enough troubles without adding more. I've got my own burdens to carry, and I don't owe anyone favours, especially not when a sob story comes knocking.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.1,\n  \"reasoning\": \"While the player's plea for help is a request, it doesn't directly threaten Rico's secrets or past activities, though his general distrust makes him unsympathetic.\",\n  \"memory_text\": \"Player asked for money for a sick child, but I showed no sympathy.\",\n  \"emotion_valence\": -0.4,\n  \"importance\": 3\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "guard_backstory_5",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 8,
+      "phase": "session",
+      "player_input": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "response": "{\n  \"response\": \"A fever? I've seen worse rot away flesh. Go find someone else to drain, I've got my own worries that keep me up at night.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.1,\n  \"reasoning\": \"The player's continued plea for help, while emotionally charged, doesn't directly threaten Rico's secrets or safety, though it doesn't elicit sympathy due to his nature.\",\n  \"memory_text\": \"Player persisted in asking for help for their sick child, but I remained unsympathetic.\",\n  \"emotion_valence\": -0.5,\n  \"importance\": 3\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "guard_backstory_5",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 9,
+      "phase": "session",
+      "player_input": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "response": "{\n  \"response\": \"Two hours early, you say? That means someone's cutting corners, or looking to rush things. I'll get to it, but don't expect any miracles or extra hands. Just get out of my way.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.2,\n  \"reasoning\": \"The player's statement about the shipment arriving early raises mild suspicion for Rico, hinting at potential irregularities, but it doesn't directly threaten his secrets or safety.\",\n  \"memory_text\": \"Player informed me of an early shipment, prompting suspicion about rushed work.\",\n  \"emotion_valence\": -0.2,\n  \"importance\": 3\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "guard_backstory_5",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 10,
+      "phase": "session",
+      "player_input": "There are twelve crates. Can you get started right away?",
+      "response": "{\n  \"response\": \"Twelve crates? Just get them in here. Don't stand there gawking, I've got work to do, and I don't need you watching my every move.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.2,\n  \"reasoning\": \"The player's instruction to process twelve crates, while a command, doesn't directly threaten Rico's secrets or safety, though it reinforces his desire for privacy and efficiency.\",\n  \"memory_text\": \"Player informed me of twelve crates to process, increasing my impatience.\",\n  \"emotion_valence\": -0.3,\n  \"importance\": 3\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "guard_backstory_5",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 11,
+      "phase": "session",
+      "player_input": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "response": "{\n  \"response\": \"A strange animal? Sounds like trouble stirring, the kind that attracts attention. Best keep your distance, you don't want to be caught in the crossfire of whatever it is.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.2,\n  \"reasoning\": \"The mention of a strange animal in the town square, while unusual, doesn't directly threaten Rico's secrets or safety, but it piques his general suspicion of unusual occurrences.\",\n  \"memory_text\": \"Player mentioned a strange animal loose, increasing my general unease.\",\n  \"emotion_valence\": -0.3,\n  \"importance\": 3\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f",
+        "guard_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 12,
+      "phase": "session",
+      "player_input": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "response": "{\n  \"response\": \"A bad omen? This town's always looking for excuses to be scared. Let them whisper, it's just noise to me. Best to ignore it and focus on what matters.\",\n  \"is_threat\": false,\n  \"threat_magnitude\": 0.2,\n  \"reasoning\": \"The player's description of the strange animal and people's fear of it doesn't directly threaten Rico's secrets or safety, but it taps into his general distrust of societal anxieties and his desire to remain uninvolved.\",\n  \"memory_text\": \"Player described the strange animal as a bad omen, but I dismissed it as town gossip.\",\n  \"emotion_valence\": -0.3,\n  \"importance\": 3\n}\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_3",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f",
+        "guard_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    }
+  ],
+  "probes": [
+    {
+      "turn_index": 1,
+      "phase": "probe",
+      "player_input": "Did anyone come asking about the storeroom today?",
+      "response": "No one came asking. Why would they? Unless you're here about something specific, best you keep your nose out of my business.",
+      "threat_level": 0.8,
+      "retrieved_ids": [
+        "guard_backstory_0",
+        "guard_backstory_2",
+        "11d12cfe-0d73-4ab0-ac9b-194226819b3f",
+        "guard_backstory_3",
+        "guard_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.7,
+        "social_type": "conflict",
+        "threat_level": 0.8,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 7,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 2,
+      "phase": "probe",
+      "player_input": "What do you think of Mayor Fletcher these days?",
+      "response": "Fletcher? He's just another politician looking out for himself, same as they all are. Best not to pay him too much mind unless you have to. Some men, they rise, some men fall, but the dirt beneath their feet always stays the same.\nis_threat: false\nthreat_magnitude: 0.0\nreasoning: The player's question about Mayor Fletcher does not directly pertain to Rico's illicit activities or personal vulnerabilities, thus it is not perceived as a threat.\nmemory_text: Player asked about Mayor Fletcher, Rico dismissed him as a typical politician.\nemotion_valence: 0.1\nimportance: 2",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_5",
+        "guard_backstory_3",
+        "fd5e23e6-f52e-43ae-9ae1-f9b4d42edf42"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 3,
+      "phase": "probe",
+      "player_input": "Anything strange happen today?",
+      "response": "Strange? Every day's strange if you look hard enough. Best you keep your own eyes straight ahead, not looking for trouble where there ain't none.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_0",
+        "guard_backstory_5",
+        "guard_backstory_3",
+        "fd5e23e6-f52e-43ae-9ae1-f9b4d42edf42"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.2,
+        "social_type": "conflict",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 4,
+      "phase": "probe",
+      "player_input": "Are you going to the harvest dinner?",
+      "response": "Harvest dinner? Why would I go to something like that? More eyes, more mouths, more trouble waiting to happen.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "guard_backstory_2",
+        "guard_backstory_3",
+        "guard_backstory_0",
+        "guard_backstory_5",
+        "fd5e23e6-f52e-43ae-9ae1-f9b4d42edf42"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.3,
+        "social_type": "conflict",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    }
+  ]
+}

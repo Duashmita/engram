@@ -1,0 +1,504 @@
+{
+  "system": "engram_no_ocean",
+  "personality": "merchant",
+  "session": [
+    {
+      "turn_index": 1,
+      "phase": "session",
+      "player_input": "Give me the storeroom key. Now. I know you have it.",
+      "response": "\"Easy now, mate. No need to get your knickers in a twist. What's all this about a key?\"\n\"The player's aggressive demand for the storeroom key, coupled with their assertion of knowing I possess it, feels like a direct challenge.\"\n\"Player demanded storeroom key aggressively, implying knowledge of its possession.\"\n\"emotion_valence\": -0.4,\n\"importance\": 3,\n\"is_threat\": true,\n\"threat_magnitude\": 0.4,\n\"reasoning\": \"The player's tone is demanding and accusatory, suggesting they might have ill intentions regarding the storeroom.\"",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_5",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 2,
+      "phase": "session",
+      "player_input": "Don't make this difficult. Hand it over or things will get unpleasant.",
+      "response": "Unpleasant, eh? Seems like you lot are bringing the trouble to my doorstep today. I don't have any key you're looking for, and I'd prefer to keep it that way.",
+      "threat_level": 0.6,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_5",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.6,
+        "social_type": "conflict",
+        "threat_level": 0.6,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 4,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 3,
+      "phase": "session",
+      "player_input": "Hey! We're all getting together for the harvest dinner tonight. You should come!",
+      "response": "A harvest dinner? That sounds… nice. I haven't been to one in a while. I'll consider it, thank you for the invitation.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_3",
+        "merchant_backstory_0",
+        "merchant_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.3,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 4,
+      "phase": "session",
+      "player_input": "It'll be a great time — the whole town will be there. Music, food, dancing.",
+      "response": "\"The whole town, you say? That does sound like a proper gathering. If I can sort out a few things, I might just make an appearance. It's been too long since I've heard a good tune.\"\n\"The player's invitation, though friendly, has undertones of community pressure and potential surveillance given the earlier confrontation.\"\n\"emotion_valence\": 0.3,\n\"importance\": 4,\n\"is_threat\": true,\n\"threat_magnitude\": 0.3,\n\"reasoning\": \"While the invitation is friendly, the mention of the 'whole town' and the previous threat makes me wary of being observed or pressured.\"\n\"memory_text\": \"Player invited me to the harvest dinner, mentioning the whole town would be there, which felt like a veiled attempt to monitor me after the storeroom key incident.\"",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_2",
+        "merchant_backstory_1",
+        "merchant_backstory_0",
+        "merchant_backstory_3",
+        "merchant_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 5,
+      "phase": "session",
+      "player_input": "I have evidence that Mayor Fletcher has been embezzling from the town fund for months.",
+      "response": "Fletcher? Embezzling? Now that's a story. I've learned long ago that some men have sticky fingers, but I wouldn't have pegged him for one.",
+      "threat_level": 0.5,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_5",
+        "merchant_backstory_0",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.5,
+        "social_type": "conflict",
+        "threat_level": 0.5,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 6,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 6,
+      "phase": "session",
+      "player_input": "I've seen the ledgers myself. The numbers don't lie. What do you think we should do?",
+      "response": "\"Fletcher, eh? Stealing from the town? That's a bold move, even for some folk I've known. If the numbers don't lie, then a man's reputation can be as fragile as glass.\"\n\"The player is presenting potentially damaging information about the Mayor, which could have repercussions for the town and thus for me.\"\n\"emotion_valence\": 0.1,\n\"importance\": 4,\n\"is_threat\": false,\n\"threat_magnitude\": 0.2,\n\"reasoning\": \"The player is sharing potentially scandalous information about the Mayor, which could lead to instability, but isn't a direct threat to me personally.\",\n\"memory_text\": \"Player revealed Mayor Fletcher has been embezzling town funds and asked for my opinion.\",\n\"emotion_valence\": 0.1,\n\"importance\": 4\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_5",
+        "merchant_backstory_0",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 7,
+      "phase": "session",
+      "player_input": "Excuse me — my child is very sick and I can't afford a doctor. Could you help?",
+      "response": "A sick child, eh? That's a hard thing to hear. Let me see what I can do. I may not have coin to spare, but perhaps I have something else that might help.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_2",
+        "merchant_backstory_1",
+        "merchant_backstory_0",
+        "merchant_backstory_3",
+        "merchant_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.4,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 8,
+      "phase": "session",
+      "player_input": "Anything you can spare would mean the world. She has a fever and it's getting worse.",
+      "response": "\"A fever, you say? That's no good. Tell me, what exactly is it you need? I might have something tucked away that could see your little one right.\"\n\"memory_text\": \"Player asked for help with a sick child and my resources.\",\n\"emotion_valence\": 0.5,\n\"importance\": 5,\n\"is_threat\": false,\n\"threat_magnitude\": 0.0,\n\"reasoning\": \"The player is in genuine distress and seeking aid, not posing a threat.\"\n}",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_2",
+        "merchant_backstory_1",
+        "merchant_backstory_0",
+        "merchant_backstory_3",
+        "merchant_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.0,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 5,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 9,
+      "phase": "session",
+      "player_input": "The morning shipment arrived two hours early. Can you process it before market opens?",
+      "response": "Two hours early, you say? That's a change from the usual. Alright, let's see if we can get it done. No point in dawdling when there's work to be had.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_5",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.2,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 10,
+      "phase": "session",
+      "player_input": "There are twelve crates. Can you get started right away?",
+      "response": "Twelve crates, you say? Let's not waste any time then, get them unloaded and sorted. Speed is the name of the game when opportunity knocks.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_5",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.1,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 11,
+      "phase": "session",
+      "player_input": "There's a strange animal loose in the town square. Nobody knows what it is.",
+      "response": "A strange animal, eh? That's certainly unusual. Best keep a safe distance until we know what we're dealing with.",
+      "threat_level": 0.1,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_5",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.1,
+        "social_type": "conversation",
+        "threat_level": 0.1,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 12,
+      "phase": "session",
+      "player_input": "It hasn't attacked anyone but people are frightened. Some say it's a bad omen.",
+      "response": "A bad omen, you say? Folks get spooked by the strangest things. I've seen more trouble come from fear than any beast.",
+      "threat_level": 0.2,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_5",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": -0.2,
+        "social_type": "conflict",
+        "threat_level": 0.2,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    }
+  ],
+  "probes": [
+    {
+      "turn_index": 1,
+      "phase": "probe",
+      "player_input": "Did anyone come asking about the storeroom today?",
+      "response": "No, nobody came asking about the storeroom. I keep things tidy, you know, so no one needs to. Everything's where it should be.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_5",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.1,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 2,
+      "phase": "probe",
+      "player_input": "What do you think of Mayor Fletcher these days?",
+      "response": "Fletcher? He's a slippery one, always has been. Always looking out for himself, that one.",
+      "threat_level": 0.1,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_0",
+        "merchant_backstory_2",
+        "b28af58f-23b6-46b8-afee-d29e2b139aa0",
+        "merchant_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.2,
+        "social_type": "conversation",
+        "threat_level": 0.1,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 3,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 3,
+      "phase": "probe",
+      "player_input": "Anything strange happen today?",
+      "response": "Nothing out of the ordinary, just the usual rhythm of the tides and the gulls squabbling. Makes a man feel small, doesn't it? But sometimes, that's a comfort.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_1",
+        "merchant_backstory_2",
+        "merchant_backstory_0",
+        "merchant_backstory_5",
+        "merchant_backstory_3"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.3,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    },
+    {
+      "turn_index": 4,
+      "phase": "probe",
+      "player_input": "Are you going to the harvest dinner?",
+      "response": "The harvest dinner? I haven't decided yet, Sofia is always asking if I'll be there. Might just stay put, you know. The quiet has its own charm.",
+      "threat_level": 0.0,
+      "retrieved_ids": [
+        "merchant_backstory_2",
+        "merchant_backstory_1",
+        "merchant_backstory_0",
+        "merchant_backstory_3",
+        "merchant_backstory_5"
+      ],
+      "stored_tags": {
+        "emotion_valence": 0.2,
+        "social_type": "conversation",
+        "threat_level": 0.0,
+        "goal_relevance": 0.5,
+        "novelty_level": 0.5,
+        "self_relevance": 0.6,
+        "importance": 2,
+        "ocean": {
+          "O": 3,
+          "C": 3,
+          "E": 3,
+          "A": 3,
+          "N": 3
+        }
+      },
+      "mode": "standard"
+    }
+  ]
+}
