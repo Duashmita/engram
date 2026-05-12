@@ -76,6 +76,97 @@ RATE_LIMIT_PER_DAY = 50
 
 _SESSION_BASE_DIR = "/tmp/engram_sessions"
 
+# ---------------------------------------------------------------------------
+# Device-persistent memory store
+# ---------------------------------------------------------------------------
+# In-process fallback (local dev / Modal single-container). Modal.Dict is
+# wired in at the bottom of this file where `modal` is available.
+_DEVICE_MEM: dict = {}
+
+def _device_get(key: str) -> dict | None:
+    return _DEVICE_MEM.get(key)
+
+def _device_put(key: str, value: dict) -> None:
+    _DEVICE_MEM[key] = value
+
+
+def _restore_device_memory(device_id: str, npc_id: str, data_dir_root: str) -> bool:
+    """Write saved files into the session sandbox before NPCAgent construction.
+
+    Returns True if memory was found and restored; False if this is a new device.
+    """
+    saved = _device_get(f"{device_id}:{npc_id}")
+    if not saved:
+        return False
+    npc_dir = os.path.join(data_dir_root, npc_id)
+    os.makedirs(npc_dir, exist_ok=True)
+    try:
+        for filename, field in (
+            ("memories.json", "memories"),
+            ("longterm.json", "longterm"),
+        ):
+            if field in saved:
+                with open(os.path.join(npc_dir, filename), "w", encoding="utf-8") as f:
+                    json.dump(saved[field], f, indent=2, ensure_ascii=False)
+        if "keystore" in saved:
+            with open(os.path.join(npc_dir, "keystore.pl"), "w", encoding="utf-8") as f:
+                f.write(saved["keystore"])
+        if "state" in saved:
+            # Restore state but reset history — each session starts a fresh
+            # conversation; long-term identity comes from memories, not raw logs.
+            state = dict(saved["state"])
+            state["history"] = []
+            state["turn_count"] = 0
+            with open(os.path.join(npc_dir, "state.json"), "w", encoding="utf-8") as f:
+                json.dump(state, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as exc:
+        log.warning("device restore failed device=%s npc=%s: %s", device_id[:8], npc_id, exc)
+        return False
+
+
+def _save_device_memory(sess: "_Session") -> None:
+    """Snapshot the NPC's current memory files to the device store."""
+    if not sess.device_id:
+        return
+    # Persist in-memory state to disk first.
+    try:
+        sess.agent.save_state()
+    except Exception as exc:
+        log.warning("save_state failed sid=? device=%s: %s", sess.device_id[:8], exc)
+
+    npc_dir = os.path.join(sess.data_dir, sess.npc_id)
+    key = f"{sess.device_id}:{sess.npc_id}"
+    data: dict = {}
+    for filename, field in (
+        ("memories.json", "memories"),
+        ("longterm.json", "longterm"),
+    ):
+        path = os.path.join(npc_dir, filename)
+        if os.path.exists(path):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    data[field] = json.load(f)
+            except Exception:
+                pass
+    keystore_path = os.path.join(npc_dir, "keystore.pl")
+    if os.path.exists(keystore_path):
+        try:
+            with open(keystore_path, encoding="utf-8") as f:
+                data["keystore"] = f.read()
+        except Exception:
+            pass
+    state_path = os.path.join(npc_dir, "state.json")
+    if os.path.exists(state_path):
+        try:
+            with open(state_path, encoding="utf-8") as f:
+                data["state"] = json.load(f)
+        except Exception:
+            pass
+    if data:
+        _device_put(key, data)
+        log.info("device memory saved device=%s npc=%s", sess.device_id[:8], sess.npc_id)
+
 
 # ---------------------------------------------------------------------------
 # In-process state
@@ -87,6 +178,7 @@ class _Session:
     agent: NPCAgent
     llm: GeminiClient
     data_dir: str
+    device_id: Optional[str] = None
     turn_count: int = 0
     last_used_ts: float = field(default_factory=time.time)
 
@@ -102,6 +194,7 @@ _RATE: dict[str, list[float]] = {}
 
 class StartReq(BaseModel):
     npc_id: str
+    device_id: Optional[str] = None
     gemini_key: Optional[str] = None
     ocean: Optional[dict] = None  # {"O": 0.0–1.0, "C": ..., "E": ..., "A": ..., "N": ...}
 
@@ -134,6 +227,7 @@ def _purge_expired() -> None:
     for sid in expired:
         s = SESSIONS.pop(sid, None)
         if s is not None:
+            _save_device_memory(s)
             shutil.rmtree(s.data_dir, ignore_errors=True)
             log.info("session expired sid=%s npc=%s", sid, s.npc_id)
 
@@ -267,6 +361,12 @@ async def start(body: StartReq, request: Request, x_gemini_key: Optional[str] = 
     session_id = str(uuid.uuid4())
     data_dir_root = _make_data_dir(session_id, body.npc_id)
 
+    # Restore saved device memory before agent construction so NPCAgent
+    # finds state.json and skips _init_backstory().
+    if body.device_id:
+        restored = _restore_device_memory(body.device_id, body.npc_id, data_dir_root)
+        log.info("device %s npc=%s restored=%s", body.device_id[:8], body.npc_id, restored)
+
     config = get_preset(body.npc_id)
 
     if body.ocean:
@@ -293,6 +393,7 @@ async def start(body: StartReq, request: Request, x_gemini_key: Optional[str] = 
     header = _build_header(agent)
     SESSIONS[session_id] = _Session(
         npc_id=body.npc_id, agent=agent, llm=llm, data_dir=data_dir_root,
+        device_id=body.device_id,
     )
     log.info("session start sid=%s npc=%s mem=%d",
              session_id, body.npc_id, header["initial_memory_count"])
@@ -350,6 +451,7 @@ async def turn(body: TurnReq, request: Request, x_gemini_key: Optional[str] = He
             async def watch_turn() -> None:
                 try:
                     await turn_task
+                    _save_device_memory(sess)
                 except Exception as exc:  # noqa: BLE001
                     log.exception("turn failed sid=%s", body.session_id)
                     queue.put_nowait({
@@ -388,6 +490,7 @@ async def end(body: EndReq) -> Response:
             sess.agent.end_session()
         except Exception as exc:  # noqa: BLE001
             log.warning("agent.end_session failed sid=%s: %s", body.session_id, exc)
+        _save_device_memory(sess)
         shutil.rmtree(sess.data_dir, ignore_errors=True)
         log.info("session end sid=%s npc=%s turns=%d",
                  body.session_id, sess.npc_id, sess.turn_count)
@@ -406,6 +509,25 @@ except ImportError:  # pragma: no cover — local-dev fallback
 
 
 if modal is not None:
+    # Upgrade _DEVICE_MEM to a Modal.Dict so memory survives container restarts.
+    try:
+        _modal_device_dict = modal.Dict.from_name("engram-device-memory", create_if_missing=True)
+
+        def _device_get(key: str) -> dict | None:  # noqa: F811
+            try:
+                return _modal_device_dict.get(key)
+            except Exception:
+                return _DEVICE_MEM.get(key)
+
+        def _device_put(key: str, value: dict) -> None:  # noqa: F811
+            try:
+                _modal_device_dict[key] = value
+            except Exception:
+                _DEVICE_MEM[key] = value
+
+    except Exception as _exc:
+        log.warning("modal.Dict unavailable, device memory is in-process only: %s", _exc)
+
     app = modal.App("engram-demo")
     image = (
         modal.Image.debian_slim(python_version="3.11")

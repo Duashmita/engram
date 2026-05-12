@@ -120,8 +120,8 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   height: 100%;
 }
 .panel-a { grid-column: 1; grid-row: 1; }
-.panel-b { grid-column: 1 / span 2; grid-row: 2; }
-.panel-c { grid-column: 3; grid-row: 1 / span 2; }
+.panel-b { grid-column: 1 / span 3; grid-row: 2; }
+.panel-c { grid-column: 3; grid-row: 1; }
 .panel-d { grid-column: 2; grid-row: 1; }
 
 .panel {
@@ -681,3 +681,88 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 .settings-actions .ctrl { width: auto; padding: 0 14px; height: 32px; font-size: 11px; }
 
 #btn-settings { margin-left: 6px; }
+
+/* ---------- mobile responsive ---------- */
+@media (max-width: 768px) {
+  body { overflow-y: auto; }
+
+  main#stage { overflow: visible; }
+
+  /* topbar: wrap into rows */
+  .topbar {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 8px 12px;
+  }
+  .brand { flex: 1; min-width: 0; }
+  #btn-settings { margin-left: 0; order: 2; }
+  .mode-toggle { order: 3; flex: 1 1 100%; }
+  .mode-btn { flex: 1; text-align: center; }
+  .session-picker {
+    order: 4;
+    flex: 1 1 100%;
+  }
+  .session-picker #session-select {
+    min-width: 0;
+    flex: 1;
+    width: 100%;
+  }
+  .live-picker {
+    order: 5;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #live-npc-select {
+    min-width: 0;
+    flex: 1;
+  }
+  .controls {
+    order: 6;
+    margin-left: 0;
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+  .speed { flex-wrap: wrap; }
+
+  /* single-view: stack panels vertically */
+  .layout-single {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+    padding: 8px;
+    gap: 8px;
+  }
+  .panel { overflow: hidden; }
+  /* mobile order: OCEAN → Transcript → Memory → Pipeline */
+  .panel-a { order: 1; max-height: none; }
+  .panel-d { order: 2; max-height: 360px; }
+  .panel-c { order: 3; max-height: 520px; }
+  .panel-b { order: 4; max-height: 400px; }
+
+  /* radar */
+  .radar-wrap { height: 200px; }
+
+  /* turn cards: make the row scroll horizontally */
+  .turn-card { overflow-x: auto; }
+  .turn-card .row { min-width: 480px; }
+
+  /* retrieval table: scroll horizontally inside expand */
+  .turn-expand { overflow-x: auto; }
+  .retrieval-table { min-width: 380px; }
+
+  /* multi-NPC: already scrolls horizontally, just tighten columns */
+  .npc-col { min-width: 280px; }
+
+  /* settings dialog: fit inside viewport */
+  .settings-dialog {
+    min-width: 0;
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+    margin: 0 16px;
+  }
+
+  /* scrubber */
+  .scrubber-row { padding: 6px 10px; }
+}

@@ -35,15 +35,26 @@ let renderFn = null;          // (state)     => void
 let currentSessionId = null;
 let npcId            = null;
 let inFlight         = false; // one /turn at a time
+let messageQueue     = [];    // messages typed while a turn is in-flight
 let beaconInstalled  = false;
 // Pending OCEAN overrides. null = use preset baseline; set when user edits sliders.
 let pendingOcean     = null;
 let dinoGame         = null;
 
 // LocalStorage keys
-const LS_SESSION = 'engram_live_session_id';
-const LS_NPC     = 'engram_live_npc_id';
-const LS_KEY     = 'engram_gemini_key';
+const LS_SESSION   = 'engram_live_session_id';
+const LS_NPC       = 'engram_live_npc_id';
+const LS_KEY       = 'engram_gemini_key';
+const LS_DEVICE_ID = 'engram_device_id';
+
+function getDeviceId() {
+  let id = localStorage.getItem(LS_DEVICE_ID);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(LS_DEVICE_ID, id);
+  }
+  return id;
+}
 
 // ---------------- public entrypoint -----------------------------------------
 
@@ -349,6 +360,7 @@ async function startSession() {
   const ocean = readSliders();
   const bodyObj = {
     npc_id: chosen,
+    device_id: getDeviceId(),
     ...(key    ? { gemini_key: key } : {}),
     ...(ocean  ? { ocean }           : {}),
   };
@@ -404,16 +416,27 @@ async function startSession() {
 // ---------------- network: /turn (SSE) --------------------------------------
 
 async function onSendClick() {
-  if (inFlight) return;
   if (!currentSessionId) { setStatus('start a session first'); return; }
 
   const input = document.getElementById('composer-input');
   const text = (input?.value ?? '').trim();
   if (!text) return;
 
+  // If a turn is already in-flight, queue the message and let the user keep typing.
+  if (inFlight) {
+    messageQueue.push(text);
+    if (input) { input.value = ''; input.style.height = 'auto'; }
+    updateQueueStatus();
+    return;
+  }
+
+  if (input) { input.value = ''; input.style.height = 'auto'; }
+  await sendMessage(text);
+}
+
+async function sendMessage(text) {
   inFlight = true;
-  setComposerEnabled(false);
-  setComposerStatus('sending…');
+  updateQueueStatus();
 
   const headers = { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' };
   const key = localStorage.getItem(LS_KEY);
@@ -431,7 +454,7 @@ async function onSendClick() {
     setComposerStatus('');
     setStatus(`network error: ${err.message}`);
     inFlight = false;
-    setComposerEnabled(true);
+    messageQueue = [];
     return;
   }
 
@@ -439,6 +462,7 @@ async function onSendClick() {
     setStatus('session not found — start a new one');
     clearPersistedSession();
     inFlight = false;
+    messageQueue = [];
     setComposerEnabled(false);
     setComposerStatus('');
     return;
@@ -447,40 +471,50 @@ async function onSendClick() {
     setStatus('session ended (cap reached) — start a new one');
     clearPersistedSession();
     inFlight = false;
+    messageQueue = [];
     setComposerEnabled(false);
     setComposerStatus('');
     return;
   }
   if (res.status === 429) {
     const j = await safeJSON(res);
-    setComposerStatus(`Rate limited — try again in ${j?.retry_after_s ?? '?'}s`);
+    setComposerStatus(`rate limited — try again in ${j?.retry_after_s ?? '?'}s`);
     inFlight = false;
-    setComposerEnabled(true);
     return;
   }
   if (res.status === 503) {
     setComposerStatus('server out of API quota — provide your key in Settings');
     inFlight = false;
-    setComposerEnabled(true);
     return;
   }
   if (!res.ok || !res.body) {
     setComposerStatus(`turn failed: ${res.status}`);
     inFlight = false;
-    setComposerEnabled(true);
     return;
   }
 
-  // Clear input before stream starts (player line lands via turn_start event).
-  if (input) { input.value = ''; input.style.height = 'auto'; }
-  setComposerStatus('streaming…');
-
+  updateQueueStatus('streaming…');
   await consumeSSE(res);
 
-  setComposerStatus('');
   inFlight = false;
-  setComposerEnabled(true);
   document.getElementById('composer-input')?.focus();
+
+  // Drain the queue: send the next message automatically.
+  if (messageQueue.length) {
+    const next = messageQueue.shift();
+    updateQueueStatus();
+    await sendMessage(next);
+  } else {
+    setComposerStatus('');
+  }
+}
+
+function updateQueueStatus(prefix = '') {
+  const q = messageQueue.length;
+  const parts = [];
+  if (prefix) parts.push(prefix);
+  if (q > 0) parts.push(`${q} queued`);
+  setComposerStatus(parts.join(' · '));
 }
 
 async function consumeSSE(res) {

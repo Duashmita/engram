@@ -16,8 +16,10 @@ export class DinoGame {
       this._jump();
     };
     this._onClick = () => this._jump();
+    this._onTouch = e => { e.preventDefault(); this._jump(); };
     document.addEventListener('keydown', this._onKey);
     canvas.addEventListener('click', this._onClick);
+    canvas.addEventListener('touchstart', this._onTouch, { passive: false });
 
     this._reset();
   }
@@ -49,6 +51,7 @@ export class DinoGame {
     this.stop();
     document.removeEventListener('keydown', this._onKey);
     this.canvas.removeEventListener('click', this._onClick);
+    this.canvas.removeEventListener('touchstart', this._onTouch);
   }
 
   _jump() {
@@ -151,7 +154,7 @@ export class DinoGame {
     if (this.dead) {
       ctx.fillStyle = '#d6deeb';
       ctx.font = '12px "JetBrains Mono", monospace';
-      ctx.fillText('GAME OVER  ·  space to restart', W / 2, H / 2 - 4);
+      ctx.fillText('GAME OVER  ·  tap or space to restart', W / 2, H / 2 - 4);
     } else if (this.score < 80) {
       ctx.fillStyle = '#3d4f63';
       ctx.font = '11px "JetBrains Mono", monospace';
