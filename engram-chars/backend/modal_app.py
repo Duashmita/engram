@@ -759,7 +759,7 @@ async def end(body: EndReq) -> Response:
 
 
 @api.post("/infer_ocean")
-async def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
+def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
     """Infer Big Five OCEAN scores + a personality summary from Q&A pairs."""
     _purge_expired()
 
@@ -832,7 +832,7 @@ async def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Op
 
 
 @api.post("/appearance")
-async def appearance(body: AppearanceReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
+def appearance(body: AppearanceReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
     """Generate a 3D character appearance description from name, persona, OCEAN."""
     _purge_expired()
 
@@ -878,7 +878,7 @@ async def appearance(body: AppearanceReq, request: Request, x_anthropic_key: Opt
 
 
 @api.post("/greeting")
-async def greeting(body: GreetingReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
+def greeting(body: GreetingReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
     """Generate a character's first spoken line to a stranger, in character."""
     _purge_expired()
 
@@ -973,7 +973,7 @@ async def character_status(job_id: str) -> dict:
 
 
 @api.get("/proxy_glb")
-async def proxy_glb(url: str):
+def proxy_glb(url: str):
     """Stream a Meshy CDN GLB through our origin so the browser can load it
     without cross-origin (CORS) issues. Only allows Meshy asset URLs."""
     if not (url.startswith("https://assets.meshy.ai/") or url.startswith("https://api.meshy.ai/")):
