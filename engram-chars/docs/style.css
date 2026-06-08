@@ -839,15 +839,14 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 .right-col {
   flex: 1 1 0;
   display: grid;
-  /* Single column, stacked top to bottom:
-     transcript (largest), memory + key/prolog, OCEAN, then the engram map. */
-  grid-template-columns: 1fr;
-  grid-template-rows: minmax(0, 1.5fr) minmax(0, 1.1fr) auto minmax(0, 0.8fr);
+  /* Two columns:
+     left  = transcript (top) + engram map / pipeline (bottom)
+     right = memory + key/prolog (top) + OCEAN (bottom, below key/prolog) */
+  grid-template-columns: 1.15fr 1fr;
+  grid-template-rows: minmax(0, 1.7fr) minmax(0, 1fr);
   grid-template-areas:
-    "panel-d"
-    "panel-c"
-    "panel-a"
-    "panel-b";
+    "panel-d panel-c"
+    "panel-b panel-a";
   gap: 10px;
   padding: 10px;
   overflow: hidden;
@@ -888,10 +887,13 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
     border-bottom: 1px solid var(--border);
   }
   .right-col {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr) auto minmax(0, 0.8fr);
     grid-template-areas:
-      "panel-a panel-a"
-      "panel-b panel-c"
-      "panel-d panel-d";
+      "panel-d"
+      "panel-c"
+      "panel-a"
+      "panel-b";
   }
 }
 
