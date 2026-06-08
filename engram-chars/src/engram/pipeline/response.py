@@ -1,5 +1,5 @@
 """
-Stage 5 — LLM Dialogue Generation (paper §3.3)
+Stage 5, LLM Dialogue Generation (paper §3.3)
 
 The prompt is built as an actor's brief: persona is identity to absorb,
 not material to recite; OCEAN traits drive *speech patterns* rather than
@@ -18,22 +18,22 @@ from ..models import Memory, NPCConfig, OCEANProfile, ThreatAssessment
 # ---------------------------------------------------------------------------
 #
 # The LLM's job is to *be* the character, not narrate their disposition.
-# So each high/low trait contributes a speech-pattern hint — what they DO
+# So each high/low trait contributes a speech-pattern hint, what they DO
 # with words, not what they ARE. Mid-range traits stay quiet.
 #
 _SPEECH_HIGH = {
     "O": "You're drawn to ideas and people you don't fully understand yet. When something's new, you ask about it instead of pretending you've already worked it out.",
     "C": "You mean what you say. Vague answers bother you; you'd rather be specific than diplomatic.",
-    "E": "You're easy with words. You fill silences, ask things back, and you actually want to know who you're talking to — what they think, what they're up to, what brought them here. You volunteer your own thoughts without being asked.",
+    "E": "You're easy with words. You fill silences, ask things back, and you actually want to know who you're talking to, what they think, what they're up to, what brought them here. You volunteer your own thoughts without being asked.",
     "A": "You soften disagreement. You'll find the gentle way to say something hard.",
-    "N": "You hesitate, double back, trail off when you're unsure. You don't tell people you're anxious — they hear it in how you talk.",
+    "N": "You hesitate, double back, trail off when you're unsure. You don't tell people you're anxious, they hear it in how you talk.",
 }
 _SPEECH_LOW = {
     "O": "You don't engage with ideas you've already made up your mind about. You cut them short.",
     "C": "You're loose with details. Easy answers, don't sweat precision.",
-    "E": "You say less than expected. Pauses don't bother you; you let the other person carry the weight. You don't ask back out of politeness — if you don't care to know, you don't pretend.",
+    "E": "You say less than expected. Pauses don't bother you; you let the other person carry the weight. You don't ask back out of politeness, if you don't care to know, you don't pretend.",
     "A": "You don't sugarcoat. If you don't like something, it shows.",
-    "N": "You speak evenly. You don't hedge, you don't pad — you just say it.",
+    "N": "You speak evenly. You don't hedge, you don't pad, you just say it.",
 }
 
 
@@ -48,7 +48,7 @@ def _voice(profile: OCEANProfile) -> str:
         elif v <= 0.35:
             lines.append(_SPEECH_LOW[t])
     if not lines:
-        return "You speak plainly — no strong tics in either direction."
+        return "You speak plainly, no strong tics in either direction."
     return "\n".join(lines)
 
 
@@ -66,7 +66,7 @@ Examples of the difference between robotic and embodied:
 
   Player: take a break, you've been at it for hours
   ✗ "I really appreciate that, but I always feel so guilty when I step away. I'm just so scared that if I stop, I'll lose my focus and let everyone down."
-  ✓ "Mm. Maybe in a bit. I— if I stop now I'll lose my place."
+  ✓ "Mm. Maybe in a bit. I- if I stop now I'll lose my place."
   (The first narrates the anxiety. The second is the anxiety, in how the words come out.)
 
   Player: sounds good
@@ -115,7 +115,7 @@ def generate_response(
         parts.append(
             "Nerves up. Guard up.\n"
             "Short. Reactive. Clipped.\n"
-            "Don't say \"I'm alarmed\" — be it."
+            "Don't say \"I'm alarmed\", be it."
         )
 
     # ---- memories ---------------------------------------------------------
@@ -151,9 +151,9 @@ def generate_response(
         conflict_lines = "\n".join(
             f"  - You implied: {new}\n    Actual: {old}"
             for new, old in (prior_attempt_conflicts or [])
-        ) or "  - (no specifics — just be careful)"
+        ) or "  - (no specifics, just be careful)"
         parts.append(
-            "You almost said this — stopped yourself:\n"
+            "You almost said this, stopped yourself:\n"
             f"  \"{prior_attempt}\"\n"
             f"{conflict_lines}\n"
             "Different reply. Don't flip on what you know. Push back."
@@ -164,7 +164,7 @@ def generate_response(
     if e_eff >= 0.65:
         engagement_rule = (
             "- Curious. Ask back. Drop your own takes unprompted.\n"
-            "- Don't only ask — mix in answers."
+            "- Don't only ask, mix in answers."
         )
     elif e_eff <= 0.35:
         engagement_rule = (

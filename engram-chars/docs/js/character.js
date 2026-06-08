@@ -1,5 +1,5 @@
 /**
- * character.js — Three.js NPC character loader and animator.
+ * character.js, Three.js NPC character loader and animator.
  *
  * Loads a Meshy-generated rigged GLB (base.glb) and blends animation clips
  * from sibling GLBs (idle.glb, talking.glb, etc.) using THREE.AnimationMixer.
@@ -35,7 +35,7 @@ function getBoneNames(object) {
  * Strip position and scale tracks from non-root bones.
  *
  * Meshy animation clips include .position and .scale tracks on every bone.
- * For a standard humanoid rig, only the root bone (Hips) should translate —
+ * For a standard humanoid rig, only the root bone (Hips) should translate -
  * all other bones express pose purely through rotation (.quaternion).
  * Leaving position tracks on arm/leg bones makes them fly away from the body.
  */
@@ -52,7 +52,10 @@ function prepareClip(clip) {
   return c;
 }
 
-export async function createCharacter(canvas, assetBasePath) {
+export async function createCharacter(canvas, assetBasePath, opts = {}) {
+  // previewOnly: skip loading the background animation GLBs (used for the
+  // catalogue preview, where we only need the base mesh, not 90MB of clips).
+  const previewOnly = !!opts.previewOnly;
   // ── Scene ──────────────────────────────────────────────────────────────────
   let renderer;
   try {
@@ -94,10 +97,10 @@ export async function createCharacter(canvas, assetBasePath) {
   back.position.set(0, 3, -4);
   scene.add(back);
 
-  // Ground
+  // Ground (light, soft shadow catcher so the figure reads on a light backdrop)
   const ground = new THREE.Mesh(
     new THREE.CircleGeometry(1.8, 64),
-    new THREE.MeshStandardMaterial({ color: 0x12182a, roughness: 1, metalness: 0 })
+    new THREE.MeshStandardMaterial({ color: 0xdfe6f3, roughness: 1, metalness: 0 })
   );
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
@@ -168,8 +171,8 @@ export async function createCharacter(canvas, assetBasePath) {
   // ── Load model + animations ────────────────────────────────────────────────
   // Meshy animation GLBs are self-contained: each (idle.glb, talking.glb, …) is
   // the FULL rigged character with one animation baked in, all sharing the same
-  // rig. So we load the idle GLB AS the model — mesh and idle animation come
-  // from the identical file, eliminating any cross-file binding mismatch — then
+  // rig. So we load the idle GLB AS the model, mesh and idle animation come
+  // from the identical file, eliminating any cross-file binding mismatch, then
   // pull the other clips from sibling GLBs (they bind by bone name to the same
   // skeleton).
   async function loadBase() {
@@ -191,7 +194,7 @@ export async function createCharacter(canvas, assetBasePath) {
 
     // The GLB we load as the actual displayed model. Prefer the idle animation
     // GLB (rigged characters); if there are NO animation GLBs (static textured
-    // meshes — e.g. presets whose rigging failed), load base.glb directly.
+    // meshes, e.g. presets whose rigging failed), load base.glb directly.
     const primaryName = animNames.includes(idleName) ? idleName
                       : (animNames[0] || null);
     const primaryUrl = primaryName
@@ -206,7 +209,7 @@ export async function createCharacter(canvas, assetBasePath) {
       mixer     = new THREE.AnimationMixer(model);
       boneNames = getBoneNames(model);
 
-      // The primary GLB's own embedded clip — keep ALL tracks (it's the native
+      // The primary GLB's own embedded clip, keep ALL tracks (it's the native
       // animation for this exact mesh, so position tracks are correct here).
       if (primaryName && gltf.animations[0]) {
         clips[primaryName] = gltf.animations[0];
@@ -241,7 +244,7 @@ export async function createCharacter(canvas, assetBasePath) {
     const animNames   = model.userData._animNames || [];
     const primaryName = model.userData._primaryName;
 
-    // Play the primary (idle) clip immediately — it's already loaded.
+    // Play the primary (idle) clip immediately, it's already loaded.
     if (clips[primaryName]) {
       playAnim(primaryName, { loop: true });
     }
@@ -287,10 +290,10 @@ export async function createCharacter(canvas, assetBasePath) {
   // ── Animation control ──────────────────────────────────────────────────────
   function playAnim(name, { loop = true, once = false, fade = 0.25 } = {}) {
     if (!mixer) return;
-    // Animations are OFF by default — characters load in their static bind pose
+    // Animations are OFF by default, characters load in their static bind pose
     // (clean T-pose). Add ?anim=1 to the URL to enable playback.
     if (!new URLSearchParams(location.search).has('anim')) return;
-    // Resolve clip — fallback chain: exact name → 'idle' → first available
+    // Resolve clip, fallback chain: exact name → 'idle' → first available
     const clip = clips[name] ?? clips['idle'] ?? Object.values(clips)[0];
     if (!clip) return;
 
@@ -353,7 +356,7 @@ export async function createCharacter(canvas, assetBasePath) {
     // Applied relative to the captured base transform so it never drifts. When a
     // mixer clip is actively playing we damp the breathing way down (and skip the
     // scale/sway) so it layers gently on top of the skeletal animation instead of
-    // fighting it — the rig already moves, we just keep the root subtly alive.
+    // fighting it, the rig already moves, we just keep the root subtly alive.
     if (model && baseSet && !materializing) {
       const clipActive = !!(currentAction && currentAction.isRunning && currentAction.isRunning());
       // Greet (procedural nod + small hop) takes priority over the idle bob.
@@ -376,7 +379,7 @@ export async function createCharacter(canvas, assetBasePath) {
         model.position.y = basePos.y + bob + greetBobY;
 
         if (!clipActive && greetT <= 0) {
-          // Subtle scale breathing (~0.5%) and gentle Y sway — only when no clip
+          // Subtle scale breathing (~0.5%) and gentle Y sway, only when no clip
           // is driving the skeleton, to avoid a doubled / broken look.
           const breath = 1 + Math.sin(elapsed * 1.6) * 0.005;
           model.scale.set(baseScale.x * breath, baseScale.y * breath, baseScale.z * breath);
@@ -428,7 +431,7 @@ export async function createCharacter(canvas, assetBasePath) {
   }
 
   // Pointer-driven look-at. We keep the handler referenced so dispose() can
-  // remove it; it only updates targetYaw — the damping happens in update().
+  // remove it; it only updates targetYaw, the damping happens in update().
   const YAW_RANGE = 0.35; // ±0.35 rad clamp
   function onPointerMove(e) {
     const rect = canvas.getBoundingClientRect();
@@ -450,7 +453,7 @@ export async function createCharacter(canvas, assetBasePath) {
     }
   }
 
-  // Intro "coming into being" — scale + opacity ease-out, REGARDLESS of ?anim.
+  // Intro "coming into being", scale + opacity ease-out, REGARDLESS of ?anim.
   function materialize(durationMs = 1200) {
     if (!model || !baseSet) return Promise.resolve();
     // Collect materials we toggle so we can restore opaque ones at the end.
@@ -562,7 +565,7 @@ export async function createCharacter(canvas, assetBasePath) {
       captureBase();
       boneNames = getBoneNames(model);
 
-      // Keep the new GLB's embedded clip (if any). We don't auto-play —
+      // Keep the new GLB's embedded clip (if any). We don't auto-play -
       // characters default to a static bind pose.
       clips = {};
       if (gltf.animations && gltf.animations[0]) {
@@ -597,7 +600,7 @@ export async function createCharacter(canvas, assetBasePath) {
   });
   // loadAnimationClips plays the primary idle as soon as the model is ready,
   // then loads the rest of the clips in the background.
-  loadAnimationClips();   // intentionally not awaited
+  if (!previewOnly) loadAnimationClips();   // intentionally not awaited
 
   // Make sure we're sized correctly now that layout has had a chance to settle,
   // then start driving frames ourselves.

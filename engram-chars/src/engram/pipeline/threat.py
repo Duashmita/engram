@@ -1,10 +1,10 @@
 """
-Stage 1 — Threat Assessment (paper §3.1)
+Stage 1, Threat Assessment (paper §3.1)
 
 Amygdala analogue. Two-layer design:
-  1. Regex pattern floor — catches explicit violence and coercion without
+  1. Regex pattern floor, catches explicit violence and coercion without
      calling the LLM, handles typos, and sets a hard magnitude floor.
-  2. LLM scoring — rates magnitude on 0–1 for ambiguous inputs; result is
+  2. LLM scoring, rates magnitude on 0-1 for ambiguous inputs; result is
      kept only if it exceeds the pattern floor.
 
 Neuroticism sets the perception threshold in Python so personality governs
@@ -29,7 +29,7 @@ from ..observability import bus
 
 # Each tuple: (compiled regex, floor magnitude, label)
 _PATTERNS: list[tuple[re.Pattern, float, str]] = [
-    # Explicit physical violence — knife (incl. common typos: knofe, knif, nife)
+    # Explicit physical violence, knife (incl. common typos: knofe, knif, nife)
     (re.compile(r'\bkn?[io]f[ef]?e?\b', re.I), 0.90, "knife"),
     # Other weapons
     (re.compile(r'\b(gun|pistol|shoot|shot|sword|blade|axe|club|bat)\b', re.I), 0.90, "weapon"),
@@ -89,10 +89,10 @@ def assess_threat(
         magnitude = floor_mag
         reasoning = f"Explicit threat pattern matched: {floor_label}"
     else:
-        # LLM scores raw magnitude — no NPC context so it can't rationalise
+        # LLM scores raw magnitude, no NPC context so it can't rationalise
         # explicit violence as fictional / game-safe.
         concatenated_note = (
-            " (words appear run together without spaces — read charitably)"
+            " (words appear run together without spaces, read charitably)"
             if len(player_input) > 10 and " " not in player_input else ""
         )
 

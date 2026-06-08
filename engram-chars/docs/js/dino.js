@@ -1,4 +1,4 @@
-// dino.js — mini infinite-runner for the loading screen.
+// dino.js, mini infinite-runner for the loading screen.
 // Matches the app dark theme. Space / ArrowUp / tap to jump.
 
 export class DinoGame {
@@ -132,7 +132,7 @@ export class DinoGame {
       ctx.fillRect(d.x + d.w - 12, d.y + d.h,    8, legPhase === 0 ? 10 : 6);
     }
 
-    // obstacles (cacti — segmented green)
+    // obstacles (cacti, segmented green)
     for (const o of this.obstacles) {
       ctx.fillStyle = '#4ddb8a';
       ctx.beginPath();

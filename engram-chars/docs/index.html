@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Engram — NPC Memory</title>
+<title>Engram, NPC Memory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>" />
 <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="catalogue.css" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script type="importmap">
 {
@@ -87,11 +88,11 @@
   <!-- ── Right: memory + pipeline panels ──────────────────────────────── -->
   <div id="single-view" class="right-col">
 
-    <!-- Panel A — OCEAN radar -->
+    <!-- Panel A, OCEAN radar -->
     <section class="panel panel-a" id="panel-a">
       <header class="panel-header">
         <h2>OCEAN</h2>
-        <div class="npc-name" id="npc-name">—</div>
+        <div class="npc-name" id="npc-name">-</div>
       </header>
       <div class="radar-wrap" id="radar-wrap">
         <canvas id="ocean-radar"></canvas>
@@ -100,7 +101,7 @@
       <div class="persona" id="persona"></div>
     </section>
 
-    <!-- Panel B — Pipeline timeline -->
+    <!-- Panel B, Pipeline timeline -->
     <section class="panel panel-b">
       <header class="panel-header">
         <h2>Pipeline</h2>
@@ -113,7 +114,7 @@
       <div class="turn-list" id="turn-list"></div>
     </section>
 
-    <!-- Panel C — Memory store -->
+    <!-- Panel C, Memory store -->
     <aside class="panel panel-c">
       <section class="sub">
         <header class="sub-header"><h3>Session window</h3><span class="muted" id="window-count">0/7</span></header>
@@ -131,12 +132,12 @@
       </section>
     </aside>
 
-    <!-- Panel D — Transcript + composer -->
+    <!-- Panel D, Transcript + composer -->
     <section class="panel panel-d">
       <header class="panel-header"><h2>Transcript</h2></header>
       <div class="transcript" id="transcript"></div>
       <div id="composer" class="composer hidden">
-        <textarea id="composer-input" rows="1" placeholder="Type a message — Enter to send, Shift+Enter for newline" disabled></textarea>
+        <textarea id="composer-input" rows="1" placeholder="Type a message, Enter to send, Shift+Enter for newline" disabled></textarea>
         <div class="composer-right">
           <button id="composer-send" class="ctrl primary" disabled>Send</button>
           <span id="composer-status" class="composer-status"></span>
@@ -167,7 +168,7 @@
       <h2>OCEAN Personality</h2>
       <button id="ocean-close" class="ctrl" type="button" title="Close">×</button>
     </header>
-    <p class="muted settings-hint">Adjust any trait before starting — changes are applied at session start.</p>
+    <p class="muted settings-hint">Adjust any trait before starting, changes are applied at session start.</p>
     <div class="ocean-sliders-panel">
       <div class="ocean-slider-row">
         <label for="slider-O"><span class="trait-key">O</span> Openness</label>
@@ -209,7 +210,7 @@
       <button id="settings-close" class="ctrl" title="Close">×</button>
     </header>
     <label class="settings-row">
-      <span>Anthropic API key (optional — bypasses rate limit)</span>
+      <span>Anthropic API key (optional, bypasses rate limit)</span>
       <input id="settings-key-input" type="password" autocomplete="off" placeholder="sk-ant-…" />
     </label>
     <p class="muted settings-hint">Stored only in your browser's localStorage.</p>

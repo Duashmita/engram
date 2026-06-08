@@ -1,5 +1,5 @@
 """
-prebake.py — pre-warm NPC data directories before backend deploy.
+prebake.py, pre-warm NPC data directories before backend deploy.
 
 When to run:
     Once locally before `modal deploy` (or before pushing the repo) so
@@ -21,7 +21,7 @@ What gets written:
 
 Idempotent:
     A preset whose data dir already contains a state.json plus a
-    non-empty memories.json is reported as cached and skipped — no
+    non-empty memories.json is reported as cached and skipped, no
     re-embedding, no API calls. Delete the preset's dir to re-bake.
 
 Usage:

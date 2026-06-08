@@ -1,11 +1,11 @@
 """
-Stage 2 — Personality-Weighted Memory Retrieval (paper §3.2)
+Stage 2, Personality-Weighted Memory Retrieval (paper §3.2)
 
 Two retrieval primitives the orchestrator selects between based on the
 threat judgement and whether scored retrieval qualifies any memories:
 
-- ``scored_retrieve``  — top-5 by personality-weighted score, hard ≥15 gate.
-- ``tag_retrieve``     — instinct fallback; cosine on 6-D EventTags.
+- ``scored_retrieve`` , top-5 by personality-weighted score, hard ≥15 gate.
+- ``tag_retrieve``    , instinct fallback; cosine on 6-D EventTags.
 """
 
 from __future__ import annotations
@@ -36,6 +36,6 @@ def tag_retrieve(
     llm: GeminiClient,
     top_k: int = 3,
 ) -> list[Memory]:
-    """Instinct-mode retrieval — tag-vector cosine over the 6-D EventTags space."""
+    """Instinct-mode retrieval, tag-vector cosine over the 6-D EventTags space."""
     tags = tag_event(player_input, "player input", llm)
     return memory_manager.retrieve_by_tag_vector(tags.to_vector(), top_k=top_k)

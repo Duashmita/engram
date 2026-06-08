@@ -38,7 +38,7 @@ from sse_starlette.sse import EventSourceResponse
 
 
 # ---------------------------------------------------------------------------
-# Path setup — make sure ``engram`` is importable in both Modal and local dev
+# Path setup, make sure ``engram`` is importable in both Modal and local dev
 # ---------------------------------------------------------------------------
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -47,7 +47,7 @@ REPO_ROOT = os.path.dirname(_THIS_DIR)
 # Local dev: src is at <repo>/src.
 # Modal: deploy file lives at /root/modal_app.py while the repo (mounted via
 # add_local_dir) is at /root/engram, so src is at /root/engram/src. Both paths
-# are checked here at module load — the engram imports below MUST resolve
+# are checked here at module load, the engram imports below MUST resolve
 # before the Modal runner inspects the FastAPI app.
 for _candidate in (os.path.join(REPO_ROOT, "src"), "/root/engram/src"):
     if os.path.isdir(_candidate) and _candidate not in sys.path:
@@ -78,7 +78,7 @@ SESSION_TTL_S = 3600
 HARD_TURN_CAP = 30
 # Rate limits apply to the shared-key path (no BYOK). The onboarding wizard fires
 # several calls per character (infer_ocean, appearance, greeting, start, …), so
-# keep these generous — the old 5/min tripped mid-wizard and surfaced as
+# keep these generous, the old 5/min tripped mid-wizard and surfaced as
 # "personality model unreachable".
 RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "120"))
 RATE_LIMIT_PER_DAY = int(os.environ.get("RATE_LIMIT_PER_DAY", "2000"))
@@ -121,7 +121,7 @@ def _restore_device_memory(device_id: str, npc_id: str, data_dir_root: str) -> b
             with open(os.path.join(npc_dir, "keystore.pl"), "w", encoding="utf-8") as f:
                 f.write(saved["keystore"])
         if "state" in saved:
-            # Restore state but reset history — each session starts a fresh
+            # Restore state but reset history, each session starts a fresh
             # conversation; long-term identity comes from memories, not raw logs.
             state = dict(saved["state"])
             state["history"] = []
@@ -206,13 +206,13 @@ class StartReq(BaseModel):
     device_id: Optional[str] = None
     anthropic_key: Optional[str] = None
     gemini_key: Optional[str] = None  # kept for backwards compat; anthropic_key takes precedence
-    ocean: Optional[dict] = None  # {"O": 0.0–1.0, "C": ..., "E": ..., "A": ..., "N": ...}
+    ocean: Optional[dict] = None  # {"O": 0.0-1.0, "C": ..., "E": ..., "A": ..., "N": ...}
     # ── Custom character (onboarding wizard) ──────────────────────────────
     custom: Optional[bool] = False
     name: Optional[str] = None
     persona: Optional[str] = None
-    backstory: Optional[list] = None   # list[str] — seed memories
-    facts: Optional[list] = None       # list[str] — seed prolog facts
+    backstory: Optional[list] = None   # list[str], seed memories
+    facts: Optional[list] = None       # list[str], seed prolog facts
 
 
 class TurnReq(BaseModel):
@@ -301,7 +301,7 @@ def _meshy_post(path: str, payload: dict) -> str:
     """POST to a Meshy create endpoint and return the result task_id.
 
     Retries on request timeouts, but never retries a 500 whose body mentions
-    "pose estimation" — that is a terminal rigging failure raised as
+    "pose estimation", that is a terminal rigging failure raised as
     _PoseEstimationError so the caller can degrade gracefully.
     """
     url = f"{MESHY_BASE}{path}"
@@ -412,7 +412,7 @@ def _generate_character_worker(job_id: str, name: str, description: str) -> None
             _update_job(job_id, status="done", stage="refine", glb_url=refine_glb, progress=100)
 
     except _PoseEstimationError as exc:
-        # Pose-estimation surfaced before refine completed — only degrade if we
+        # Pose-estimation surfaced before refine completed, only degrade if we
         # actually have a refined mesh; otherwise it's a genuine failure.
         if refine_glb:
             _update_job(job_id, status="done", stage="refine", glb_url=refine_glb, progress=100)
@@ -474,7 +474,7 @@ def _check_rate(ip: str) -> tuple[bool, int]:
     day_ago = now - 86400.0
 
     bucket = _RATE.get(ip, [])
-    # Inline cleanup — drop anything older than the daily window.
+    # Inline cleanup, drop anything older than the daily window.
     bucket = [t for t in bucket if t >= day_ago]
     in_minute = sum(1 for t in bucket if t >= minute_ago)
 
@@ -512,7 +512,7 @@ def _make_data_dir(session_id: str, npc_id: str) -> str:
 
     Local dev: pre-baked data lives at <repo>/data/<npc_id>/.
     Modal container: the repo is mounted at /root/engram, so it lives at
-    /root/engram/data/<npc_id>/. Try both — first match wins.
+    /root/engram/data/<npc_id>/. Try both, first match wins.
     """
     os.makedirs(_SESSION_BASE_DIR, exist_ok=True)
     dst = os.path.join(_SESSION_BASE_DIR, session_id)
@@ -645,7 +645,7 @@ async def start(body: StartReq, request: Request, x_anthropic_key: Optional[str]
                         raise HTTPException(400, f"ocean.{trait} must be in [0, 1]")
                     setattr(config.profile, trait, round(val, 3))
 
-    # Run agent construction OUTSIDE the live event bus — backstory init can
+    # Run agent construction OUTSIDE the live event bus, backstory init can
     # emit dozens of memory_added events that would otherwise race the SSE
     # response. We surface them in the header instead.
     try:
@@ -704,7 +704,7 @@ async def turn(body: TurnReq, request: Request, x_anthropic_key: Optional[str] =
     loop = asyncio.get_running_loop()
 
     def on_event(event: dict) -> None:
-        # Called from the executor thread (sync emit) — must hop back to the loop.
+        # Called from the executor thread (sync emit), must hop back to the loop.
         loop.call_soon_threadsafe(queue.put_nowait, event)
 
     async def event_stream():
@@ -750,7 +750,7 @@ async def end(body: EndReq) -> Response:
     sess = SESSIONS.pop(body.session_id, None)
     if sess is not None:
         try:
-            # Best-effort end_session for symmetry with chat.py — never let
+            # Best-effort end_session for symmetry with chat.py, never let
             # cleanup throw across the network boundary.
             sess.agent.end_session()
         except Exception as exc:  # noqa: BLE001
@@ -995,13 +995,13 @@ def proxy_glb(url: str):
 
 
 # ---------------------------------------------------------------------------
-# Modal wrapping — optional. The block must remain importable even when Modal
+# Modal wrapping, optional. The block must remain importable even when Modal
 # is not installed (the local dev path uses uvicorn, no Modal needed).
 # ---------------------------------------------------------------------------
 
 try:
     import modal  # type: ignore
-except ImportError:  # pragma: no cover — local-dev fallback
+except ImportError:  # pragma: no cover, local-dev fallback
     modal = None  # type: ignore
 
 
@@ -1039,7 +1039,10 @@ if modal is not None:
 
     @app.function(
         image=image,
-        secrets=[modal.Secret.from_name("engram-gemini-key")],
+        # Create with:
+        #   modal secret create engram-keys \
+        #     ANTHROPIC_API_KEY=sk-ant-... VOYAGE_API_KEY=pa-... MESHY_API_KEY=msy_...
+        secrets=[modal.Secret.from_name("engram-keys")],
         # Pinned to a single container so SESSIONS (in-process dict) and the
         # bus singleton + Prolog state all stay coherent across requests.
         # Sticky sessions across containers would require modal.Dict + agent

@@ -6,12 +6,12 @@ import time
 @dataclass
 class OCEANProfile:
     name: str
-    O: float  # openness, 0–1
-    C: float  # conscientiousness, 0–1
-    E: float  # extraversion, 0–1
-    A: float  # agreeableness, 0–1
-    N: float  # neuroticism, 0–1
-    # fight/flight temporary deltas — decay back to 0
+    O: float  # openness, 0-1
+    C: float  # conscientiousness, 0-1
+    E: float  # extraversion, 0-1
+    A: float  # agreeableness, 0-1
+    N: float  # neuroticism, 0-1
+    # fight/flight temporary deltas, decay back to 0
     _dO: float = field(default=0.0, compare=False, repr=False)
     _dC: float = field(default=0.0, compare=False, repr=False)
     _dE: float = field(default=0.0, compare=False, repr=False)
@@ -61,13 +61,13 @@ class OCEANProfile:
 
 @dataclass
 class EventTags:
-    emotion_valence: float   # –1.0 to 1.0
+    emotion_valence: float   # -1.0 to 1.0
     social_type: str         # solitude|conversation|cooperation|conflict
     threat_level: float      # 0.0 to 1.0
     goal_relevance: float    # 0.0 to 1.0
     novelty_level: float     # 0.0 to 1.0
     self_relevance: float    # 0.0 to 1.0
-    importance: int = 5      # 1–10 LLM-judged
+    importance: int = 5      # 1-10 LLM-judged
     ocean: dict = field(default_factory=lambda: {'O': 3, 'C': 3, 'E': 3, 'A': 3, 'N': 3})
 
     @property

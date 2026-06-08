@@ -1,11 +1,11 @@
-// render.js — DOM updates from state.
+// render.js, DOM updates from state.
 //
 // Renderer is idempotent: given the same state it produces the same DOM.
-// This is what makes scrubbing work — the replay loop calls rebuild() and
+// This is what makes scrubbing work, the replay loop calls rebuild() and
 // then renderAll() and we don't have to worry about cleaning up animations
 // that fired in the alternate timeline.
 //
-// Animation hints (state.flash_ff, fresh_mem_id, etc.) are *consumed* —
+// Animation hints (state.flash_ff, fresh_mem_id, etc.) are *consumed* -
 // the renderer reads them, applies a transient class, and clears them.
 
 const TRAITS = ['O','C','E','A','N'];
@@ -170,7 +170,7 @@ export function renderHeader(state) {
 // ---------- pipeline turns (Panel B) ----------
 export function renderTurns(state, opts = {}) {
   const list = document.getElementById('turn-list');
-  // newest-first reads better — newest events animate at the top, the user's
+  // newest-first reads better, newest events animate at the top, the user's
   // eye lands there. Document choice: newest-on-top.
   const turns = [...state.turns].reverse();
 
@@ -314,7 +314,7 @@ function bindTurnHandlers(list) {
 
 // ---------- memory store (Panel C) ----------
 export function renderMemoryStore(state) {
-  // Session window — render exactly window_size slots
+  // Session window, render exactly window_size slots
   const track = document.getElementById('window-track');
   const ws = state.window_size || 7;
   const slots = [];

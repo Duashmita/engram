@@ -1,11 +1,11 @@
-// onboard.js — Character-creation as a rewarding journey.
+// onboard.js, Character-creation as a rewarding journey.
 //
 // The arc: name → interview (personality forms in real time) → the reveal
 // (archetype + radar draws itself) → taking shape (appearance types out) →
 // a past (memories fly into them) → birth (handed back to app.js, where the
 // character materializes, waves, and speaks first).
 //
-// The grey 3D caricature is alive throughout — breathing, watching the cursor.
+// The grey 3D caricature is alive throughout, breathing, watching the cursor.
 // Visual reward components come from onboard-visuals.js.
 
 import { BACKEND_URL } from '../config.js';
@@ -18,7 +18,7 @@ import {
 const LS_KEY = 'engram_gemini_key';
 
 const QUESTIONS = [
-  { trait: 'O', tag: 'their curiosity',   q: 'When your character meets something new or unfamiliar — do they lean in, or hold back?' },
+  { trait: 'O', tag: 'their curiosity',   q: 'When your character meets something new or unfamiliar, do they lean in, or hold back?' },
   { trait: 'C', tag: 'their discipline',  q: 'How do they handle their work, their plans, their promises?' },
   { trait: 'E', tag: 'their energy',      q: 'Drop them into a room full of strangers. What do they do?' },
   { trait: 'A', tag: 'their warmth',      q: 'Someone challenges them, flatly disagrees. How do they take it?' },
@@ -146,7 +146,7 @@ export function startOnboarding({ onComplete }) {
     ).join('');
   }
 
-  // ── 0. Threshold — name ─────────────────────────────────────────────────────
+  // ── 0. Threshold, name ─────────────────────────────────────────────────────
   function stepName() {
     setStep(0);
     radarWrap.classList.remove('visible');
@@ -175,7 +175,7 @@ export function startOnboarding({ onComplete }) {
     setTimeout(() => input.focus(), 40);
   }
 
-  // ── 1. Interview — personality forms as you answer ──────────────────────────
+  // ── 1. Interview, personality forms as you answer ──────────────────────────
   function stepInterview(idx) {
     setStep(1);
     ensureRadar().setProgress(idx);
@@ -213,7 +213,7 @@ export function startOnboarding({ onComplete }) {
     setTimeout(() => ta.focus(), 40);
   }
 
-  // ── 2. The reveal — archetype + radar draws itself ──────────────────────────
+  // ── 2. The reveal, archetype + radar draws itself ──────────────────────────
   async function reveal() {
     setStep(2);
     // Infer the first time, and RETRY whenever the previous attempt failed
@@ -235,7 +235,7 @@ export function startOnboarding({ onComplete }) {
         data.archetype = j.archetype || 'The Enigma';
       } catch (err) {
         console.warn('[onboard] infer_ocean error', err);
-        data.summary = 'The personality model was unreachable — start from neutral and shape them by hand.';
+        data.summary = 'The personality model was unreachable, start from neutral and shape them by hand.';
         data.archetype = 'The Unknown';
       }
     }
@@ -290,12 +290,12 @@ export function startOnboarding({ onComplete }) {
     requestAnimationFrame(() => { refine.style.transition = 'opacity .6s ease'; refine.style.opacity = '1'; });
   }
 
-  // ── 3. Taking shape — appearance types itself out ───────────────────────────
+  // ── 3. Taking shape, appearance types itself out ───────────────────────────
   async function stepAppearance() {
     setStep(3);
     card.innerHTML = `
       <h2 class="onboard-h">${esc(data.name)} takes shape</h2>
-      <p class="onboard-subnote">Sculpted from these words. Edit anything — it's theirs.</p>
+      <p class="onboard-subnote">Sculpted from these words. Edit anything, it's theirs.</p>
       <div class="onboard-appear" id="ob-appear"></div>
       <div class="onboard-actions">
         <button id="ob-back" class="onboard-btn ghost">Back</button>
@@ -303,7 +303,7 @@ export function startOnboarding({ onComplete }) {
         <button id="ob-next" class="onboard-btn primary">Give them a past</button>
       </div>`;
     const appear = card.querySelector('#ob-appear');
-    // Back to the personality reveal/sliders (no re-inference — re-entrant).
+    // Back to the personality reveal/sliders (no re-inference, re-entrant).
     card.querySelector('#ob-back').addEventListener('click', reveal);
 
     async function load() {
@@ -318,7 +318,7 @@ export function startOnboarding({ onComplete }) {
           if (res.ok) text = (await res.json()).description || '';
         } catch (err) { console.warn('[onboard] appearance error', err); }
       }
-      if (!text) text = 'Describe your character here — they will be sculpted from it.';
+      if (!text) text = 'Describe your character here, they will be sculpted from it.';
       data.appearanceDescription = text;
       kickoffGeneration(data.name, text);   // start the real 3D build in the background
       await typewriter(card.querySelector('#ob-type'), text, { cps: 55 });
@@ -337,7 +337,7 @@ export function startOnboarding({ onComplete }) {
     load();
   }
 
-  // ── 4. A past — memories fly into the character ─────────────────────────────
+  // ── 4. A past, memories fly into the character ─────────────────────────────
   function stepMemories() {
     setStep(4);
     card.innerHTML = `

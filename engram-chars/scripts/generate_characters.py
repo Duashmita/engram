@@ -53,10 +53,10 @@ OUTPUT_DIR = os.path.join(_REPO_ROOT, "docs", "assets", "characters")
 # Per-preset animation sets
 # Each preset downloads a curated set of Meshy action IDs suited to its
 # personality. The same action_id values may appear across presets (that's
-# fine — each rig task produces its own version).
+# fine, each rig task produces its own version).
 # ---------------------------------------------------------------------------
 
-# Full shared library — superset of all presets.
+# Full shared library, superset of all presets.
 _ALL_ANIMS = {
     "idle":         0,    # Standard upright idle
     "idle_cross":   3,    # Arms-crossed idle (reserved/low-A)
@@ -81,7 +81,7 @@ _ALL_ANIMS = {
 
 # Per-preset curated sets.
 PRESET_ANIMATIONS: dict[str, dict[str, int]] = {
-    "guard": {   # high-N (0.9), low-A (0.2) — paranoid, defensive
+    "guard": {   # high-N (0.9), low-A (0.2), paranoid, defensive
         "idle":        56,   # crouching/guarded idle
         "talking":     12,
         "thinking":    8,
@@ -93,7 +93,7 @@ PRESET_ANIMATIONS: dict[str, dict[str, int]] = {
         "getting_hit": 68,
         "dying":       72,
     },
-    "merchant": {  # high-E (0.9), high-A (0.8) — warm, expressive
+    "merchant": {  # high-E (0.9), high-A (0.8), warm, expressive
         "idle":        17,   # wave/greeting idle
         "talking":     12,
         "thinking":    8,
@@ -105,7 +105,7 @@ PRESET_ANIMATIONS: dict[str, dict[str, int]] = {
         "getting_hit": 68,
         "dying":       72,
     },
-    "clerk": {    # low-O (0.1), high-C (0.9) — rigid, precise
+    "clerk": {    # low-O (0.1), high-C (0.9), rigid, precise
         "idle":        0,    # strict upright idle
         "talking":     12,
         "thinking":    8,
@@ -114,7 +114,7 @@ PRESET_ANIMATIONS: dict[str, dict[str, int]] = {
         "getting_hit": 68,
         "dying":       72,
     },
-    "jeanie": {  # high-N (0.85), high-C (0.85) — anxious, precise
+    "jeanie": {  # high-N (0.85), high-C (0.85), anxious, precise
         "idle":        56,   # slightly defensive
         "talking":     12,
         "thinking":    8,
@@ -124,7 +124,7 @@ PRESET_ANIMATIONS: dict[str, dict[str, int]] = {
         "getting_hit": 68,
         "dying":       72,
     },
-    "maya": {    # high-O (0.9), high-E (0.85), high-A (0.8) — expressive, open
+    "maya": {    # high-O (0.9), high-E (0.85), high-A (0.8), expressive, open
         "idle":        5,    # curious, looking around
         "talking":     12,
         "thinking":    8,
@@ -135,7 +135,7 @@ PRESET_ANIMATIONS: dict[str, dict[str, int]] = {
         "getting_hit": 68,
         "dying":       72,
     },
-    "hale": {    # high-C (0.85), low-A (0.2), low-N (0.25) — blunt, authoritative
+    "hale": {    # high-C (0.85), low-A (0.2), low-N (0.25), blunt, authoritative
         "idle":        3,    # arms-crossed authoritative idle
         "talking":     12,
         "thinking":    8,
@@ -172,7 +172,7 @@ def _post(url: str, api_key: str, payload: dict, timeout: int = 90, retries: int
     for attempt in range(retries):
         try:
             resp = requests.post(url, headers=_headers(api_key), json=payload, timeout=timeout)
-            # 4xx are deterministic (bad prompt, bad request) — don't retry, surface body.
+            # 4xx are deterministic (bad prompt, bad request), don't retry, surface body.
             if 400 <= resp.status_code < 500:
                 raise RuntimeError(f"non-retryable {resp.status_code}: {resp.text[:200]}")
             # Some 500s are non-transient (e.g. rigging pose-estimation failure on a
@@ -185,7 +185,7 @@ def _post(url: str, api_key: str, payload: dict, timeout: int = 90, retries: int
             resp.raise_for_status()
             return resp.json()
         except RuntimeError:
-            raise  # non-retryable — surface immediately
+            raise  # non-retryable, surface immediately
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError,
                 requests.exceptions.HTTPError) as exc:
             last_exc = exc
@@ -240,12 +240,12 @@ def _download(url: str, path: str) -> None:
 # ---------------------------------------------------------------------------
 
 def step_description(client: AnthropicClient, config) -> str:
-    """Step 1 — ask Claude to write a personality-expressive appearance description."""
+    """Step 1, ask Claude to write a personality-expressive appearance description."""
     o = config.profile
     # Map trait values to strong prose descriptors
     def trait_prose(trait, val):
         if trait == "N":
-            if val >= 0.7: return "visibly anxious, guarded, tense — braced for threat"
+            if val >= 0.7: return "visibly anxious, guarded, tense, braced for threat"
             if val <= 0.3: return "calm and relaxed, loose posture, at ease"
         if trait == "E":
             if val >= 0.7: return "open posture, arms wide, physically expressive"
@@ -267,19 +267,19 @@ def step_description(client: AnthropicClient, config) -> str:
         if trait_prose(t, getattr(o, t))
     )
 
-    prompt = f"""Write a 2–3 sentence 3D character appearance description for a game NPC.
+    prompt = f"""Write a 2-3 sentence 3D character appearance description for a game NPC.
 The description will be sent directly to a 3D generation API (Meshy).
 
 Character: {config.name}
 Role/persona: {config.persona[:200]}
-Personality (OCEAN Big Five, 0–1 scale):
+Personality (OCEAN Big Five, 0-1 scale):
   {traits}
 
 Rules:
 - Focus exclusively on BODY SHAPE, POSTURE, FACIAL STRUCTURE, and EXPRESSION.
 - Let the personality radiate through body language above all else.
 - Do NOT mention colors or skin tone.
-- Be specific and evocative — avoid generic phrases like "weathered" or "rugged".
+- Be specific and evocative, avoid generic phrases like "weathered" or "rugged".
 - End with exactly: "T-pose, humanoid, game character, realistic proportions."
 
 Write only the description, nothing else."""
@@ -288,7 +288,7 @@ Write only the description, nothing else."""
 
 
 # Short suffix to help the auto-rigger's pose estimation: limbs separated from
-# the body. Kept brief — Meshy's text-to-3D prompt limit is ~600 characters.
+# the body. Kept brief, Meshy's text-to-3D prompt limit is ~600 characters.
 _POSE_SUFFIX = (
     " Strict T-pose, arms straight out with clear gaps from the torso, legs apart, "
     "fitted clothing (no coats/robes bridging limbs), full body, facing forward."
@@ -297,7 +297,7 @@ _MESHY_PROMPT_MAX = 780   # Meshy hard limit is 800 chars
 
 
 def step_preview(api_key: str, description: str) -> str:
-    """Step 2 — Meshy text-to-3D preview. Returns preview task_id."""
+    """Step 2, Meshy text-to-3D preview. Returns preview task_id."""
     # Keep total under Meshy's ~600-char limit: trim the description if needed,
     # then append the pose suffix.
     budget = _MESHY_PROMPT_MAX - len(_POSE_SUFFIX)
@@ -315,7 +315,7 @@ def step_preview(api_key: str, description: str) -> str:
 
 
 def step_refine(api_key: str, preview_id: str) -> tuple[str, str]:
-    """Step 3 — Meshy refine (textures). Returns (refine_task_id, glb_url)."""
+    """Step 3, Meshy refine (textures). Returns (refine_task_id, glb_url)."""
     data = _post(f"{MESHY_BASE}/openapi/v2/text-to-3d", api_key,
                  {"mode": "refine", "preview_task_id": preview_id})
     task_id = data["result"]
@@ -325,7 +325,7 @@ def step_refine(api_key: str, preview_id: str) -> tuple[str, str]:
 
 
 def step_rig(api_key: str, refine_task_id: str) -> tuple[str, str]:
-    """Step 4 — Meshy auto-rig. Returns (rig_task_id, rigged_glb_url)."""
+    """Step 4, Meshy auto-rig. Returns (rig_task_id, rigged_glb_url)."""
     data = _post(f"{MESHY_BASE}/openapi/v1/rigging", api_key,
                  {"input_task_id": refine_task_id})
     task_id = data["result"]
@@ -337,7 +337,7 @@ def step_rig(api_key: str, refine_task_id: str) -> tuple[str, str]:
 def step_animations(api_key: str, rig_task_id: str, anim_map: dict[str, int],
                     out_dir: str) -> dict[str, str]:
     """
-    Step 5 — Submit ALL animation tasks at once, then poll them in parallel.
+    Step 5, Submit ALL animation tasks at once, then poll them in parallel.
 
     Instead of: submit → wait → submit → wait (18 × ~30s = 9 min)
     We do:      submit all → wait once for all (~60-90s total)
@@ -361,7 +361,7 @@ def step_animations(api_key: str, rig_task_id: str, anim_map: dict[str, int],
         print("  [anim] no animation tasks submitted")
         return {}
 
-    print(f"  [anim] {len(pending)} tasks submitted — polling...")
+    print(f"  [anim] {len(pending)} tasks submitted, polling...")
 
     # Poll all tasks together until all complete
     completed: dict[str, str] = {}   # name → download_url
@@ -459,7 +459,7 @@ def generate_for_preset(preset_key: str, client: AnthropicClient, api_key: str,
     anim_map = PRESET_ANIMATIONS.get(preset_key, _DEFAULT_ANIMATIONS)
 
     print(f"\n{'='*60}")
-    print(f"  {preset_key} — {config.name}")
+    print(f"  {preset_key}, {config.name}")
     print(f"  O={config.profile.O} C={config.profile.C} E={config.profile.E} A={config.profile.A} N={config.profile.N}")
     print(f"{'='*60}")
 
@@ -480,7 +480,7 @@ def generate_for_preset(preset_key: str, client: AnthropicClient, api_key: str,
         state["refine_id"], state["refine_glb_url"] = step_refine(api_key, state["preview_id"])
         _save_state(out_dir, state)
 
-    # Step 4: rig — but the auto-rigger fails pose-estimation on clothed/bulky
+    # Step 4: rig, but the auto-rigger fails pose-estimation on clothed/bulky
     # meshes. If it fails, fall back to the textured (unrigged) refine mesh so
     # the preset still gets a preloaded static GLB.
     rig_failed = state.get("rig_failed", False)
@@ -503,10 +503,10 @@ def generate_for_preset(preset_key: str, client: AnthropicClient, api_key: str,
     else:
         print("  [skip] base.glb already exists")
 
-    # Step 5: animations — only if rigging succeeded (static mesh can't animate).
+    # Step 5: animations, only if rigging succeeded (static mesh can't animate).
     if rig_failed:
         anim_paths = {}
-        print("  [animations] skipped (no rig — static mesh)")
+        print("  [animations] skipped (no rig, static mesh)")
     elif not state.get("animations_done"):
         anim_paths = step_animations(api_key, state["rig_id"], anim_map, out_dir)
         state["animation_paths"] = anim_paths
@@ -533,7 +533,7 @@ def generate_for_preset(preset_key: str, client: AnthropicClient, api_key: str,
     }
     with open(os.path.join(out_dir, "manifest.json"), "w") as f:
         json.dump(manifest, f, indent=2)
-    print(f"  [manifest] written — {len(anim_paths)} animations")
+    print(f"  [manifest] written, {len(anim_paths)} animations")
 
 
 # ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// live.js — Live Chat mode for Engram viz.
+// live.js, Live Chat mode for Engram viz.
 //
 // Architecture:
 //   * Replay mode reads events from a static NDJSON file and emits them on a
@@ -28,7 +28,7 @@ const NPC_PRESETS = [
 ];
 
 // Module-local state ----------------------------------------------------------
-let stateRef = null;          // { state }   — shared mutable handle from app.js
+let stateRef = null;          // { state }  , shared mutable handle from app.js
 let applyFn  = null;          // (state, ev) => state
 let renderFn = null;          // (state)     => void
 
@@ -91,7 +91,7 @@ export function enterLive({ stateRef: sRef, applyFn: aFn, renderFn: rFn, onSessi
   });
 
   // When launching a fresh custom character (resume=false), do NOT auto-resume a
-  // stale preset session or pop the OCEAN dialog — the caller will immediately
+  // stale preset session or pop the OCEAN dialog, the caller will immediately
   // start the custom session itself.
   if (!resume) return;
 
@@ -118,7 +118,7 @@ export function enterLive({ stateRef: sRef, applyFn: aFn, renderFn: rFn, onSessi
 /** Tear-down hook for when user toggles back to replay. Clears live UI. */
 export function exitLive() {
   hideLiveUI();
-  // We deliberately do NOT /end the session — user may toggle back.
+  // We deliberately do NOT /end the session, user may toggle back.
 }
 
 // ---------------- UI plumbing -----------------------------------------------
@@ -416,19 +416,19 @@ async function startSession() {
   try {
     res = await fetch(`${BACKEND_URL}/start`, { method: 'POST', headers, body: JSON.stringify(bodyObj) });
   } catch (err) {
-    setStatus(`network error — check your connection (${err.message})`);
+    setStatus(`network error, check your connection (${err.message})`);
     setStartLoading(false);
     return;
   }
 
   if (res.status === 429) {
     const j = await safeJSON(res);
-    setStatus(`rate limited — try again in ${j?.retry_after_s ?? '?'}s`);
+    setStatus(`rate limited, try again in ${j?.retry_after_s ?? '?'}s`);
     setStartLoading(false);
     return;
   }
   if (res.status === 503) {
-    setStatus('no API key — paste yours in Settings (⚙)');
+    setStatus('no API key, paste yours in Settings (⚙)');
     setStartLoading(false);
     return;
   }
@@ -457,7 +457,7 @@ async function startSession() {
   if (onSessionStartCb) onSessionStartCb(chosen);
 
   setStartLoading(false);
-  setStatus(`live with ${data.header?.npc_name ?? npcId} — say something`);
+  setStatus(`live with ${data.header?.npc_name ?? npcId}, say something`);
   setComposerEnabled(true);
   document.getElementById('composer-input')?.focus();
 }
@@ -499,7 +499,7 @@ export async function startCustomSession(config) {
   try {
     res = await fetch(`${BACKEND_URL}/start`, { method: 'POST', headers, body: JSON.stringify(bodyObj) });
   } catch (err) {
-    setStatus(`network error — check your connection (${err.message})`);
+    setStatus(`network error, check your connection (${err.message})`);
     setStartLoading(false);
     return;
   }
@@ -525,7 +525,61 @@ export async function startCustomSession(config) {
   if (onSessionStartCb) await onSessionStartCb(slug);
 
   setStartLoading(false);
-  setStatus(`live with ${dataResp.header?.npc_name ?? config.name} — say something`);
+  setStatus(`live with ${dataResp.header?.npc_name ?? config.name}, say something`);
+  setComposerEnabled(true);
+  document.getElementById('composer-input')?.focus();
+}
+
+/**
+ * Start a session for a built-in preset NPC (from the catalogue). Posts a
+ * normal (non-custom) /start so the backend uses the preset's prebaked
+ * backstory and facts. Returns once the session is wired and the model loaded.
+ */
+export async function startPresetSession(presetId, ocean) {
+  setStatus('starting session…');
+  setStartLoading(true);
+  setComposerEnabled(false);
+
+  const headers = { 'Content-Type': 'application/json' };
+  const key = localStorage.getItem(LS_KEY);
+  if (key) headers['X-Gemini-Key'] = key;
+
+  const bodyObj = {
+    npc_id: presetId,
+    device_id: getDeviceId(),
+    ...(ocean ? { ocean } : {}),
+    ...(key ? { anthropic_key: key } : {}),
+  };
+
+  let res;
+  try {
+    res = await fetch(`${BACKEND_URL}/start`, { method: 'POST', headers, body: JSON.stringify(bodyObj) });
+  } catch (err) {
+    setStatus(`network error, check your connection (${err.message})`);
+    setStartLoading(false);
+    return;
+  }
+  if (!res.ok) {
+    const j = await safeJSON(res);
+    setStatus(`start failed: ${j?.detail ?? res.status}`);
+    setStartLoading(false);
+    return;
+  }
+
+  const dataResp = await res.json();
+  currentSessionId = dataResp.session_id;
+  npcId            = presetId;
+  localStorage.setItem(LS_SESSION, currentSessionId);
+  localStorage.setItem(LS_NPC,     npcId);
+
+  stateRef.state = freshState(dataResp.header);
+  applyFn(stateRef.state, { t: 0, type: 'session_init', payload: dataResp.header });
+  renderFn(stateRef.state);
+
+  if (onSessionStartCb) await onSessionStartCb(presetId);
+
+  setStartLoading(false);
+  setStatus(`live with ${dataResp.header?.npc_name ?? presetId}, say something`);
   setComposerEnabled(true);
   document.getElementById('composer-input')?.focus();
 }
@@ -586,7 +640,7 @@ async function sendMessage(text) {
   }
 
   if (res.status === 404) {
-    setStatus('session not found — start a new one');
+    setStatus('session not found, start a new one');
     clearPersistedSession();
     inFlight = false;
     messageQueue = [];
@@ -595,7 +649,7 @@ async function sendMessage(text) {
     return;
   }
   if (res.status === 410) {
-    setStatus('session ended (cap reached) — start a new one');
+    setStatus('session ended (cap reached), start a new one');
     clearPersistedSession();
     inFlight = false;
     messageQueue = [];
@@ -605,12 +659,12 @@ async function sendMessage(text) {
   }
   if (res.status === 429) {
     const j = await safeJSON(res);
-    setComposerStatus(`rate limited — try again in ${j?.retry_after_s ?? '?'}s`);
+    setComposerStatus(`rate limited, try again in ${j?.retry_after_s ?? '?'}s`);
     inFlight = false;
     return;
   }
   if (res.status === 503) {
-    setComposerStatus('server out of API quota — provide your key in Settings');
+    setComposerStatus('server out of API quota, provide your key in Settings');
     inFlight = false;
     return;
   }
@@ -696,7 +750,7 @@ async function consumeSSE(res) {
   }
 
   if (!sawTurnEnd) {
-    // stream closed without a turn_end — show a hint but don't error
+    // stream closed without a turn_end, show a hint but don't error
     setStatus('stream ended');
   }
 }

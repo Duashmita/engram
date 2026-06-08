@@ -4,7 +4,7 @@ from ..config import SESSION_WINDOW, EVICT_BATCH
 
 
 class SessionMemory:
-    """Rolling window of NPC–player dialogue turns.
+    """Rolling window of NPC-player dialogue turns.
 
     When the window overflows, the oldest ``batch`` turns are evicted and
     returned so the caller can generate a long-term summary from them.

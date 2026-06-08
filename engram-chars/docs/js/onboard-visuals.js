@@ -133,27 +133,36 @@ function ensureStyles() {
       overflow: hidden;
     }
 
+    /*
+     * Card is a flex column so every section stacks with a guaranteed gap.
+     * This is what prevents the OCEAN block and the appearance text from
+     * overlapping: the gap is enforced by flow, not by per-child margins.
+     * Near-white surface with a soft border so it reads cleanly on a light page.
+     */
     .character-card {
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
       width: 280px;
-      padding: 18px 18px 16px;
+      padding: 18px;
       border-radius: 14px;
-      background: ${PALETTE.surface};
-      color: ${PALETTE.text};
-      border: 1px solid rgba(106, 163, 255, 0.3);
-      box-shadow: 0 0 0 1px rgba(106, 163, 255, 0.06),
-                  0 10px 30px rgba(0, 0, 0, 0.5),
-                  0 0 24px rgba(106, 163, 255, 0.12);
+      background: #ffffff;
+      color: #1c2433;
+      border: 1px solid rgba(106, 163, 255, 0.35);
+      box-shadow: 0 1px 2px rgba(28, 36, 51, 0.06),
+                  0 8px 24px rgba(28, 36, 51, 0.10);
       font-family: inherit;
     }
     .character-card .ov-cc-name {
-      margin: 0 0 2px 0;
+      margin: 0;
       font-size: 1.25rem;
       font-weight: 700;
-      color: ${PALETTE.text};
+      line-height: 1.2;
+      color: #1c2433;
     }
     .character-card .ov-cc-arch {
-      margin: 0 0 14px 0;
+      margin: -6px 0 0 0; /* tuck close under the name, gap still applies below */
       font-size: 0.85rem;
       font-weight: 600;
       letter-spacing: 0.06em;
@@ -162,21 +171,23 @@ function ensureStyles() {
     }
     .character-card .ov-cc-ocean {
       display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 6px 8px;
+      grid-template-columns: 1ch 1fr auto;
       align-items: center;
-      margin-bottom: 14px;
+      column-gap: 8px;
+      row-gap: 8px;
+      margin: 0;
     }
     .character-card .ov-cc-axis {
       font-size: 0.72rem;
       color: ${PALETTE.muted};
       font-weight: 600;
-      width: 1ch;
+      line-height: 1;
+      text-align: center;
     }
     .character-card .ov-cc-bar {
       height: 6px;
       border-radius: 3px;
-      background: rgba(122, 134, 153, 0.18);
+      background: rgba(122, 134, 153, 0.22);
       overflow: hidden;
     }
     .character-card .ov-cc-bar > span {
@@ -187,19 +198,26 @@ function ensureStyles() {
     }
     .character-card .ov-cc-num {
       font-size: 0.72rem;
-      color: ${PALETTE.text};
+      color: #1c2433;
       font-variant-numeric: tabular-nums;
       min-width: 2.5ch;
+      line-height: 1;
       text-align: right;
     }
+    /*
+     * Appearance sits clearly below the OCEAN block: the flex gap provides the
+     * vertical separation and the top border plus padding-top draw a visible
+     * divider so the scrollable text can never collide with the bars above it.
+     */
     .character-card .ov-cc-appearance {
       margin: 0;
+      padding: 12px 4px 0 0;
+      border-top: 1px solid rgba(28, 36, 51, 0.10);
       font-size: 0.82rem;
-      line-height: 1.45;
+      line-height: 1.5;
       color: ${PALETTE.muted};
-      max-height: 7.5em;       /* ~5 lines, then scroll — full text, no cutoff */
+      max-height: 7.5em; /* about 5 lines, then scroll. full text, no cutoff */
       overflow-y: auto;
-      padding-right: 4px;
     }
 
     .ov-confetti-overlay {
@@ -604,7 +622,7 @@ export function buildCharacterCard({ name, archetype, ocean, appearance } = {}) 
 
   const sub = document.createElement('div');
   sub.className = 'ov-cc-arch';
-  sub.textContent = truncate(archetype || '—', 40);
+  sub.textContent = truncate(archetype || 'Unknown', 40);
   card.appendChild(sub);
 
   const grid = document.createElement('div');

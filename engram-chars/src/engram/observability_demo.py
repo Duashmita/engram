@@ -23,7 +23,7 @@ def main() -> int:
     if src_root not in sys.path:
         sys.path.insert(0, src_root)
 
-    from engram.observability import bus  # noqa: WPS433 — runtime import
+    from engram.observability import bus  # noqa: WPS433, runtime import
 
     log_path = "/tmp/engram_viz_test.ndjson"
     if os.path.exists(log_path):

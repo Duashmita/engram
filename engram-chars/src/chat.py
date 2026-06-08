@@ -1,5 +1,5 @@
 """
-Engram interactive chat — one-on-one player-vs-NPC.
+Engram interactive chat, one-on-one player-vs-NPC.
 
 Lets a user define an NPC (name, persona, backstory, OCEAN) and chat with
 it turn-by-turn. State persists to ``data/<npc_id>/`` so re-running with
@@ -68,7 +68,7 @@ _DOCS_SESSIONS = os.path.join(_REPO_ROOT, "docs", "sessions")
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="chat.py",
-        description="Engram — interactive NPC chat",
+        description="Engram, interactive NPC chat",
     )
     p.add_argument("--preset", help=f"start from a preset NPC ({', '.join(PRESETS)})")
     p.add_argument("--name", help="NPC name (skips the prompt; resumes if state exists)")
@@ -188,11 +188,11 @@ def _build_config_interactive() -> NPCConfig:
     backstory = _ask_multiline("Backstory lines (each line stored as one memory)")
 
     print("\nOCEAN personality (each trait in [0, 1], default 0.5):")
-    print("  O = Openness        — curiosity, willingness to revise beliefs")
-    print("  C = Conscientiousness — organisation, goal focus")
-    print("  E = Extraversion    — sociability")
-    print("  A = Agreeableness   — cooperativeness, trust")
-    print("  N = Neuroticism     — anxiety, threat sensitivity\n")
+    print("  O = Openness       , curiosity, willingness to revise beliefs")
+    print("  C = Conscientiousness, organisation, goal focus")
+    print("  E = Extraversion   , sociability")
+    print("  A = Agreeableness  , cooperativeness, trust")
+    print("  N = Neuroticism    , anxiety, threat sensitivity\n")
 
     O = _ask_float("  O", 0.5)
     C = _ask_float("  C", 0.5)
@@ -221,7 +221,7 @@ def _build_config_from_name(name: str, data_dir: str) -> NPCConfig:
             f"No saved NPC named '{name}' under {data_dir}/. "
             f"Drop --name to create one interactively, or use --fresh."
         )
-    # Resume requires SOME config — persona/backstory aren't persisted in state.json,
+    # Resume requires SOME config, persona/backstory aren't persisted in state.json,
     # so we reconstruct a minimal config from the directory and let memory + facts
     # carry the personality continuity. Profile is restored from history but baseline
     # OCEAN values aren't in state.json, so we default to 0.5 across.
@@ -339,7 +339,7 @@ def _chat(agent: NPCAgent) -> None:
             print("(quitting without ending session)")
             return
         if line in ("/end", "/e"):
-            print("\nEnding session — promoting key memories, reconciling facts...")
+            print("\nEnding session, promoting key memories, reconciling facts...")
             agent.end_session()
             print("done.")
             return

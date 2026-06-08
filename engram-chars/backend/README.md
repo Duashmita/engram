@@ -56,7 +56,7 @@ URL backed by your laptop.
 | POST   | /turn    | run one pipeline turn, stream events as SSE          |
 | POST   | /end     | drop a session and clean up its sandbox (idempotent) |
 
-`/turn` is the interesting one — every `bus.emit(...)` from the pipeline
+`/turn` is the interesting one, every `bus.emit(...)` from the pipeline
 becomes a `data:` line in the SSE stream, in real time. The header you got
 from `/start` is *not* re-sent on `/turn`; it's delivered once per session
 out of band.
@@ -74,11 +74,11 @@ out of band.
   who paste their own Gemini key in the UI's settings popover bypass the
   limits (BYOK path).
 - **Single-tenant container.** `modal.concurrent(max_inputs=1)` serializes
-  requests per container — the observability bus is a process-global
+  requests per container, the observability bus is a process-global
   singleton, so we don't try to interleave two pipelines through one
   process. Modal scales out by adding more containers, not threads.
 
 ## Files
 
-- `modal_app.py` — the FastAPI app and the Modal wrapping.
-- `requirements.txt` — pinned deps.
+- `modal_app.py`, the FastAPI app and the Modal wrapping.
+- `requirements.txt`, pinned deps.

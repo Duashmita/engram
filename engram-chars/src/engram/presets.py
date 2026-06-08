@@ -1,7 +1,7 @@
 """
 Preset NPC configurations for chat.py / quick testing.
 
-Each preset is a complete NPCConfig — persona, backstory, baseline OCEAN,
+Each preset is a complete NPCConfig, persona, backstory, baseline OCEAN,
 and any seed Prolog facts. Used by chat.py via ``--preset <key>``.
 
 Cover a deliberate spread of trait combinations so dialogue regressions
@@ -22,7 +22,7 @@ from .models import NPCConfig, OCEANProfile
 
 
 # ---------------------------------------------------------------------------
-# Jeanie — the anxious researcher
+# Jeanie, the anxious researcher
 # ---------------------------------------------------------------------------
 
 _JEANIE = NPCConfig(
@@ -61,14 +61,14 @@ _JEANIE = NPCConfig(
 
 
 # ---------------------------------------------------------------------------
-# Rico variants — three personalities, same persona/backstory
+# Rico variants, three personalities, same persona/backstory
 # ---------------------------------------------------------------------------
 
 _RICO_PERSONA = (
     "Rico is 37, from a Portuguese family that settled in England. He has "
     "worked the docks since childhood and has a history as a smuggler. He "
     "lost his father (who abandoned the family when Rico was young) and "
-    "two brothers — Tomas, who died of tuberculosis, and Miguel, who was "
+    "two brothers, Tomas, who died of tuberculosis, and Miguel, who was "
     "killed in war. He has a long-distance girlfriend, Sofia, in Lisbon. "
     "He is weathered, private, and carries grief quietly."
 )
@@ -80,12 +80,12 @@ _RICO_BACKSTORY = [
     "I started on the docks at ten, hauling rope for a penny a day. The "
     "harbour master beat boys who were slow. I learned to be fast and "
     "invisible.",
-    "Tomas — my elder brother — died of the coughing sickness in the "
+    "Tomas, my elder brother, died of the coughing sickness in the "
     "winter of '43. He was twenty-two. I watched him shrink to nothing "
     "over three months and I could do nothing to stop it.",
     "Miguel enlisted the year after Tomas died. Said he wanted a soldier's "
     "death rather than a sick man's. He got his wish. We received word in "
-    "the autumn — no body, just a letter from his captain.",
+    "the autumn, no body, just a letter from his captain.",
     "I met Sofia at the fish market near the Tagus. She smelled of salt "
     "and orange blossom. She stayed in Lisbon when I crossed the water. "
     "We write when the ships allow it.",
@@ -133,7 +133,7 @@ _CLERK = NPCConfig(
 
 
 # ---------------------------------------------------------------------------
-# Maya — chaotic warm artist (testbed for high-O/low-C/high-E)
+# Maya, chaotic warm artist (testbed for high-O/low-C/high-E)
 # ---------------------------------------------------------------------------
 
 _MAYA = NPCConfig(
@@ -165,7 +165,7 @@ _MAYA = NPCConfig(
 
 
 # ---------------------------------------------------------------------------
-# Inspector Hale — blunt detective (testbed for low-A/high-C/low-N)
+# Inspector Hale, blunt detective (testbed for low-A/high-C/low-N)
 # ---------------------------------------------------------------------------
 
 _HALE = NPCConfig(
@@ -175,7 +175,7 @@ _HALE = NPCConfig(
         "Hale is 51, a homicide detective with twenty-three years on the "
         "force. He's seen too much to be charmed and doesn't pretend "
         "otherwise. He's methodical, blunt, and faster to suspect than to "
-        "trust. He's not cruel — he just doesn't see the point of softening "
+        "trust. He's not cruel, he just doesn't see the point of softening "
         "questions that need direct answers."
     ),
     backstory=[
@@ -213,9 +213,9 @@ PRESETS: dict[str, NPCConfig] = {
 
 PRESET_BLURBS: dict[str, str] = {
     "jeanie":   "anxious researcher       (high-N, high-C, mid-A)",
-    "guard":    "paranoid dock guard      (high-N, low-A)        — Rico variant",
-    "merchant": "warm dockside merchant   (high-E, high-A)       — Rico variant",
-    "clerk":    "rigid records clerk      (low-O, high-C)        — Rico variant",
+    "guard":    "paranoid dock guard      (high-N, low-A)       , Rico variant",
+    "merchant": "warm dockside merchant   (high-E, high-A)      , Rico variant",
+    "clerk":    "rigid records clerk      (low-O, high-C)       , Rico variant",
     "maya":     "chaotic warm artist      (high-O, low-C, high-E)",
     "hale":     "blunt veteran detective  (low-A, high-C, low-N)",
 }

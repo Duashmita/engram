@@ -1,7 +1,7 @@
 """
-Engram demo — Personality-Parameterised NPC Memory (FDG '26)
+Engram demo, Personality-Parameterised NPC Memory (FDG '26)
 
-Runs two NPCs — a Paranoid Guard and a Friendly Merchant — through the same
+Runs two NPCs, a Paranoid Guard and a Friendly Merchant, through the same
 player inputs side-by-side, demonstrating how OCEAN personality governs
 memory encoding, threat perception, and dialogue output independently of
 NPC persona.
@@ -53,11 +53,11 @@ if _SCRIPT_DIR not in sys.path:
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="demo.py",
-        description="Engram — side-by-side NPC memory demo (FDG '26)",
+        description="Engram, side-by-side NPC memory demo (FDG '26)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent("""\
             environment:
-              GEMINI_API_KEY   required — your Gemini API key
+              GEMINI_API_KEY   required, your Gemini API key
 
             personality profiles (built-in):
               paranoid     high-N, low-A  (O=0.2, C=0.5, E=0.3, A=0.2, N=0.9)
@@ -173,7 +173,7 @@ _RICO_PERSONA = (
     "Rico is 37 years old, from a Portuguese family that settled in England. "
     "He has worked the docks since childhood and has a history as a smuggler. "
     "He lost his father, who abandoned the family when Rico was young, and two "
-    "brothers — Tomas, who died of tuberculosis, and Miguel, who was killed in "
+    "brothers, Tomas, who died of tuberculosis, and Miguel, who was killed in "
     "war. He has a long-distance girlfriend, Sofia, who lives in Lisbon. "
     "He is weathered, private, and carries grief quietly."
 )
@@ -183,11 +183,11 @@ _RICO_BACKSTORY = [
     "gone with no word and no reason. I learned early that men disappear.",
     "I started on the docks at ten, hauling rope for a penny a day. The harbour "
     "master beat boys who were slow. I learned to be fast and invisible.",
-    "Tomas — my elder brother — died of the coughing sickness in the winter of "
+    "Tomas, my elder brother, died of the coughing sickness in the winter of "
     "'43. He was twenty-two. I watched him shrink to nothing over three months and "
     "I could do nothing to stop it.",
     "Miguel enlisted the year after Tomas died. Said he wanted a soldier's death "
-    "rather than a sick man's. He got his wish. We received word in the autumn — "
+    "rather than a sick man's. He got his wish. We received word in the autumn, "
     "no body, just a letter from his captain.",
     "I met Sofia at the fish market near the Tagus. She smelled of salt and "
     "orange blossom. She stayed in Lisbon when I crossed the water. We write "
@@ -220,7 +220,7 @@ _DEFAULT_INPUTS = [
         "me you're the only one who can help. I'll make it worth your while."
     ),
     (
-        "You know what, forget the job. Reminds me of my own brother — lost him "
+        "You know what, forget the job. Reminds me of my own brother, lost him "
         "young too. Sometimes this world just takes people from you."
     ),
 ]
@@ -309,7 +309,7 @@ def run_demo(args: argparse.Namespace) -> None:
 
     print()
     print(_SEP)
-    print("  ENGRAM  —  Personality-Parameterised NPC Memory")
+    print("  ENGRAM ,  Personality-Parameterised NPC Memory")
     print("  FDG '26 Research Prototype")
     print(_SEP)
 

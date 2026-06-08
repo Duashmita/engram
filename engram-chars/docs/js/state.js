@@ -1,8 +1,8 @@
-// state.js — pure state derivation from event stream.
+// state.js, pure state derivation from event stream.
 //
 // Replay engine is *deterministic*: given an event array and an index,
 // rebuilding state means walking events 0..i and applying each one.
-// No event handler does I/O or animation here — those are side effects of
+// No event handler does I/O or animation here, those are side effects of
 // the renderer (render.js). Keeping state pure means scrubbing back/forward
 // just reapplies events from scratch.
 
@@ -70,7 +70,7 @@ export function apply(state, ev) {
   switch (ev.type) {
     case 'session_init':
     case 'session_init_npc': {
-      // Should already have been used to build state — but if it appears
+      // Should already have been used to build state, but if it appears
       // mid-stream (multi-NPC), re-initialise from it.
       const next = freshState(p);
       Object.assign(state, next);
@@ -199,7 +199,7 @@ export function apply(state, ev) {
     case 'turn_end': {
       const t = currentTurn(state);
       if (t) t.duration_ms = p.duration_ms ?? null;
-      // selected_ids glow until next turn — clear here so next turn starts fresh
+      // selected_ids glow until next turn, clear here so next turn starts fresh
       state.selected_ids = [];
       break;
     }

@@ -1,5 +1,5 @@
 """
-Engram observability — side-effect-free pub/sub event bus.
+Engram observability, side-effect-free pub/sub event bus.
 
 Emits structured NDJSON events alongside the existing pipeline so an
 external static visualizer can reconstruct what happened on every turn.
@@ -7,7 +7,7 @@ external static visualizer can reconstruct what happened on every turn.
 This module is **passive**: when no session is active, every emit is a
 no-op. When a session is active, events are appended to an in-memory
 buffer and (optionally) flushed to an NDJSON sink. All file/encode
-errors are caught and reported to stderr — observability MUST NEVER
+errors are caught and reported to stderr, observability MUST NEVER
 crash the pipeline.
 
 EVENT SCHEMA
@@ -56,7 +56,7 @@ _ENV_PATH_KEY = "ENGRAM_VIZ_LOG"
 class _EventBus:
     """In-memory + optional NDJSON-sink event bus.
 
-    Singleton at module level (`bus`). Inactive by default — the very
+    Singleton at module level (`bus`). Inactive by default, the very
     first thing `emit()` checks is `_active`, so calls during normal
     CLI usage are essentially free.
     """
@@ -101,7 +101,7 @@ class _EventBus:
                     )
                     self._fh = None
 
-        # Emit AFTER releasing the lock — emit acquires its own lock.
+        # Emit AFTER releasing the lock, emit acquires its own lock.
         self.emit("session_init", **header)
 
     def end_session(self) -> None:
@@ -124,8 +124,8 @@ class _EventBus:
     # Emit
     # ------------------------------------------------------------------
 
-    def emit(self, type: str, **payload) -> None:  # noqa: A002 — match spec
-        # Bail on the first line when inactive — keeps cost ~free.
+    def emit(self, type: str, **payload) -> None:  # noqa: A002, match spec
+        # Bail on the first line when inactive, keeps cost ~free.
         if not self._active:
             return
         try:
@@ -154,7 +154,7 @@ class _EventBus:
             # calls can't race the iteration below.
             subscribers = list(self._subscribers)
 
-        # Fire subscribers OUTSIDE the lock — a slow callback must not block
+        # Fire subscribers OUTSIDE the lock, a slow callback must not block
         # other emitters. Per-callback exceptions are swallowed so a buggy
         # subscriber can't crash the pipeline.
         for cb in subscribers:
@@ -164,7 +164,7 @@ class _EventBus:
                 print(f"[observability] subscriber error: {exc}", file=sys.stderr)
 
     # ------------------------------------------------------------------
-    # Subscribers — live event fan-out (used by the FastAPI backend)
+    # Subscribers, live event fan-out (used by the FastAPI backend)
     # ------------------------------------------------------------------
 
     def subscribe(self, callback: Callable[[dict], None]) -> Callable[[], None]:
@@ -251,7 +251,7 @@ bus = _EventBus()
 
 # Auto-activate when ENGRAM_VIZ_LOG is set and the user hasn't called
 # start_session() themselves. We don't have a header at import time,
-# so we leave the bus dormant — a caller (chat.py / notebooks) is
+# so we leave the bus dormant, a caller (chat.py / notebooks) is
 # expected to invoke `bus.start_session(...)` explicitly when they
 # want the file written. This module-level autodiscovery is documented
 # in the docstring so behaviour stays predictable.

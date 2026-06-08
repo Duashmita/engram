@@ -1,21 +1,21 @@
 """
-Stage 4 + Stage 6 — Prolog contradiction checking & memory consolidation.
+Stage 4 + Stage 6, Prolog contradiction checking & memory consolidation.
 
 Three entry points:
 
 check_contradictions()
-    Stage 4 (paper §3.4) — runs before response generation. Extracts
+    Stage 4 (paper §3.4), runs before response generation. Extracts
     candidate facts from the player input, checks each against the NPC's
     Prolog keystore, and returns the list of (new_fact, old_fact) pairs
     so the response prompt can flag the contradiction to the LLM.
 
 consolidate()
-    Stage 6a — called after every NPC turn. Encodes the exchange as a
+    Stage 6a, called after every NPC turn. Encodes the exchange as a
     Memory, stores it in the session window, and triggers the
     MemoryManager's eviction / summary logic when the window fills.
 
 post_session_fact_check()
-    Stage 6b — called at session end. Reconciles new facts with the
+    Stage 6b, called at session end. Reconciles new facts with the
     Prolog key-memory base, gated by Openness: high-O NPCs accept belief
     revision; low-O NPCs reject it.
 """
@@ -33,7 +33,7 @@ from ..observability import bus
 
 
 # ---------------------------------------------------------------------------
-# Stage 4 — pre-response contradiction check (paper §3.4)
+# Stage 4, pre-response contradiction check (paper §3.4)
 # ---------------------------------------------------------------------------
 
 def check_contradictions(
@@ -77,7 +77,7 @@ def check_contradictions(
 
 
 # ---------------------------------------------------------------------------
-# Stage 6a — per-turn consolidation
+# Stage 6a, per-turn consolidation
 # ---------------------------------------------------------------------------
 
 def consolidate(
@@ -113,16 +113,16 @@ def consolidate(
     -------
     The newly created and stored Memory object.
     """
-    # Step 1 — combine into a single text representation
+    # Step 1, combine into a single text representation
     combined_text = f"Player: {player_input} | {config.name}: {npc_response}"
 
-    # Step 2 — embed the combined text
+    # Step 2, embed the combined text
     embedding = llm.embed(combined_text)
 
-    # Step 3 — tag the combined text
+    # Step 3, tag the combined text
     tags = tag_event(combined_text, f"{config.name} interaction", llm)
 
-    # Step 4 — create Memory
+    # Step 4, create Memory
     memory = Memory(
         id=memory_id,
         text=combined_text,
@@ -132,17 +132,17 @@ def consolidate(
         timestamp=time.time(),
     )
 
-    # Step 5 — store memory
+    # Step 5, store memory
     memory_manager.add_memory(memory)
 
-    # Step 6 — record the raw turn (drives session window + eviction / summary)
+    # Step 6, record the raw turn (drives session window + eviction / summary)
     memory_manager.add_turn(player_input, npc_response)
 
     return memory
 
 
 # ---------------------------------------------------------------------------
-# Stage 6b — post-session Prolog fact reconciliation
+# Stage 6b, post-session Prolog fact reconciliation
 # ---------------------------------------------------------------------------
 
 def post_session_fact_check(
@@ -160,7 +160,7 @@ def post_session_fact_check(
     - For each fact, convert to a Prolog string and check for contradictions.
     - If a contradiction exists:
         - High-O NPC (O ≥ 0.5): retract old fact, assert new fact.
-        - Low-O NPC  (O < 0.5): skip — low-Openness NPCs resist belief revision.
+        - Low-O NPC  (O < 0.5): skip, low-Openness NPCs resist belief revision.
     - If no contradiction: assert the new fact unconditionally.
 
     Parameters
@@ -193,12 +193,12 @@ def post_session_fact_check(
 
             if found:
                 if profile.O >= 0.5:
-                    # High Openness — accept the new belief
+                    # High Openness, accept the new belief
                     keystore.retract_fact(old_fact)
                     keystore.assert_fact(fact_str)
                     bus.emit("fact_revised", fact=fact_str, old=old_fact)
                 else:
-                    # Low Openness — reject new belief silently
+                    # Low Openness, reject new belief silently
                     bus.emit("fact_rejected", fact=fact_str, old=old_fact)
             else:
                 keystore.assert_fact(fact_str)

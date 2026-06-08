@@ -1,5 +1,5 @@
 """
-NPCAgent — full pipeline orchestrator for Engram (paper §3).
+NPCAgent, full pipeline orchestrator for Engram (paper §3).
 
 Wires together MemoryManager and the six pipeline stages into a single
 per-NPC agent that can be stepped turn-by-turn and persisted across
@@ -12,7 +12,7 @@ Per turn (paper §3):
        gate; falls back to instinct
        tag retrieval when nothing
        qualifies
-    3. Response-mode selection     (§3.3) — derived here from threat +
+    3. Response-mode selection     (§3.3), derived here from threat +
        scored-retrieval results
     4. In-loop Prolog              (§3.4, pipeline.consolidation.check_contradictions)
        contradiction check
@@ -117,7 +117,7 @@ class NPCAgent:
         query_embedding = self.llm.embed(player_input)
         bus.emit("embedding_done")
 
-        # Stage 1 — threat assessment (§3.1)
+        # Stage 1, threat assessment (§3.1)
         assessment = assess_threat(
             player_input,
             query_embedding,
@@ -126,7 +126,7 @@ class NPCAgent:
             self.llm,
         )
 
-        # Stage 2 + 3 — scored retrieval drives mode selection (§3.2 / §3.3)
+        # Stage 2 + 3, scored retrieval drives mode selection (§3.2 / §3.3)
         if assessment.is_threat:
             self.profile.apply_fight_flight(assessment.threat_magnitude)
             bus.emit(
@@ -150,7 +150,7 @@ class NPCAgent:
 
         bus.emit("mode_selected", mode=mode)
 
-        # Stage 4 — response generation (§3.3) — standard mode also gets
+        # Stage 4, response generation (§3.3), standard mode also gets
         # the OCEAN-biased long-term summaries (§3.3).
         summaries = (
             self.memory_manager.longterm.get_summaries() if mode == "standard" else None
@@ -168,14 +168,14 @@ class NPCAgent:
         )
         bus.emit("response_generated", text=response, attempt=1)
 
-        # Stage 5 — post-response Prolog contradiction check (paper §3.4).
+        # Stage 5, post-response Prolog contradiction check (paper §3.4).
         # Extract facts from the NPC's own response, query the keystore,
         # and re-roll if a conflict is detected. Re-roll is gated by
         # Openness: low-O NPCs cannot tolerate inconsistency with their
         # established knowledge and regenerate; high-O NPCs let the
         # response stand and the drift gets resolved (or rejected) at
         # end_session via post_session_fact_check.
-        # Player-input facts are NOT checked here — they're handled at
+        # Player-input facts are NOT checked here, they're handled at
         # end_session, which is the only place the Prolog DB ever changes.
         if response and self.profile.O < 0.5:
             response_conflicts = check_contradictions(
@@ -198,7 +198,7 @@ class NPCAgent:
                 )
                 bus.emit("response_generated", text=response, attempt=2)
 
-        # Stage 6 — consolidation (§3.5)
+        # Stage 6, consolidation (§3.5)
         new_memory = consolidate(
             player_input,
             response,
@@ -211,7 +211,7 @@ class NPCAgent:
         self.session_memories.append(new_memory)
         bus.emit("consolidated", memory_id=new_memory.id, text=new_memory.text)
 
-        # Bookkeeping — fight/flight delta decay
+        # Bookkeeping, fight/flight delta decay
         self.profile.decay(DECAY_RATE)
         bus.emit("profile_decay", effective=self.profile.effective)
         self.turn_count += 1

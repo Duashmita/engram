@@ -68,10 +68,10 @@ def _score(memory: Memory, query_embedding: list[float], profile: OCEANProfile) 
 
     Where:
         rag_score  = cosine similarity of query_embedding and memory.embedding
-        t_mem      = memory.tags.ocean[trait] / 5  (normalised 0–1)
+        t_mem      = memory.tags.ocean[trait] / 5  (normalised 0-1)
         t_agent    = profile.effective[trait], floored at 0.05
         ratio      = capped at 5.0 per trait
-        importance = memory.tags.importance (1–10)
+        importance = memory.tags.importance (1-10)
     """
     score, _rag, _ocean_sum = _score_components(memory, query_embedding, profile)
     return score
@@ -150,7 +150,7 @@ class MemoryManager:
 
         Returns up to *top_k* memories whose personality-weighted score is
         at or above ``RETRIEVAL_THRESHOLD``, sorted by score descending.
-        Returns ``[]`` when no memory qualifies — the caller is expected to
+        Returns ``[]`` when no memory qualifies, the caller is expected to
         fall back to instinct-mode tag retrieval (paper §3.3).
         """
         # Score every memory once; keep components so observability can
@@ -194,7 +194,7 @@ class MemoryManager:
         query_vec: list[float],
         top_k: int = 3,
     ) -> list[Memory]:
-        """Cosine similarity on 6-D EventTags vectors — no score threshold.
+        """Cosine similarity on 6-D EventTags vectors, no score threshold.
 
         Used for instinct-mode retrieval (social/emotional tag matching).
         """
@@ -239,7 +239,7 @@ class MemoryManager:
         query_embedding: list[float],
         top_k: int = 3,
     ) -> list[Memory]:
-        """Top-K by personality-weighted score — no threshold.
+        """Top-K by personality-weighted score, no threshold.
 
         Same scoring formula as `retrieve()` (paper Eq. 1, §3.2) but without
         the ≥15 gate. Used by threat assessment so the context memories the

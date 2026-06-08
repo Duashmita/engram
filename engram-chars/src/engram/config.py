@@ -2,7 +2,7 @@
 Engram configuration.
 
 Loads API keys from the environment, falling back to a .env file at the
-project root. The .env parser is intentionally tiny — no python-dotenv dep.
+project root. The .env parser is intentionally tiny, no python-dotenv dep.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ ANTHROPIC_AUTH_TOKEN = os.environ.get("ANTHROPIC_AUTH_TOKEN", "")  # OAuth from 
 VOYAGE_API_KEY      = os.environ.get("VOYAGE_API_KEY", "")
 MESHY_API_KEY     = os.environ.get("MESHY_API_KEY", "")
 
-# Legacy aliases — some internal modules still reference GEMINI_API_KEY
+# Legacy aliases, some internal modules still reference GEMINI_API_KEY
 GEMINI_API_KEY     = ANTHROPIC_API_KEY
 GEMINI_CHAT_MODEL  = CLAUDE_CHAT_MODEL
 GEMINI_EMBED_MODEL = VOYAGE_EMBED_MODEL

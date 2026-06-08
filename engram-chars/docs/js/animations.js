@@ -1,5 +1,5 @@
 /**
- * animations.js — Maps engram pipeline events → character animations.
+ * animations.js, Maps engram pipeline events → character animations.
  *
  * Call handleEvent(state, prevState, char) after every state.js apply() call.
  * Returns the animation name that was triggered (or null).
@@ -116,7 +116,7 @@ export function handleEvent(state, prevState, char) {
     return 'thinking';
   }
 
-  // ── Turn end — return to personality idle ─────────────────────────────────
+  // ── Turn end, return to personality idle ─────────────────────────────────
   if (!state.turns?.at(-1)?.turn || state.session_ended) {
     _setPersonalityIdle(state, char);
     return 'idle';

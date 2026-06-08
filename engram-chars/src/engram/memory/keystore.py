@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Optional pyswip import — degrade gracefully when SWI-Prolog is unavailable.
+# Optional pyswip import, degrade gracefully when SWI-Prolog is unavailable.
 # ---------------------------------------------------------------------------
 try:
     from pyswip import Prolog as _SWIProlog  # type: ignore
@@ -43,7 +43,7 @@ def _personality_score(memory: "Memory", profile: "OCEANProfile") -> float:
     """Personality × importance ranking used at key-memory promotion time.
 
     Same formula as `MemoryManager._score` but with the RAG term fixed at
-    1.0 — promotion has no current query, so the score collapses to a
+    1.0, promotion has no current query, so the score collapses to a
     pure personality × importance ordering of the corpus.
     """
     if not memory.embedding:
@@ -214,7 +214,7 @@ class KeyStore:
         os.makedirs(os.path.dirname(self.pl_path) or ".", exist_ok=True)
 
         lines: list[str] = [
-            "% Engram KeyStore — auto-generated, do not edit by hand.",
+            "% Engram KeyStore, auto-generated, do not edit by hand.",
             "",
             "% key_memory(Id, Text).",
         ]

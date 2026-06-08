@@ -1,24 +1,29 @@
 /* ---------- tokens ---------- */
 :root {
-  --bg:       #0d1117;
-  --bg-2:    #11161d;
-  --surface: #161c25;
-  --surface-2:#1d2530;
-  --border:  #232b37;
-  --border-2:#2d3744;
-  --text:    #d6deeb;
-  --muted:   #7a8699;
-  --accent:  #6aa3ff;
+  --bg:       #f5f7fb;
+  --bg-2:    #eef1f7;
+  --surface: #ffffff;
+  --surface-2:#f1f4fa;
+  --border:  #e7ebf3;
+  --border-2:#d3dae6;
+  --text:    #1b2230;
+  --muted:   #6b7588;
+  --accent:  #3b6cff;
 
-  --c-standard:  #5b8cff;
-  --c-fight:     #ff5d6c;
-  --c-instinct:  #b073ff;
-  --c-new:       #4ddb8a;
-  --c-retrieved: #ffd158;
-  --c-promoted:  #b073ff;
-  --c-warn:      #ffae5c;
-  --c-bad:       #ff5d6c;
-  --c-good:      #4ddb8a;
+  /* mode colors, tuned to read well on white */
+  --c-standard:  #3b6cff;
+  --c-fight:     #e23b54;
+  --c-instinct:  #9a4dff;
+  --c-new:       #1faf6a;
+  --c-retrieved: #d99a00;
+  --c-promoted:  #9a4dff;
+  --c-warn:      #d97a1a;
+  --c-bad:       #e23b54;
+  --c-good:      #1faf6a;
+
+  /* soft elevation shadows for the light theme */
+  --shadow-sm: 0 1px 2px rgba(27, 34, 48, 0.05);
+  --shadow-md: 0 4px 16px rgba(27, 34, 48, 0.08);
 
   --r-md: 8px;
   --r-lg: 12px;
@@ -84,7 +89,7 @@ button { font-family: inherit; }
   transition: background 150ms, border-color 150ms;
 }
 .ctrl:hover { background: var(--surface-2); border-color: var(--border-2); }
-.ctrl.primary { background: var(--c-standard); border-color: var(--c-standard); color: #0a0e15; }
+.ctrl.primary { background: var(--c-standard); border-color: var(--c-standard); color: #ffffff; }
 .ctrl.primary:hover { filter: brightness(1.1); }
 
 .speed { display: flex; gap: 2px; margin-left: 8px; }
@@ -128,7 +133,8 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
   overflow: hidden;
   display: flex; flex-direction: column;
   min-height: 0;
@@ -139,7 +145,7 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 }
 .panel-header h2 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; }
 
-/* ---------- panel A — radar ---------- */
+/* ---------- panel A, radar ---------- */
 .npc-name { font-size: 12px; font-weight: 600; color: var(--text); }
 .radar-wrap {
   position: relative;
@@ -173,7 +179,7 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   flex: 1; overflow-y: auto;
 }
 
-/* ---------- panel B — pipeline ---------- */
+/* ---------- panel B, pipeline ---------- */
 .legend { display: flex; gap: 8px; }
 .lg {
   font-size: 10px; padding: 2px 7px;
@@ -293,7 +299,7 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 }
 .bar-fill.qualified { background: var(--c-good); }
 
-/* ---------- panel C — memory store ---------- */
+/* ---------- panel C, memory store ---------- */
 .panel-c { padding: 0; gap: 0; }
 .panel-c .sub {
   border-bottom: 1px solid var(--border);
@@ -428,7 +434,7 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   100% { background: var(--bg-2); }
 }
 
-/* ---------- panel D — transcript ---------- */
+/* ---------- panel D, transcript ---------- */
 .panel-d { padding: 12px; }
 .transcript {
   font-family: var(--mono);
@@ -610,13 +616,13 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 /* ---------- loading dialog (dino game) ---------- */
 .loading-dialog {
   background: var(--surface);
-  border: 1px solid var(--border-2);
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 20px 24px 18px;
-  box-shadow: 0 16px 56px rgba(0,0,0,0.6);
+  box-shadow: var(--shadow-md);
 }
 .loading-dialog::backdrop {
-  background: rgba(5, 8, 14, 0.75);
+  background: rgba(27, 34, 48, 0.28);
   backdrop-filter: blur(3px);
 }
 .loading-inner { display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -639,15 +645,15 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 .settings-dialog {
   background: var(--surface);
   color: var(--text);
-  border: 1px solid var(--border-2);
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 18px 20px;
   min-width: 360px;
   max-width: 440px;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+  box-shadow: var(--shadow-md);
 }
 .settings-dialog::backdrop {
-  background: rgba(5, 8, 14, 0.65);
+  background: rgba(27, 34, 48, 0.28);
   backdrop-filter: blur(2px);
 }
 .settings-dialog form { display: flex; flex-direction: column; gap: 12px; }
@@ -768,7 +774,7 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 }
 
 /* ============================================================
-   engram-chars — character viewport + split layout
+   engram-chars, character viewport + split layout
    ============================================================ */
 
 /* Override the single-view layout to a left/right split */
@@ -784,7 +790,8 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   position: relative;
   flex: 0 0 42%;
   min-width: 300px;
-  background: radial-gradient(ellipse at 50% 80%, #0f1a2e 0%, #070b12 100%);
+  /* soft light backdrop so the 3D figure pops as the centerpiece */
+  background: radial-gradient(ellipse at 50% 42%, #ffffff 0%, #eef3fb 45%, #dde6f3 100%);
   border-right: 1px solid var(--border);
   overflow: hidden;
 }
@@ -792,6 +799,16 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   width: 100%;
   height: 100%;
   display: block;
+  position: relative;
+  z-index: 1;
+}
+/* gentle vignette to frame the character against the clean light backdrop */
+.char-viewport::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(ellipse at 50% 44%, transparent 58%, rgba(120, 140, 175, 0.18) 100%);
 }
 .char-overlay {
   position: absolute;
@@ -799,6 +816,7 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
+  z-index: 3;
 }
 .mode-pill {
   display: inline-block;
@@ -821,19 +839,24 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 .right-col {
   flex: 1 1 0;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  /* row 1: OCEAN (auto), row 2: pipeline capped, row 3: transcript gets the rest */
+  grid-template-rows: auto minmax(0, 0.9fr) minmax(0, 1.4fr);
   grid-template-columns: 1fr 240px;
   grid-template-areas:
     "panel-a panel-a"
     "panel-b panel-c"
     "panel-d panel-c";
+  gap: 10px;
+  padding: 10px;
   overflow: hidden;
   min-width: 0;
 }
-.right-col .panel-a { grid-area: panel-a; max-height: 220px; }
-.right-col .panel-b { grid-area: panel-b; overflow-y: auto; }
-.right-col .panel-c { grid-area: panel-c; overflow-y: auto; border-left: 1px solid var(--border); }
-.right-col .panel-d { grid-area: panel-d; display: flex; flex-direction: column; }
+/* min-height/min-width: 0 lets grid children shrink so inner content scrolls
+   instead of expanding the row and pushing siblings off-screen */
+.right-col .panel-a { grid-area: panel-a; max-height: 220px; min-height: 0; min-width: 0; }
+.right-col .panel-b { grid-area: panel-b; min-height: 0; min-width: 0; overflow: hidden; }
+.right-col .panel-c { grid-area: panel-c; min-height: 0; min-width: 0; overflow: hidden; }
+.right-col .panel-d { grid-area: panel-d; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
 
 /* Compact OCEAN radar row in the right column */
 .right-col .radar-wrap {
@@ -885,13 +908,13 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   position: fixed;
   bottom: 24px; left: 50%;
   transform: translate(-50%, 12px);
-  background: var(--surface-2);
+  background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border-2);
   border-radius: var(--r-md);
   padding: 10px 16px;
   font-size: 13px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+  box-shadow: var(--shadow-md);
   opacity: 0;
   transition: opacity 200ms, transform 200ms;
   z-index: 1000;
@@ -928,9 +951,10 @@ body.onboarding-active .topbar { visibility: hidden; }
 .onboard-char {
   flex: 1 1 0;
   min-width: 0;
-  background: var(--bg-2);
+  background: radial-gradient(ellipse at 50% 42%, #ffffff 0%, #eef3fb 45%, #dde6f3 100%);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
   display: flex;
   position: relative;
   overflow: hidden;
@@ -1028,7 +1052,7 @@ body.onboarding-active .topbar { visibility: hidden; }
   margin-left: auto;
   background: var(--accent);
   border-color: var(--accent);
-  color: #0a0e15;
+  color: #ffffff;
 }
 .onboard-btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
 .onboard-btn:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -1119,7 +1143,7 @@ body.onboarding-active .topbar { visibility: hidden; }
   opacity: 0; transform: translateY(6px);
   transition: opacity .5s ease, transform .5s ease;
   pointer-events: none;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  text-shadow: 0 1px 6px rgba(255,255,255,0.9);
 }
 .onboard-nameplate.visible { opacity: 1; transform: translateY(0); }
 .onboard-nameplate { z-index: 2; }   /* above the char-panel vignette */
@@ -1185,12 +1209,12 @@ body.onboarding-active .topbar { visibility: hidden; }
   to   { opacity: 1; transform: none; }
 }
 
-/* the grey caricature panel gets a soft inner vignette so the figure pops */
+/* the caricature panel gets a soft inner vignette so the figure pops */
 .onboard-char::after {
   content: "";
   position: absolute; inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at 50% 42%, transparent 55%, rgba(0,0,0,0.35) 100%);
+  background: radial-gradient(ellipse at 50% 42%, transparent 55%, rgba(120, 140, 175, 0.18) 100%);
 }
 
 /* birth card flourish */

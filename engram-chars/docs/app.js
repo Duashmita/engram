@@ -1,5 +1,5 @@
 /**
- * app.js — engram-chars entry point.
+ * app.js, engram-chars entry point.
  *
  * Extends the engram replay/live system with a Three.js character viewport.
  * The character is driven by the same state/event stream as the memory panels.
@@ -7,11 +7,25 @@
 
 import { freshState, apply, rebuild } from './js/state.js';
 import { initRadar, renderAll }        from './js/render.js';
-import { enterLive, exitLive, startCustomSession, injectNpcLine } from './js/live.js';
+import { enterLive, exitLive, startCustomSession, startPresetSession, injectNpcLine } from './js/live.js';
 import { BACKEND_URL } from './config.js';
 import { createCharacter }             from './js/character.js';
 import { handleEvent, setInitialIdle } from './js/animations.js';
 import { startOnboarding }             from './js/onboard.js';
+import { showStartScreen, saveToCatalogue } from './js/catalogue.js';
+
+// Built-in premade characters shown on the start screen.
+const PRESET_ENTRIES = [
+  { id: 'guard',    name: 'Rico, the Paranoid Guard', archetype: 'The Wary Sentinel',  source: 'preset', assetPath: 'assets/characters/guard',    ocean: { O:0.2, C:0.5, E:0.3, A:0.2, N:0.9 }, persona: 'A weathered dock guard who trusts no one.' },
+  { id: 'merchant', name: 'Rico, the Friendly Merchant', archetype: 'The Warm Broker', source: 'preset', assetPath: 'assets/characters/merchant', ocean: { O:0.5, C:0.5, E:0.9, A:0.8, N:0.2 }, persona: 'A warm, talkative dockside trader.' },
+  { id: 'clerk',    name: 'Rico, the Rigid Clerk',    archetype: 'The Rigid Archivist', source: 'preset', assetPath: 'assets/characters/clerk',    ocean: { O:0.1, C:0.9, E:0.3, A:0.5, N:0.4 }, persona: 'A by-the-book records clerk.' },
+  { id: 'jeanie',   name: 'Jeanie',                   archetype: 'The Anxious Scholar', source: 'preset', assetPath: 'assets/characters/jeanie',   ocean: { O:0.65, C:0.85, E:0.4, A:0.65, N:0.85 }, persona: 'An anxious, driven MIT researcher.' },
+  { id: 'maya',     name: 'Maya',                     archetype: 'The Open Wanderer',  source: 'preset', assetPath: 'assets/characters/maya',     ocean: { O:0.9, C:0.2, E:0.85, A:0.8, N:0.4 }, persona: 'A chaotic, free-spirited artist.' },
+  { id: 'hale',     name: 'Inspector Hale',           archetype: 'The Blunt Detective', source: 'preset', assetPath: 'assets/characters/hale',     ocean: { O:0.4, C:0.85, E:0.3, A:0.2, N:0.25 }, persona: 'A blunt, exacting detective.' },
+];
+
+let startScreen = null;     // handle from showStartScreen
+let previewChar = null;     // 3D character shown on the start screen
 
 // Character config collected by the onboarding wizard (null until launch).
 let customCharacter = null;
@@ -66,7 +80,7 @@ async function initCharacter(npcId) {
     char = await createCharacter(canvas, assetPath);
   } catch (e) {
     console.error('[app] createCharacter failed:', e);
-    STATUS('Character failed to load — check console');
+    STATUS('Character failed to load, check console');
     return;
   }
   console.log('[app] character created', { npcId, assetPath, hasChar: !!char,
@@ -297,12 +311,12 @@ function boot() {
     document.getElementById('settings-dialog').showModal();
   });
 
-  // Export to Unity (placeholder — no functionality yet).
+  // Export to Unity (placeholder, no functionality yet).
   document.getElementById('btn-unity')?.addEventListener('click', () => {
     showToast('Unity export coming soon');
   });
 
-  // Prepare Live-mode UI chrome (kept hidden behind the onboarding overlay).
+  // Prepare Live-mode UI chrome (kept hidden behind the start/onboarding overlay).
   const replayControls = document.querySelector('.controls');
   const scrubRow = document.querySelector('.scrubber-row');
   const sessionPicker = document.querySelector('.session-picker');
@@ -315,47 +329,119 @@ function boot() {
   replayControls.style.display = 'none';
   scrubRow.style.display = 'none';
   sessionPicker.classList.add('hidden');
-  livePicker.classList.remove('hidden');
+  livePicker.classList.add('hidden');     // catalogue + New character button replace it
   composer.classList.remove('hidden');
 
-  // Hide the main engram UI until the wizard launches the character.
-  document.body.classList.add('onboarding-active');
+  // Wire live plumbing once (composer, SSE, onSessionStart). resume:false so it
+  // never auto-restores a stale session.
+  enterLive({ stateRef, applyFn: apply, renderFn: renderAll, onSessionStart: initCharacter, resume: false });
 
-  // Run the onboarding wizard first; reveal + start the live session on finish.
-  startOnboarding({
-    onComplete: async (characterConfig) => {
-      customCharacter = characterConfig;
-      document.body.classList.remove('onboarding-active');
+  // Show the catalogue start screen first.
+  showStart();
+}
 
-      // Clear any stale preset session so enterLive doesn't resume "Jeanie".
-      localStorage.removeItem('engram_live_session_id');
-      localStorage.removeItem('engram_live_npc_id');
-
-      // startCustomSession registers the character in the topbar dropdown and
-      // selects it, so the picker stays visible and shows the new name. Add a
-      // "New character" affordance too.
-      installNewCharacterButton();
-
-      try {
-        // resume:false → don't restore a stale session or pop the OCEAN dialog.
-        enterLive({ stateRef, applyFn: apply, renderFn: renderAll, onSessionStart: initCharacter, resume: false });
-        // startCustomSession awaits initCharacter, so `char` is ready after it.
-        await startCustomSession(characterConfig);
-        // Safety net: if the session wired up but the model didn't load, force it.
-        if (!char) {
-          const slug = (characterConfig.name || 'custom')
-            .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'custom';
-          await initCharacter(slug);
-        }
-        await birthMoment(characterConfig);
-        // If a background 3D build is running, progressively swap the model in.
-        if (characterConfig.genJobId) pollAndSwapModel(characterConfig.genJobId);
-      } catch (e) {
-        console.error('[boot] live launch failed:', e);
-        STATUS('Error starting Live mode — check console');
-      }
-    },
+// ── Start screen / catalogue ───────────────────────────────────────────────
+function showStart() {
+  document.body.classList.add('onboarding-active');   // hide the cockpit
+  let mount = document.getElementById('start-mount');
+  if (!mount) {
+    mount = document.createElement('div');
+    mount.id = 'start-mount';
+    mount.className = 'start-mount';
+    document.body.appendChild(mount);
+  }
+  mount.style.display = '';
+  startScreen = showStartScreen({
+    mountEl: mount,
+    presets: PRESET_ENTRIES,
+    onPreview: previewEntry,
+    onPlay: playEntry,
+    onCreateNew: () => { closeStart(); launchWizard(); },
   });
+}
+
+function closeStart() {
+  if (previewChar) { previewChar.dispose?.(); previewChar = null; }
+  if (startScreen) { startScreen.destroy?.(); startScreen = null; }
+  const m = document.getElementById('start-mount');
+  if (m) m.style.display = 'none';
+}
+
+// Load the selected character into the start-screen viewport (see their face).
+async function previewEntry(entry, canvas) {
+  if (!canvas) return;
+  if (previewChar) { previewChar.dispose?.(); previewChar = null; }
+  try {
+    if (entry.source === 'custom' && entry.glbUrl) {
+      previewChar = await createCharacter(canvas, null, { previewOnly: true });
+      await previewChar.loadModelFromUrl(`${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(entry.glbUrl)}`);
+    } else {
+      previewChar = await createCharacter(canvas, entry.assetPath || null, { previewOnly: true });
+    }
+    previewChar.setBreathing?.(true);
+    previewChar.lookAtPointer?.(true);
+  } catch (e) { console.warn('[preview] failed', e); }
+}
+
+// Enter the cockpit and start a session for a premade or saved character.
+async function playEntry(entry) {
+  closeStart();
+  document.body.classList.remove('onboarding-active');
+  installNewCharacterButton();
+  localStorage.removeItem('engram_live_session_id');
+  localStorage.removeItem('engram_live_npc_id');
+  try {
+    if (entry.source === 'custom') {
+      await startCustomSession(entry);
+      if (entry.glbUrl && char?.loadModelFromUrl) {
+        try { await char.loadModelFromUrl(`${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(entry.glbUrl)}`); } catch (_) {}
+      }
+    } else {
+      await startPresetSession(entry.id, entry.ocean);
+    }
+    await birthMoment(entry);
+  } catch (e) {
+    console.error('[play] failed:', e);
+    STATUS('Error starting session, check console');
+  }
+}
+
+function launchWizard() {
+  document.body.classList.add('onboarding-active');
+  startOnboarding({ onComplete: onWizardComplete });
+}
+
+async function onWizardComplete(characterConfig) {
+  customCharacter = characterConfig;
+  document.body.classList.remove('onboarding-active');
+  localStorage.removeItem('engram_live_session_id');
+  localStorage.removeItem('engram_live_npc_id');
+  installNewCharacterButton();
+
+  // Save the new character to the catalogue. Its 3D face (glbUrl) is filled in
+  // later when background generation finishes.
+  const slug = (characterConfig.name || 'custom')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'custom';
+  const entry = {
+    id: 'custom-' + slug,
+    name: characterConfig.name,
+    archetype: characterConfig.archetype || 'Custom',
+    ocean: characterConfig.ocean,
+    persona: characterConfig.persona,
+    backstory: characterConfig.backstory || [],
+    source: 'custom',
+  };
+  try { saveToCatalogue(entry); } catch (_) {}
+
+  try {
+    await startCustomSession(characterConfig);
+    if (!char) await initCharacter(slug);
+    await birthMoment(characterConfig);
+    if (characterConfig.genJobId) pollAndSwapModel(characterConfig.genJobId, entry);
+  } catch (e) {
+    console.error('[wizard] live launch failed:', e);
+    STATUS('Error starting Live mode, check console');
+  }
 }
 
 // Add a small "✦ New character" button to the topbar that re-runs onboarding.
@@ -365,8 +451,13 @@ function installNewCharacterButton() {
   btn.id = 'btn-new-char';
   btn.className = 'ctrl ctrl-wide';
   btn.title = 'Create a new character';
-  btn.innerHTML = '<span>✦ New character</span>';
-  btn.addEventListener('click', () => location.reload());
+  btn.innerHTML = '<span>New character</span>';
+  // Return to the catalogue start screen rather than a full reload.
+  btn.addEventListener('click', () => {
+    if (char) { char.dispose?.(); char = null; }
+    if (charRAF) { cancelAnimationFrame(charRAF); charRAF = null; }
+    showStart();
+  });
   const settings = document.getElementById('btn-settings');
   settings?.parentNode?.insertBefore(btn, settings);
 }
@@ -374,10 +465,10 @@ function installNewCharacterButton() {
 // ── Progressive 3D build: poll the backend and hot-swap the model as Meshy
 // finishes each stage (raw mesh → textured → rigged). The character starts as
 // the grey placeholder and upgrades in place over a few minutes.
-async function pollAndSwapModel(jobId) {
+async function pollAndSwapModel(jobId, catalogueEntry) {
   let lastUrl = null;
-  const STAGE_LABEL = { preview: 'sculpting…', refine: 'texturing…', rig: 'rigging…' };
-  for (let i = 0; i < 160; i++) {           // ~160 × 8s ≈ 21 min cap
+  const STAGE_LABEL = { preview: 'sculpting', refine: 'texturing', rig: 'rigging' };
+  for (let i = 0; i < 160; i++) {           // ~160 x 8s ~ 21 min cap
     await new Promise(r => setTimeout(r, 8000));
     let job;
     try {
@@ -388,7 +479,11 @@ async function pollAndSwapModel(jobId) {
     if (!job || job.status === 'error') { break; }
 
     if (job.stage && STAGE_LABEL[job.stage]) {
-      STATUS(`✨ ${job.name ?? 'your character'} — ${STAGE_LABEL[job.stage]} (${job.progress ?? 0}%)`);
+      STATUS(`${job.name ?? 'your character'}: ${STAGE_LABEL[job.stage]} (${job.progress ?? 0}%)`);
+    }
+    // Persist the generated face to the catalogue so it shows next time.
+    if (job.glb_url && catalogueEntry) {
+      try { saveToCatalogue({ ...catalogueEntry, glbUrl: job.glb_url }); } catch (_) {}
     }
     // A newer GLB is available → swap it into the viewport. Load via our
     // backend proxy so the browser doesn't hit CORS on Meshy's CDN.
@@ -402,7 +497,7 @@ async function pollAndSwapModel(jobId) {
   }
 }
 
-// ── The "birth" moment — the payoff after creation ────────────────────────────
+// ── The "birth" moment, the payoff after creation ────────────────────────────
 // The character materializes, waves, and speaks first (unprompted), turning the
 // thing the user just built into a presence that greets them.
 async function birthMoment(config) {
@@ -450,6 +545,6 @@ document.addEventListener('DOMContentLoaded', () => {
     boot();
   } catch (e) {
     console.error('[app] boot failed:', e);
-    document.getElementById('status-text').textContent = 'Boot error — open console (Cmd+Opt+I)';
+    document.getElementById('status-text').textContent = 'Boot error, open console (Cmd+Opt+I)';
   }
 });
