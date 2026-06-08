@@ -216,22 +216,26 @@ export function startOnboarding({ onComplete }) {
   // ── 2. The reveal — archetype + radar draws itself ──────────────────────────
   async function reveal() {
     setStep(2);
-    card.innerHTML = `
-      <div class="onboard-loading">
-        <div class="onboard-spinner"></div>
-        <p class="onboard-loading-text">Reading ${esc(data.name)}…</p>
-      </div>`;
-    try {
-      const res = await postJSON('/infer_ocean', { qa: data.answers });
-      if (!res.ok) throw new Error(res.status);
-      const j = await res.json();
-      if (j.ocean) data.ocean = normalizeOcean(j.ocean);
-      data.summary = j.summary || '';
-      data.archetype = j.archetype || 'The Enigma';
-    } catch (err) {
-      console.warn('[onboard] infer_ocean error', err);
-      data.summary = 'The personality model was unreachable — start from neutral and shape them by hand.';
-      data.archetype = 'The Unknown';
+    // Only infer the first time. On re-entry (Back from a later step) we already
+    // have the personality — skip the network call and just re-show the reveal.
+    if (!data.archetype) {
+      card.innerHTML = `
+        <div class="onboard-loading">
+          <div class="onboard-spinner"></div>
+          <p class="onboard-loading-text">Reading ${esc(data.name)}…</p>
+        </div>`;
+      try {
+        const res = await postJSON('/infer_ocean', { qa: data.answers });
+        if (!res.ok) throw new Error(res.status);
+        const j = await res.json();
+        if (j.ocean) data.ocean = normalizeOcean(j.ocean);
+        data.summary = j.summary || '';
+        data.archetype = j.archetype || 'The Enigma';
+      } catch (err) {
+        console.warn('[onboard] infer_ocean error', err);
+        data.summary = 'The personality model was unreachable — start from neutral and shape them by hand.';
+        data.archetype = 'The Unknown';
+      }
     }
 
     // Archetype lands, then the radar draws to the true shape.
@@ -261,6 +265,7 @@ export function startOnboarding({ onComplete }) {
           </div>`).join('')}
       </div>
       <div class="onboard-actions">
+        <button id="ob-back" class="onboard-btn ghost">Back to questions</button>
         <button id="ob-next" class="onboard-btn primary">Give them a face</button>
       </div>`;
     for (const t of TRAITS) {
@@ -274,6 +279,12 @@ export function startOnboarding({ onComplete }) {
       });
     }
     refine.querySelector('#ob-next').addEventListener('click', stepAppearance);
+    // Back to the interview to change answers. Clearing archetype makes the
+    // reveal re-infer the personality from the edited answers.
+    refine.querySelector('#ob-back').addEventListener('click', () => {
+      data.archetype = '';
+      stepInterview(QUESTIONS.length - 1);
+    });
     requestAnimationFrame(() => { refine.style.transition = 'opacity .6s ease'; refine.style.opacity = '1'; });
   }
 
@@ -285,10 +296,13 @@ export function startOnboarding({ onComplete }) {
       <p class="onboard-subnote">Sculpted from these words. Edit anything — it's theirs.</p>
       <div class="onboard-appear" id="ob-appear"></div>
       <div class="onboard-actions">
+        <button id="ob-back" class="onboard-btn ghost">Back</button>
         <button id="ob-regen" class="onboard-btn ghost">Regenerate</button>
         <button id="ob-next" class="onboard-btn primary">Give them a past</button>
       </div>`;
     const appear = card.querySelector('#ob-appear');
+    // Back to the personality reveal/sliders (no re-inference — re-entrant).
+    card.querySelector('#ob-back').addEventListener('click', reveal);
 
     async function load() {
       appear.innerHTML = `<div class="onboard-typing" id="ob-type"></div>`;
