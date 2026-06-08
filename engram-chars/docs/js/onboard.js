@@ -55,7 +55,28 @@ const data = {
   appearanceDescription: '',
   memories: '',
   notes: '',
+  genJobId: null,        // background Meshy generation job (online progressive 3D)
 };
+
+// Kick off background 3D generation as soon as we have an appearance description,
+// so the model is partway done by the time the user reaches the cockpit. Fires
+// once; the cockpit polls /character_status and hot-swaps the model as it builds.
+let _genKicked = false;
+async function kickoffGeneration(name, description) {
+  if (_genKicked || !description) return;
+  _genKicked = true;
+  try {
+    const res = await fetch(`${BACKEND_URL}/generate_character`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, description }),
+    });
+    if (res.ok) {
+      const j = await res.json();
+      data.genJobId = j.job_id || null;
+    }
+  } catch (e) { console.warn('[onboard] generation kickoff failed', e); }
+}
 
 export function startOnboarding({ onComplete }) {
   const overlay = document.createElement('div');
@@ -279,6 +300,7 @@ export function startOnboarding({ onComplete }) {
       }
       if (!text) text = 'Describe your character here — they will be sculpted from it.';
       data.appearanceDescription = text;
+      kickoffGeneration(data.name, text);   // start the real 3D build in the background
       await typewriter(card.querySelector('#ob-type'), text, { cps: 55 });
       // Swap the typed text for an editable field, preserving content.
       appear.innerHTML = `<textarea id="ob-appear-ta" class="onboard-textarea" rows="5">${esc(text)}</textarea>`;
@@ -399,6 +421,7 @@ export function startOnboarding({ onComplete }) {
       facts: [],
       appearanceDescription: data.appearanceDescription,
       archetype: data.archetype,
+      genJobId: data.genJobId,
     };
     radar?.destroy?.();
     cardObserver.disconnect();

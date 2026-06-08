@@ -16,7 +16,12 @@ export function freshState(header) {
     baseline_ocean:  { ...baseline },
     effective_ocean: { ...baseline },
 
-    memories: [],          // {id, importance, source, text, tags}
+    // Seed with any backstory memories the backend loaded at init (they load
+    // outside the event bus, so the header carries them so the UI can show them).
+    memories: (header?.initial_memories ?? []).map(m => ({
+      id: m.id, text: m.text, source: m.source ?? 'backstory',
+      importance: m.importance ?? 5, tags: m.tags ?? null,
+    })),
     selected_ids: [],      // most recent retrieval_scored.selected_ids
     retrieval_threshold: header?.config?.retrieval_threshold ?? 15,
 

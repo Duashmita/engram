@@ -22,10 +22,13 @@ import logging
 import os
 import shutil
 import sys
+import threading
 import time
 import uuid
 from dataclasses import dataclass, field
 from typing import Optional
+
+import requests
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,6 +54,7 @@ for _candidate in (os.path.join(REPO_ROOT, "src"), "/root/engram/src"):
         sys.path.insert(0, _candidate)
 
 from engram import config as engram_config  # noqa: E402
+from engram.config import MESHY_API_KEY  # noqa: E402
 from engram.llm.client import AnthropicClient as GeminiClient  # noqa: E402
 from engram.models import NPCConfig, OCEANProfile  # noqa: E402
 from engram.npc import NPCAgent  # noqa: E402
@@ -237,6 +241,185 @@ class GreetingReq(BaseModel):
     anthropic_key: Optional[str] = None
 
 
+class GenerateCharacterReq(BaseModel):
+    name: str
+    description: str
+
+
+# ---------------------------------------------------------------------------
+# Meshy text-to-3D background jobs
+# ---------------------------------------------------------------------------
+# Each job_id -> {"status": "running"|"done"|"error",
+#                 "stage": "queued"|"preview"|"refine"|"rig"|"failed",
+#                 "glb_url": <str|None>,   # latest best available model URL
+#                 "progress": <int 0-100>,
+#                 "error": <str|None>}
+
+MESHY_BASE = "https://api.meshy.ai"
+
+CHARACTER_JOBS: dict = {}
+_CHARACTER_JOBS_LOCK = threading.Lock()
+
+# Polling tuning.
+_MESHY_POLL_INTERVAL_S = 8
+_MESHY_STAGE_TIMEOUT_S = 20 * 60  # ~20 min cap per stage
+_MESHY_POST_TIMEOUT_S = 60
+_MESHY_POST_RETRIES = 2
+
+
+def _meshy_headers() -> dict:
+    return {
+        "Authorization": f"Bearer {MESHY_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+
+def _get_job(job_id: str) -> Optional[dict]:
+    """Read a job snapshot under the lock (returns a copy)."""
+    with _CHARACTER_JOBS_LOCK:
+        job = CHARACTER_JOBS.get(job_id)
+        return dict(job) if job is not None else None
+
+
+def _update_job(job_id: str, **fields) -> None:
+    """Mutate a job's fields under the lock."""
+    with _CHARACTER_JOBS_LOCK:
+        job = CHARACTER_JOBS.get(job_id)
+        if job is not None:
+            job.update(fields)
+
+
+class _PoseEstimationError(Exception):
+    """Non-fatal rigging failure (clothed/bulky mesh). Degrade to refined mesh."""
+
+
+def _meshy_post(path: str, payload: dict) -> str:
+    """POST to a Meshy create endpoint and return the result task_id.
+
+    Retries on request timeouts, but never retries a 500 whose body mentions
+    "pose estimation" — that is a terminal rigging failure raised as
+    _PoseEstimationError so the caller can degrade gracefully.
+    """
+    url = f"{MESHY_BASE}{path}"
+    last_exc: Optional[Exception] = None
+    for attempt in range(_MESHY_POST_RETRIES + 1):
+        try:
+            resp = requests.post(
+                url, json=payload, headers=_meshy_headers(),
+                timeout=_MESHY_POST_TIMEOUT_S,
+            )
+        except requests.exceptions.Timeout as exc:
+            last_exc = exc
+            log.warning("meshy POST %s timed out (attempt %d)", path, attempt + 1)
+            continue
+        if resp.status_code == 500 and "pose estimation" in (resp.text or "").lower():
+            raise _PoseEstimationError(resp.text[:200])
+        resp.raise_for_status()
+        data = resp.json()
+        result = data.get("result")
+        if not result:
+            raise RuntimeError(f"meshy POST {path} returned no result: {data}")
+        return result
+    raise last_exc or RuntimeError(f"meshy POST {path} failed")
+
+
+def _meshy_poll(path: str, extract) -> str:
+    """Poll a Meshy GET endpoint until SUCCEEDED, returning a value from `extract`.
+
+    `extract(data)` pulls the GLB url out of the SUCCEEDED payload. Raises on
+    FAILED/EXPIRED or when the per-stage timeout is exceeded.
+    """
+    url = f"{MESHY_BASE}{path}"
+    deadline = time.time() + _MESHY_STAGE_TIMEOUT_S
+    while True:
+        resp = requests.get(url, headers=_meshy_headers(), timeout=_MESHY_POST_TIMEOUT_S)
+        if resp.status_code == 500 and "pose estimation" in (resp.text or "").lower():
+            raise _PoseEstimationError(resp.text[:200])
+        resp.raise_for_status()
+        data = resp.json()
+        status = data.get("status")
+        if status == "SUCCEEDED":
+            glb = extract(data)
+            if not glb:
+                raise RuntimeError(f"meshy GET {path} succeeded but no glb url")
+            return glb
+        if status in ("FAILED", "EXPIRED"):
+            raise RuntimeError(f"meshy task {status}: {str(data.get('task_error') or data)[:200]}")
+        if time.time() >= deadline:
+            raise RuntimeError(f"meshy GET {path} timed out (last status={status})")
+        time.sleep(_MESHY_POLL_INTERVAL_S)
+
+
+def _generate_character_worker(job_id: str, name: str, description: str) -> None:
+    """Background pipeline: preview -> refine -> rig, updating the job each stage.
+
+    Rig failures (including pose-estimation 500s) are non-fatal: the refined
+    mesh is kept as the final result. Only preview/refine failures mark error.
+    """
+    refine_glb: Optional[str] = None
+    try:
+        # ── Preview ───────────────────────────────────────────────────────
+        log.info("character job %s: preview start name=%s", job_id, name)
+        preview_task_id = _meshy_post("/openapi/v2/text-to-3d", {
+            "mode": "preview",
+            "prompt": description,
+            "art_style": "realistic",
+            "should_remesh": True,
+        })
+        preview_glb = _meshy_poll(
+            f"/openapi/v2/text-to-3d/{preview_task_id}",
+            lambda d: (d.get("model_urls") or {}).get("glb"),
+        )
+        _update_job(job_id, stage="preview", glb_url=preview_glb, progress=33)
+        log.info("character job %s: preview done", job_id)
+
+        # ── Refine ────────────────────────────────────────────────────────
+        refine_task_id = _meshy_post("/openapi/v2/text-to-3d", {
+            "mode": "refine",
+            "preview_task_id": preview_task_id,
+        })
+        refine_glb = _meshy_poll(
+            f"/openapi/v2/text-to-3d/{refine_task_id}",
+            lambda d: (d.get("model_urls") or {}).get("glb"),
+        )
+        _update_job(job_id, stage="refine", glb_url=refine_glb, progress=66)
+        log.info("character job %s: refine done", job_id)
+
+        # ── Rig (best-effort; degrade to refined mesh on failure) ─────────
+        try:
+            rig_task_id = _meshy_post("/openapi/v1/rigging", {
+                "input_task_id": refine_task_id,
+            })
+            rigged_glb = _meshy_poll(
+                f"/openapi/v1/rigging/{rig_task_id}",
+                lambda d: (d.get("result") or {}).get("rigged_character_glb_url"),
+            )
+            _update_job(
+                job_id, status="done", stage="rig",
+                glb_url=rigged_glb, progress=100,
+            )
+            log.info("character job %s: rig done", job_id)
+        except _PoseEstimationError as exc:
+            log.info("character job %s: rig pose-estimation failure, keeping refined mesh: %s",
+                     job_id, exc)
+            _update_job(job_id, status="done", stage="refine", glb_url=refine_glb, progress=100)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("character job %s: rig failed, keeping refined mesh: %s", job_id, exc)
+            _update_job(job_id, status="done", stage="refine", glb_url=refine_glb, progress=100)
+
+    except _PoseEstimationError as exc:
+        # Pose-estimation surfaced before refine completed — only degrade if we
+        # actually have a refined mesh; otherwise it's a genuine failure.
+        if refine_glb:
+            _update_job(job_id, status="done", stage="refine", glb_url=refine_glb, progress=100)
+        else:
+            log.warning("character job %s failed: %s", job_id, exc)
+            _update_job(job_id, status="error", stage="failed", error=str(exc)[:200])
+    except Exception as exc:  # noqa: BLE001
+        log.exception("character job %s failed", job_id)
+        _update_job(job_id, status="error", stage="failed", error=str(exc)[:200])
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -341,15 +524,32 @@ def _make_data_dir(session_id: str, npc_id: str) -> str:
     return dst
 
 
+def _serialize_memory(m) -> dict:
+    """Compact memory shape for the frontend memory panel."""
+    tags = getattr(m, "tags", None)
+    importance = getattr(tags, "importance", None) if tags else None
+    return {
+        "id": getattr(m, "id", ""),
+        "text": getattr(m, "text", ""),
+        "source": getattr(m, "source", "backstory"),
+        "importance": importance if importance is not None else 5,
+    }
+
+
 def _build_header(agent: NPCAgent) -> dict:
     """Mirror chat.py's _build_viz_header but populate from a live agent."""
     p = agent.config.profile
+    mems = list(agent.memory_manager.all_memories)
     return {
         "npc_id": agent.config.npc_id,
         "npc_name": agent.config.name,
         "persona": agent.config.persona,
         "baseline_ocean": {"O": p.O, "C": p.C, "E": p.E, "A": p.A, "N": p.N},
-        "initial_memory_count": len(agent.memory_manager.all_memories),
+        "initial_memory_count": len(mems),
+        # Seed memories so the UI shows the backstory the user gave the character
+        # (these load on the backend outside the event bus, so they'd otherwise
+        # be invisible until the first turn).
+        "initial_memories": [_serialize_memory(m) for m in mems],
         "config": {
             "retrieval_threshold": engram_config.RETRIEVAL_THRESHOLD,
             "top_k": engram_config.TOP_K_RETRIEVAL,
@@ -725,6 +925,51 @@ async def greeting(body: GreetingReq, request: Request, x_anthropic_key: Optiona
     greeting_text = (greeting_text or "").strip().strip('"').strip("'").strip()
     log.info("greeting generated name=%s len=%d", body.name, len(greeting_text))
     return {"greeting": greeting_text}
+
+
+@api.post("/generate_character")
+async def generate_character(body: GenerateCharacterReq) -> dict:
+    """Kick off a background Meshy text-to-3D pipeline (preview->refine->rig).
+
+    Returns a job_id the frontend polls via /character_status. If no Meshy key
+    is configured, returns {"job_id": None, "disabled": True} so the frontend
+    keeps its grey placeholder instead of erroring.
+    """
+    if not MESHY_API_KEY:
+        log.info("generate_character disabled (no MESHY_API_KEY)")
+        return {"job_id": None, "disabled": True}
+
+    job_id = uuid.uuid4().hex
+    with _CHARACTER_JOBS_LOCK:
+        CHARACTER_JOBS[job_id] = {
+            "status": "running",
+            "stage": "queued",
+            "glb_url": None,
+            "progress": 0,
+            "error": None,
+        }
+
+    thread = threading.Thread(
+        target=_generate_character_worker,
+        args=(job_id, body.name, body.description),
+        daemon=True,
+    )
+    thread.start()
+    log.info("generate_character job=%s name=%s", job_id, body.name)
+    return {"job_id": job_id}
+
+
+@api.get("/character_status/{job_id}")
+async def character_status(job_id: str) -> dict:
+    """Return the current state of a character-generation job.
+
+    Returns a status=error dict (not an exception) for unknown jobs so the
+    frontend can stop polling cleanly.
+    """
+    job = _get_job(job_id)
+    if job is None:
+        return {"status": "error", "error": "unknown job"}
+    return job
 
 
 # ---------------------------------------------------------------------------

@@ -17,7 +17,6 @@
 import * as THREE from 'three';
 import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls }   from 'three/addons/controls/OrbitControls.js';
-import * as SkeletonUtils  from 'three/addons/utils/SkeletonUtils.js';
 
 const loader = new GLTFLoader();
 
@@ -55,13 +54,25 @@ function prepareClip(clip) {
 
 export async function createCharacter(canvas, assetBasePath) {
   // ── Scene ──────────────────────────────────────────────────────────────────
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+  } catch (e) {
+    console.error('[character] WebGL init failed', e);
+    canvas.style.background = '#12182a';
+    // Return a stub so callers don't crash; all methods are no-ops.
+    return {
+      playAnim() {}, setParticles() {}, update() {},
+      setBreathing() {}, materialize() { return Promise.resolve(); },
+      greet() { return Promise.resolve(); }, lookAtPointer() {}, dispose() {}
+    };
+  }
 
   const scene = new THREE.Scene();
   scene.background = null;
@@ -301,7 +312,13 @@ export async function createCharacter(canvas, assetBasePath) {
 
   // ── Resize ─────────────────────────────────────────────────────────────────
   function resize() {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
+    // Canvas can momentarily have zero layout size right after creation; fall
+    // back to the parent's size, then to a sane default, so we never size to 0×0.
+    const parent = canvas.parentElement;
+    let w = canvas.clientWidth  || (parent && parent.clientWidth)  || 0;
+    let h = canvas.clientHeight || (parent && parent.clientHeight) || 0;
+    if (!w) w = 480;
+    if (!h) h = 480;
     renderer.setSize(w, h, false);
     camera.aspect = w / Math.max(h, 1);
     camera.updateProjectionMatrix();
@@ -312,7 +329,16 @@ export async function createCharacter(canvas, assetBasePath) {
 
   // ── Update loop ─────────────────────────────────────────────────────────────
   const clock = new THREE.Clock();
-  function update() {
+  // The real per-frame work. Driven by the internal RAF loop (renderLoop) so
+  // rendering never depends on an external caller's animation frame.
+  function frame() {
+    // Cheap guard: if the drawing buffer no longer matches the canvas's client
+    // size, re-size. Covers the case where layout settled after creation.
+    if (renderer.domElement.width  !== Math.floor((canvas.clientWidth  || 0) * renderer.getPixelRatio()) ||
+        renderer.domElement.height !== Math.floor((canvas.clientHeight || 0) * renderer.getPixelRatio())) {
+      resize();
+    }
+
     const dt = clock.getDelta();
     if (mixer) mixer.update(dt);
     controls.update();
@@ -488,16 +514,98 @@ export async function createCharacter(canvas, assetBasePath) {
     return new Promise(resolve => setTimeout(resolve, 1200));
   }
 
+  // ── Hot-swap the displayed model from an arbitrary GLB URL ──────────────────
+  // Lets the app progressively upgrade a character (grey placeholder → raw mesh
+  // → textured → rigged) as background generation completes. `url` is loaded
+  // directly (e.g. Meshy CDN signed URLs). On any failure we keep the current
+  // model and resolve, so a failed upgrade never blanks the character.
+  function loadModelFromUrl(url) {
+    return loadGLTF(url).then(gltf => {
+      // Remove + dispose the current model (guard null).
+      if (model) {
+        scene.remove(model);
+        model.traverse(n => {
+          if (!n.isMesh) return;
+          if (n.geometry) n.geometry.dispose();
+          const mats = Array.isArray(n.material) ? n.material : (n.material ? [n.material] : []);
+          for (const mat of mats) mat.dispose();
+        });
+      }
+
+      // Stop the old mixer; build a new one only if the new GLB has animations.
+      if (mixer) mixer.stopAllAction();
+      currentAction = null;
+
+      model = gltf.scene;
+      model.traverse(n => { if (n.isMesh) { n.castShadow = true; n.receiveShadow = true; } });
+      scene.add(model);
+
+      mixer = (gltf.animations && gltf.animations.length)
+        ? new THREE.AnimationMixer(model)
+        : null;
+
+      // Same normalization as the base load path: scale to ~1.85m tall,
+      // center on X/Z, sit on Y=0.
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const scale = 1.85 / Math.max(size.y, 0.01);
+      model.scale.setScalar(scale);
+      model.position.set(-center.x, -box.min.y, -center.z);
+
+      // Refresh breathing/look-at baseline + bone names for the new model.
+      modelHeight = 1.85;
+      captureBase();
+      boneNames = getBoneNames(model);
+
+      // Keep the new GLB's embedded clip (if any). We don't auto-play —
+      // characters default to a static bind pose.
+      clips = {};
+      if (gltf.animations && gltf.animations[0]) {
+        clips['idle'] = gltf.animations[0];
+      }
+
+      // Smoothly fade/scale the new model in.
+      try { materialize(); } catch (_) {}
+    }).catch(err => {
+      console.warn('[character] loadModelFromUrl failed', url, err);
+    });
+  }
+
+  // ── Internal render loop ────────────────────────────────────────────────────
+  // createCharacter SELF-DRIVES its own render loop, so rendering no longer
+  // depends on a caller invoking update() each frame. The returned `update` is a
+  // harmless no-op to avoid double-stepping clock.getDelta() (which would halve
+  // dt and break breathing/look-at/greet timing).
+  let rafId = null;
+  function renderLoop() {
+    rafId = requestAnimationFrame(renderLoop);
+    frame();
+  }
+
   // ── Boot ───────────────────────────────────────────────────────────────────
   await loadBase();
+  console.log('[character] loaded', {
+    assetBasePath,
+    hasModel: !!model,
+    canvasW: canvas.clientWidth,
+    canvasH: canvas.clientHeight,
+  });
   // loadAnimationClips plays the primary idle as soon as the model is ready,
   // then loads the rest of the clips in the background.
   loadAnimationClips();   // intentionally not awaited
 
+  // Make sure we're sized correctly now that layout has had a chance to settle,
+  // then start driving frames ourselves.
+  resize();
+  renderLoop();
+
   return {
-    playAnim, setParticles, update,
-    setBreathing, materialize, greet, lookAtPointer,
+    playAnim, setParticles,
+    update: () => {},   // no-op: internal renderLoop owns the per-frame step
+    setBreathing, materialize, greet, lookAtPointer, loadModelFromUrl,
     dispose() {
+      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
       ro.disconnect();
       if (pointerBound) {
         canvas.removeEventListener('pointermove', onPointerMove);

@@ -172,6 +172,9 @@ def _post(url: str, api_key: str, payload: dict, timeout: int = 90, retries: int
     for attempt in range(retries):
         try:
             resp = requests.post(url, headers=_headers(api_key), json=payload, timeout=timeout)
+            # 4xx are deterministic (bad prompt, bad request) — don't retry, surface body.
+            if 400 <= resp.status_code < 500:
+                raise RuntimeError(f"non-retryable {resp.status_code}: {resp.text[:200]}")
             # Some 500s are non-transient (e.g. rigging pose-estimation failure on a
             # mesh the auto-rigger can't parse). Don't waste retries on those.
             if resp.status_code >= 500:
@@ -284,10 +287,26 @@ Write only the description, nothing else."""
     return client.generate(prompt, max_tokens=220).strip()
 
 
+# Short suffix to help the auto-rigger's pose estimation: limbs separated from
+# the body. Kept brief — Meshy's text-to-3D prompt limit is ~600 characters.
+_POSE_SUFFIX = (
+    " Strict T-pose, arms straight out with clear gaps from the torso, legs apart, "
+    "fitted clothing (no coats/robes bridging limbs), full body, facing forward."
+)
+_MESHY_PROMPT_MAX = 780   # Meshy hard limit is 800 chars
+
+
 def step_preview(api_key: str, description: str) -> str:
     """Step 2 — Meshy text-to-3D preview. Returns preview task_id."""
+    # Keep total under Meshy's ~600-char limit: trim the description if needed,
+    # then append the pose suffix.
+    budget = _MESHY_PROMPT_MAX - len(_POSE_SUFFIX)
+    desc = description.strip()
+    if len(desc) > budget:
+        desc = desc[:budget].rsplit(" ", 1)[0]
+    prompt = desc + _POSE_SUFFIX
     data = _post(f"{MESHY_BASE}/openapi/v2/text-to-3d", api_key,
-                 {"mode": "preview", "prompt": description,
+                 {"mode": "preview", "prompt": prompt,
                   "art_style": "realistic", "should_remesh": True})
     task_id = data["result"]
     print(f"  [preview] task={task_id}")
@@ -461,22 +480,34 @@ def generate_for_preset(preset_key: str, client: AnthropicClient, api_key: str,
         state["refine_id"], state["refine_glb_url"] = step_refine(api_key, state["preview_id"])
         _save_state(out_dir, state)
 
-    # Step 4: rig
-    if not state.get("rig_id"):
-        state["rig_id"], state["rigged_glb_url"] = step_rig(api_key, state["refine_id"])
-        _save_state(out_dir, state)
+    # Step 4: rig — but the auto-rigger fails pose-estimation on clothed/bulky
+    # meshes. If it fails, fall back to the textured (unrigged) refine mesh so
+    # the preset still gets a preloaded static GLB.
+    rig_failed = state.get("rig_failed", False)
+    if not state.get("rig_id") and not rig_failed:
+        try:
+            state["rig_id"], state["rigged_glb_url"] = step_rig(api_key, state["refine_id"])
+            _save_state(out_dir, state)
+        except Exception as exc:
+            print(f"  [rig] failed ({exc}); falling back to static textured mesh")
+            rig_failed = True
+            state["rig_failed"] = True
+            _save_state(out_dir, state)
 
-    # Download rigged base GLB
     base_path = os.path.join(out_dir, "base.glb")
     if not os.path.exists(base_path) or force:
-        print("  [download] base.glb...")
-        _download(state["rigged_glb_url"], base_path)
+        url = state.get("rigged_glb_url") if not rig_failed else state.get("refine_glb_url")
+        print(f"  [download] base.glb ({'rigged' if not rig_failed else 'static'})...")
+        _download(url, base_path)
         print(f"  [saved] {base_path}")
     else:
         print("  [skip] base.glb already exists")
 
-    # Step 5: animations (parallel submit + poll + download)
-    if not state.get("animations_done"):
+    # Step 5: animations — only if rigging succeeded (static mesh can't animate).
+    if rig_failed:
+        anim_paths = {}
+        print("  [animations] skipped (no rig — static mesh)")
+    elif not state.get("animations_done"):
         anim_paths = step_animations(api_key, state["rig_id"], anim_map, out_dir)
         state["animation_paths"] = anim_paths
         state["animations_done"] = True

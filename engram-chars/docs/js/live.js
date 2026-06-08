@@ -41,6 +41,10 @@ let beaconInstalled  = false;
 let pendingOcean     = null;
 let dinoGame         = null;
 
+// Custom characters created via the onboarding wizard. Maps slug -> config so
+// the topbar dropdown can re-launch them and startSession() can delegate.
+const customConfigs = {};
+
 // LocalStorage keys
 const LS_SESSION   = 'engram_live_session_id';
 const LS_NPC       = 'engram_live_npc_id';
@@ -351,10 +355,45 @@ function setSelectedNpc(id) {
   if (sel) sel.value = id;
 }
 
+/**
+ * Register a custom character (from the onboarding wizard) so it shows up in the
+ * topbar NPC dropdown, selected. Stores the config keyed by its derived slug so
+ * startSession() can re-launch it. Returns the slug.
+ */
+export function registerCustomNpc(config) {
+  const slug = (config.name || 'custom')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'custom';
+
+  customConfigs[slug] = config;
+
+  // Reveal the live picker so the dropdown is visible.
+  document.getElementById('live-picker')?.classList.remove('hidden');
+
+  const sel = document.getElementById('live-npc-select');
+  if (sel) {
+    const exists = Array.from(sel.options).some(o => o.value === slug);
+    if (!exists) {
+      const opt = document.createElement('option');
+      opt.value = slug;
+      opt.textContent = config.name;
+      sel.insertBefore(opt, sel.firstChild);
+    }
+    sel.value = slug;
+  }
+
+  return slug;
+}
+
 // ---------------- network: /start -------------------------------------------
 
 async function startSession() {
+  // If the active selection is a custom character, delegate to the custom path.
   const sel = document.getElementById('live-npc-select');
+  const chosenVal = sel ? sel.value : null;
+  if (chosenVal && customConfigs[chosenVal]) {
+    return startCustomSession(customConfigs[chosenVal]);
+  }
+
   const chosen = sel?.value ?? NPC_PRESETS[0].id;
 
   setStatus('starting session…');
@@ -440,8 +479,9 @@ export async function startCustomSession(config) {
   if (key) headers['X-Gemini-Key'] = key;
 
   // Derive a stable npc_id slug from the name so generated assets can be cached.
-  const slug = (config.name || 'custom')
-    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'custom';
+  // registerCustomNpc both computes the slug and surfaces the character in the
+  // topbar dropdown (added + selected) so the UI reflects the active character.
+  const slug = registerCustomNpc(config);
 
   const bodyObj = {
     npc_id: slug,

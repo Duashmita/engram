@@ -62,10 +62,19 @@ async function initCharacter(npcId) {
     } catch (_) {}
   }
 
-  char = await createCharacter(canvas, assetPath);
-  STATUS(assetPath ? 'Character loaded' : '3D character not yet generated — run scripts/generate_characters.py');
+  try {
+    char = await createCharacter(canvas, assetPath);
+  } catch (e) {
+    console.error('[app] createCharacter failed:', e);
+    STATUS('Character failed to load — check console');
+    return;
+  }
+  console.log('[app] character created', { npcId, assetPath, hasChar: !!char,
+    w: canvas.clientWidth, h: canvas.clientHeight });
+  STATUS(assetPath ? 'Character loaded' : 'Using placeholder character (no 3D model generated for this NPC yet)');
 
-  // Animation render loop (independent of event clock)
+  // createCharacter self-drives its own render loop now; update() is a no-op,
+  // but we keep a light loop for any state-driven hooks.
   function animLoop() {
     charRAF = requestAnimationFrame(animLoop);
     if (char) char.update();
@@ -322,10 +331,9 @@ function boot() {
       localStorage.removeItem('engram_live_session_id');
       localStorage.removeItem('engram_live_npc_id');
 
-      // This is a custom-character app: hide the preset picker (NPC dropdown +
-      // Start) so it can't override the freshly created character. Offer a
-      // "New character" affordance instead.
-      document.getElementById('live-picker')?.classList.add('hidden');
+      // startCustomSession registers the character in the topbar dropdown and
+      // selects it, so the picker stays visible and shows the new name. Add a
+      // "New character" affordance too.
       installNewCharacterButton();
 
       try {
@@ -340,6 +348,8 @@ function boot() {
           await initCharacter(slug);
         }
         await birthMoment(characterConfig);
+        // If a background 3D build is running, progressively swap the model in.
+        if (characterConfig.genJobId) pollAndSwapModel(characterConfig.genJobId);
       } catch (e) {
         console.error('[boot] live launch failed:', e);
         STATUS('Error starting Live mode — check console');
@@ -359,6 +369,35 @@ function installNewCharacterButton() {
   btn.addEventListener('click', () => location.reload());
   const settings = document.getElementById('btn-settings');
   settings?.parentNode?.insertBefore(btn, settings);
+}
+
+// ── Progressive 3D build: poll the backend and hot-swap the model as Meshy
+// finishes each stage (raw mesh → textured → rigged). The character starts as
+// the grey placeholder and upgrades in place over a few minutes.
+async function pollAndSwapModel(jobId) {
+  let lastUrl = null;
+  const STAGE_LABEL = { preview: 'sculpting…', refine: 'texturing…', rig: 'rigging…' };
+  for (let i = 0; i < 160; i++) {           // ~160 × 8s ≈ 21 min cap
+    await new Promise(r => setTimeout(r, 8000));
+    let job;
+    try {
+      const res = await fetch(`${BACKEND_URL}/character_status/${jobId}`);
+      if (!res.ok) break;
+      job = await res.json();
+    } catch (_) { continue; }
+    if (!job || job.status === 'error') { break; }
+
+    if (job.stage && STAGE_LABEL[job.stage]) {
+      STATUS(`✨ ${job.name ?? 'your character'} — ${STAGE_LABEL[job.stage]} (${job.progress ?? 0}%)`);
+    }
+    // A newer GLB is available → swap it into the viewport.
+    if (job.glb_url && job.glb_url !== lastUrl && char?.loadModelFromUrl) {
+      lastUrl = job.glb_url;
+      try { await char.loadModelFromUrl(job.glb_url); STATUS('✨ character updated'); }
+      catch (e) { console.warn('[app] model swap failed', e); }
+    }
+    if (job.status === 'done') { STATUS('Character ready'); break; }
+  }
 }
 
 // ── The "birth" moment — the payoff after creation ────────────────────────────

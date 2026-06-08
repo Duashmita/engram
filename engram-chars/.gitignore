@@ -1,5 +1,6 @@
 # Secrets — never commit
 .env
+.claude
 
 # Python
 .venv/
@@ -14,7 +15,6 @@ data/
 .llm_cache/
 docs/sessions/
 .DS_Store
-.claude
 
 # Large regenerable character assets (re-create with scripts/generate_characters.py).
 # guard/ is committed as a working demo character; the rest are ignored.
