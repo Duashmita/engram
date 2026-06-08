@@ -189,13 +189,17 @@ export async function createCharacter(canvas, assetBasePath) {
     }
     personalityIdle = idleName;
 
-    // The GLB we load as the actual displayed model — prefer the idle one.
+    // The GLB we load as the actual displayed model. Prefer the idle animation
+    // GLB (rigged characters); if there are NO animation GLBs (static textured
+    // meshes — e.g. presets whose rigging failed), load base.glb directly.
     const primaryName = animNames.includes(idleName) ? idleName
                       : (animNames[0] || null);
-    if (!primaryName) { model = buildPlaceholder(); scene.add(model); modelHeight = 1.85; captureBase(); return; }
+    const primaryUrl = primaryName
+      ? `${assetBasePath}/${primaryName}.glb`
+      : `${assetBasePath}/base.glb`;
 
     try {
-      const gltf = await loadGLTF(`${assetBasePath}/${primaryName}.glb`);
+      const gltf = await loadGLTF(primaryUrl);
       model = gltf.scene;
       model.traverse(n => { if (n.isMesh) { n.castShadow = true; n.receiveShadow = true; } });
       scene.add(model);
@@ -204,7 +208,7 @@ export async function createCharacter(canvas, assetBasePath) {
 
       // The primary GLB's own embedded clip — keep ALL tracks (it's the native
       // animation for this exact mesh, so position tracks are correct here).
-      if (gltf.animations[0]) {
+      if (primaryName && gltf.animations[0]) {
         clips[primaryName] = gltf.animations[0];
       }
     } catch (e) {

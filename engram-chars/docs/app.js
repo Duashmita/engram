@@ -390,10 +390,12 @@ async function pollAndSwapModel(jobId) {
     if (job.stage && STAGE_LABEL[job.stage]) {
       STATUS(`✨ ${job.name ?? 'your character'} — ${STAGE_LABEL[job.stage]} (${job.progress ?? 0}%)`);
     }
-    // A newer GLB is available → swap it into the viewport.
+    // A newer GLB is available → swap it into the viewport. Load via our
+    // backend proxy so the browser doesn't hit CORS on Meshy's CDN.
     if (job.glb_url && job.glb_url !== lastUrl && char?.loadModelFromUrl) {
       lastUrl = job.glb_url;
-      try { await char.loadModelFromUrl(job.glb_url); STATUS('✨ character updated'); }
+      const proxied = `${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(job.glb_url)}`;
+      try { await char.loadModelFromUrl(proxied); STATUS('✨ character updated'); }
       catch (e) { console.warn('[app] model swap failed', e); }
     }
     if (job.status === 'done') { STATUS('Character ready'); break; }

@@ -972,6 +972,24 @@ async def character_status(job_id: str) -> dict:
     return job
 
 
+@api.get("/proxy_glb")
+async def proxy_glb(url: str):
+    """Stream a Meshy CDN GLB through our origin so the browser can load it
+    without cross-origin (CORS) issues. Only allows Meshy asset URLs."""
+    if not (url.startswith("https://assets.meshy.ai/") or url.startswith("https://api.meshy.ai/")):
+        raise HTTPException(400, "only meshy asset urls are allowed")
+    try:
+        r = requests.get(url, timeout=120, stream=True)
+        r.raise_for_status()
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(502, f"fetch failed: {exc}")
+    return Response(
+        content=r.content,
+        media_type="model/gltf-binary",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
 # ---------------------------------------------------------------------------
 # Modal wrapping — optional. The block must remain importable even when Modal
 # is not installed (the local dev path uses uvicorn, no Modal needed).
