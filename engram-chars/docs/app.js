@@ -39,6 +39,20 @@ const stateRef  = { state: null };
 function getState() { return stateRef.state; }
 function setState(s) { stateRef.state = s; }
 
+// Surface any uncaught error on-page so failures are visible without DevTools.
+function showError(msg) {
+  let b = document.getElementById('app-error-banner');
+  if (!b) {
+    b = document.createElement('div');
+    b.id = 'app-error-banner';
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#e23b54;color:#fff;font:13px/1.4 system-ui;padding:8px 14px;white-space:pre-wrap;';
+    document.body.appendChild(b);
+  }
+  b.textContent = 'Error: ' + msg;
+}
+window.addEventListener('error', e => showError((e.message || 'script error') + (e.filename ? ' @ ' + e.filename.split('/').pop() + ':' + e.lineno : '')));
+window.addEventListener('unhandledrejection', e => showError('promise: ' + (e.reason?.message || e.reason || 'unknown')));
+
 let i_emit      = 0;
 let t_virtual   = 0;
 let t_end       = 0;
@@ -342,22 +356,28 @@ function boot() {
 
 // ── Start screen / catalogue ───────────────────────────────────────────────
 function showStart() {
-  document.body.classList.add('onboarding-active');   // hide the cockpit
-  let mount = document.getElementById('start-mount');
-  if (!mount) {
-    mount = document.createElement('div');
-    mount.id = 'start-mount';
-    mount.className = 'start-mount';
-    document.body.appendChild(mount);
+  try {
+    document.body.classList.add('onboarding-active');   // hide the cockpit
+    let mount = document.getElementById('start-mount');
+    if (!mount) {
+      mount = document.createElement('div');
+      mount.id = 'start-mount';
+      mount.className = 'start-mount';
+      document.body.appendChild(mount);
+    }
+    mount.style.display = '';
+    console.log('[start] showing catalogue with', PRESET_ENTRIES.length, 'presets');
+    startScreen = showStartScreen({
+      mountEl: mount,
+      presets: PRESET_ENTRIES,
+      onPreview: previewEntry,
+      onPlay: playEntry,
+      onCreateNew: () => { closeStart(); launchWizard(); },
+    });
+  } catch (e) {
+    console.error('[start] showStart failed:', e);
+    showError('start screen failed: ' + (e?.message || e));
   }
-  mount.style.display = '';
-  startScreen = showStartScreen({
-    mountEl: mount,
-    presets: PRESET_ENTRIES,
-    onPreview: previewEntry,
-    onPlay: playEntry,
-    onCreateNew: () => { closeStart(); launchWizard(); },
-  });
 }
 
 function closeStart() {
