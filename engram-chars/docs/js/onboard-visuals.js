@@ -162,7 +162,7 @@ function ensureStyles() {
     }
     .character-card .ov-cc-ocean {
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: auto 1fr auto;
       gap: 6px 8px;
       align-items: center;
       margin-bottom: 14px;
@@ -185,11 +185,21 @@ function ensureStyles() {
       border-radius: 3px;
       background: ${PALETTE.accent};
     }
+    .character-card .ov-cc-num {
+      font-size: 0.72rem;
+      color: ${PALETTE.text};
+      font-variant-numeric: tabular-nums;
+      min-width: 2.5ch;
+      text-align: right;
+    }
     .character-card .ov-cc-appearance {
       margin: 0;
       font-size: 0.82rem;
       line-height: 1.45;
       color: ${PALETTE.muted};
+      max-height: 7.5em;       /* ~5 lines, then scroll — full text, no cutoff */
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
     .ov-confetti-overlay {
@@ -608,17 +618,24 @@ export function buildCharacterCard({ name, archetype, ocean, appearance } = {}) 
     const bar = document.createElement('div');
     bar.className = 'ov-cc-bar';
     const fill = document.createElement('span');
-    fill.style.width = (clamp01(o[axis]) * 100).toFixed(1) + '%';
+    const v = clamp01(o[axis]);
+    fill.style.width = (v * 100).toFixed(1) + '%';
     bar.appendChild(fill);
+
+    const num = document.createElement('span');
+    num.className = 'ov-cc-num';
+    num.textContent = v.toFixed(2);
 
     grid.appendChild(label);
     grid.appendChild(bar);
+    grid.appendChild(num);
   });
   card.appendChild(grid);
 
+  // Full appearance description in a scrollable box (no truncation).
   const app = document.createElement('p');
   app.className = 'ov-cc-appearance';
-  app.textContent = truncate(appearance || '', 140);
+  app.textContent = appearance || '';
   card.appendChild(app);
 
   return card;
