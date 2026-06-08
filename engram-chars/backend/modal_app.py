@@ -76,8 +76,12 @@ log.setLevel(logging.INFO)
 
 SESSION_TTL_S = 3600
 HARD_TURN_CAP = 30
-RATE_LIMIT_PER_MIN = 5
-RATE_LIMIT_PER_DAY = 50
+# Rate limits apply to the shared-key path (no BYOK). The onboarding wizard fires
+# several calls per character (infer_ocean, appearance, greeting, start, …), so
+# keep these generous — the old 5/min tripped mid-wizard and surfaced as
+# "personality model unreachable".
+RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "120"))
+RATE_LIMIT_PER_DAY = int(os.environ.get("RATE_LIMIT_PER_DAY", "2000"))
 
 _SESSION_BASE_DIR = "/tmp/engram_sessions"
 

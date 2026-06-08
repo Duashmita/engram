@@ -216,9 +216,11 @@ export function startOnboarding({ onComplete }) {
   // ── 2. The reveal — archetype + radar draws itself ──────────────────────────
   async function reveal() {
     setStep(2);
-    // Only infer the first time. On re-entry (Back from a later step) we already
-    // have the personality — skip the network call and just re-show the reveal.
-    if (!data.archetype) {
+    // Infer the first time, and RETRY whenever the previous attempt failed
+    // (so a transient backend hiccup doesn't permanently trap "The Unknown").
+    // Skip only when we already have a real, successful result.
+    const haveRealResult = data.archetype && data.archetype !== 'The Unknown';
+    if (!haveRealResult) {
       card.innerHTML = `
         <div class="onboard-loading">
           <div class="onboard-spinner"></div>
