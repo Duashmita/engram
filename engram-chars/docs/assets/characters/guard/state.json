@@ -1,0 +1,21 @@
+{
+  "description": "A lean, sinewy man in his late thirties with a weathered face marked by deep lines around the eyes and mouth, conveying years of hardship and loss. His posture is defensive\u2014shoulders drawn inward, head slightly forward as though perpetually braced against bad news\u2014with calloused hands held close to his body and jaw clenched tight. His expression is distant and guarded, the gaze of someone who trusts nothing and watches everything. T-pose, humanoid, game character, realistic proportions.",
+  "preview_id": "019e9e30-4379-76b1-bc94-ad0612e282b4",
+  "refine_id": "019e9e31-636b-7eb0-8c49-d973a25f744a",
+  "refine_glb_url": "saved",
+  "rig_id": "019e9e35-2f97-79f9-be93-97e2e63605e1",
+  "rigged_glb_url": "saved",
+  "animation_paths": {
+    "looking": "assets/characters/guard/looking.glb",
+    "talking": "assets/characters/guard/talking.glb",
+    "idle": "assets/characters/guard/idle.glb",
+    "shaking": "assets/characters/guard/shaking.glb",
+    "thinking": "assets/characters/guard/thinking.glb",
+    "surprised": "assets/characters/guard/surprised.glb",
+    "getting_hit": "assets/characters/guard/getting_hit.glb",
+    "scared": "assets/characters/guard/scared.glb",
+    "combat": "assets/characters/guard/combat.glb",
+    "dying": "assets/characters/guard/dying.glb"
+  },
+  "animations_done": true
+}

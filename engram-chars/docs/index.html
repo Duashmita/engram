@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Engram — NPC Memory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.167/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo-dot"></div>
+    <h1>Engram <span class="sub" id="brand-sub">Characters</span></h1>
+  </div>
+
+  <div class="mode-toggle" role="tablist" aria-label="Mode">
+    <button id="mode-replay" class="mode-btn active" data-mode="replay" role="tab">Replay</button>
+    <button id="mode-live"   class="mode-btn"        data-mode="live"   role="tab">Live</button>
+  </div>
+
+  <div class="session-picker">
+    <label for="session-select">Session</label>
+    <select id="session-select"></select>
+    <span id="group-badge" class="group-badge hidden"></span>
+  </div>
+
+  <div id="live-picker" class="live-picker hidden">
+    <label for="live-npc-select">NPC</label>
+    <select id="live-npc-select"></select>
+    <button id="btn-ocean" class="ctrl" title="Tune OCEAN personality">OCEAN ▾</button>
+    <button id="live-start" class="ctrl primary" title="Start session">Start session</button>
+  </div>
+
+  <div class="controls">
+    <button id="btn-reset"       class="ctrl" title="Reset">⟲</button>
+    <button id="btn-step"        class="ctrl" title="Step one event">›</button>
+    <button id="btn-step-turn"   class="ctrl" title="Step to next turn">»</button>
+    <button id="btn-play"        class="ctrl primary" title="Play/Pause">▶</button>
+    <div class="speed">
+      <button data-speed="0.5">0.5x</button>
+      <button data-speed="1" class="active">1x</button>
+      <button data-speed="2">2x</button>
+      <button data-speed="4">4x</button>
+    </div>
+  </div>
+
+  <button id="btn-unity" class="ctrl ctrl-wide" title="Export to Unity">
+    <svg width="14" height="14" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M22.9 6.0l-6.0 10.4 6.0 10.4 3.0-1.7v-5.0l-4.3 7.4-2.5-1.5 4.3-7.5h-8.6l4.3 7.5-2.5 1.5-4.3-7.4 4.3-7.5h8.6l-4.3 7.5 2.5 1.5 4.3-7.4v-5.0z"/>
+      <path fill="currentColor" d="M16.0 1.3l-7.0 4.0-7.0 12.1 7.0 12.1 7.0 4.0 7.0-4.0-2.6-1.5-4.4 2.5-4.4-2.5-4.4-7.6h8.8l4.4 7.6 2.6-1.5-7.0-12.1z"/>
+    </svg>
+    <span>Unity</span>
+  </button>
+  <button id="btn-settings" class="ctrl" title="Settings">⚙</button>
+</header>
+
+<div class="scrubber-row">
+  <span id="time-cur">0.00s</span>
+  <input id="scrubber" type="range" min="0" max="1000" value="0" step="1" />
+  <span id="time-end">0.00s</span>
+</div>
+
+<main id="stage" class="stage-split">
+
+  <!-- ── Left: 3D character viewport ───────────────────────────────────── -->
+  <section class="char-viewport">
+    <canvas id="char-canvas"></canvas>
+    <div class="char-overlay">
+      <span id="char-mode-pill" class="mode-pill"></span>
+    </div>
+  </section>
+
+  <!-- ── Right: memory + pipeline panels ──────────────────────────────── -->
+  <div id="single-view" class="right-col">
+
+    <!-- Panel A — OCEAN radar -->
+    <section class="panel panel-a" id="panel-a">
+      <header class="panel-header">
+        <h2>OCEAN</h2>
+        <div class="npc-name" id="npc-name">—</div>
+      </header>
+      <div class="radar-wrap" id="radar-wrap">
+        <canvas id="ocean-radar"></canvas>
+      </div>
+      <div class="ocean-readout" id="ocean-readout"></div>
+      <div class="persona" id="persona"></div>
+    </section>
+
+    <!-- Panel B — Pipeline timeline -->
+    <section class="panel panel-b">
+      <header class="panel-header">
+        <h2>Pipeline</h2>
+        <div class="legend">
+          <span class="lg lg-standard">standard</span>
+          <span class="lg lg-fight">fight/flight</span>
+          <span class="lg lg-instinct">instinct</span>
+        </div>
+      </header>
+      <div class="turn-list" id="turn-list"></div>
+    </section>
+
+    <!-- Panel C — Memory store -->
+    <aside class="panel panel-c">
+      <section class="sub">
+        <header class="sub-header"><h3>Session window</h3><span class="muted" id="window-count">0/7</span></header>
+        <div class="window-track" id="window-track"></div>
+        <div class="summaries" id="summaries"></div>
+      </section>
+      <section class="sub">
+        <header class="sub-header"><h3>All memories</h3><span class="muted" id="mem-count">0</span></header>
+        <div class="mem-list" id="mem-list"></div>
+      </section>
+      <section class="sub">
+        <header class="sub-header"><h3>Key memories &amp; Prolog facts</h3></header>
+        <div class="key-list" id="key-list"></div>
+        <div class="facts-list" id="facts-list"></div>
+      </section>
+    </aside>
+
+    <!-- Panel D — Transcript + composer -->
+    <section class="panel panel-d">
+      <header class="panel-header"><h2>Transcript</h2></header>
+      <div class="transcript" id="transcript"></div>
+      <div id="composer" class="composer hidden">
+        <textarea id="composer-input" rows="1" placeholder="Type a message — Enter to send, Shift+Enter for newline" disabled></textarea>
+        <div class="composer-right">
+          <button id="composer-send" class="ctrl primary" disabled>Send</button>
+          <span id="composer-status" class="composer-status"></span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /right-col -->
+</main>
+
+<footer class="statusbar">
+  <span id="status-text">loading…</span>
+  <span class="spacer"></span>
+  <span class="muted" id="event-counter">0/0 events</span>
+</footer>
+
+<!-- Dialogs (same as engram original) -->
+<dialog id="loading-dialog" class="loading-dialog">
+  <div class="loading-inner">
+    <p class="loading-status" id="loading-status">Starting session…</p>
+    <canvas id="dino-canvas" width="560" height="152"></canvas>
+  </div>
+</dialog>
+
+<dialog id="ocean-dialog" class="settings-dialog">
+  <form method="dialog">
+    <header class="settings-header">
+      <h2>OCEAN Personality</h2>
+      <button id="ocean-close" class="ctrl" type="button" title="Close">×</button>
+    </header>
+    <p class="muted settings-hint">Adjust any trait before starting — changes are applied at session start.</p>
+    <div class="ocean-sliders-panel">
+      <div class="ocean-slider-row">
+        <label for="slider-O"><span class="trait-key">O</span> Openness</label>
+        <input type="range" id="slider-O" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-O">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-C"><span class="trait-key">C</span> Conscientiousness</label>
+        <input type="range" id="slider-C" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-C">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-E"><span class="trait-key">E</span> Extraversion</label>
+        <input type="range" id="slider-E" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-E">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-A"><span class="trait-key">A</span> Agreeableness</label>
+        <input type="range" id="slider-A" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-A">0.50</span>
+      </div>
+      <div class="ocean-slider-row">
+        <label for="slider-N"><span class="trait-key">N</span> Neuroticism</label>
+        <input type="range" id="slider-N" min="0" max="100" value="50" />
+        <span class="slider-val" id="val-N">0.50</span>
+      </div>
+    </div>
+    <div class="settings-actions">
+      <button id="ocean-reset" class="ctrl" type="button">Reset to preset</button>
+      <button id="ocean-done"  class="ctrl primary" type="button">Done</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="settings-dialog" class="settings-dialog">
+  <form method="dialog">
+    <header class="settings-header">
+      <h2>Settings</h2>
+      <button id="settings-close" class="ctrl" title="Close">×</button>
+    </header>
+    <label class="settings-row">
+      <span>Anthropic API key (optional — bypasses rate limit)</span>
+      <input id="settings-key-input" type="password" autocomplete="off" placeholder="sk-ant-…" />
+    </label>
+    <p class="muted settings-hint">Stored only in your browser's localStorage.</p>
+    <div class="settings-actions">
+      <button id="settings-clear" class="ctrl">Clear</button>
+      <button id="settings-save"  class="ctrl primary">Use this key</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

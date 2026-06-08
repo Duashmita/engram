@@ -1,0 +1,25 @@
+# Secrets — never commit
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Runtime / generated
+data/
+.llm_cache/
+docs/sessions/
+.DS_Store
+.claude
+
+# Large regenerable character assets (re-create with scripts/generate_characters.py).
+# guard/ is committed as a working demo character; the rest are ignored.
+docs/assets/characters/merchant/
+docs/assets/characters/clerk/
+docs/assets/characters/jeanie/
+docs/assets/characters/maya/
+docs/assets/characters/hale/

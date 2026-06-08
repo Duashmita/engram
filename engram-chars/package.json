@@ -1,0 +1,12 @@
+{
+  "name": "engram-chars",
+  "version": "0.1.0",
+  "description": "Engram NPC memory with 3D Meshy characters",
+  "type": "module",
+  "scripts": {
+    "serve": "python3 -m http.server 8080 --directory docs",
+    "generate": "python3 scripts/generate_characters.py",
+    "generate:all": "python3 scripts/generate_characters.py --all",
+    "generate:desc": "python3 scripts/generate_characters.py --desc-only --all"
+  }
+}

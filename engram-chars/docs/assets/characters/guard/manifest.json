@@ -1,0 +1,26 @@
+{
+  "preset": "guard",
+  "name": "Rico (Paranoid)",
+  "description": "A lean, sinewy man in his late thirties with a weathered face marked by deep lines around the eyes and mouth, conveying years of hardship and loss. His posture is defensive\u2014shoulders drawn inward, head slightly forward as though perpetually braced against bad news\u2014with calloused hands held close to his body and jaw clenched tight. His expression is distant and guarded, the gaze of someone who trusts nothing and watches everything. T-pose, humanoid, game character, realistic proportions.",
+  "ocean": {
+    "O": 0.2,
+    "C": 0.5,
+    "E": 0.3,
+    "A": 0.2,
+    "N": 0.9
+  },
+  "base": "assets/characters/guard/base.glb",
+  "animations": {
+    "looking": "assets/characters/guard/looking.glb",
+    "talking": "assets/characters/guard/talking.glb",
+    "idle": "assets/characters/guard/idle.glb",
+    "shaking": "assets/characters/guard/shaking.glb",
+    "thinking": "assets/characters/guard/thinking.glb",
+    "surprised": "assets/characters/guard/surprised.glb",
+    "getting_hit": "assets/characters/guard/getting_hit.glb",
+    "scared": "assets/characters/guard/scared.glb",
+    "combat": "assets/characters/guard/combat.glb",
+    "dying": "assets/characters/guard/dying.glb"
+  },
+  "idle_anim": "idle"
+}

@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+sse-starlette>=2.0
+anthropic>=0.40.0
+voyageai>=0.3.0
+numpy>=1.24
+pydantic>=2.5
+requests>=2.31
+# modal>=0.62  # only needed for cloud deployment
+# pyswip>=0.2.10  # only needed if SWI-Prolog is installed
