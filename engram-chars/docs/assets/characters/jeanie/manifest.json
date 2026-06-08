@@ -1,0 +1,15 @@
+{
+  "preset": "jeanie",
+  "name": "Jeanie",
+  "description": "Jeanie is a 26-year-old woman with an angular, sharp-featured face marked by high cheekbones and an intense, focused gaze that rarely softens. Her posture is rigidly upright with shoulders drawn back and slightly tensed, as if bracing against an invisible force, while her jaw carries a subtle clench that speaks to constant vigilance. Her frame is lean and precisely maintained, with movements that suggest disciplined control, yet her eyes hold a darting quality and her brow furrows easily\u2014betraying the anxiety beneath her composed exterior. T-pose, humanoid, game character, realistic proportions.",
+  "ocean": {
+    "O": 0.65,
+    "C": 0.85,
+    "E": 0.4,
+    "A": 0.65,
+    "N": 0.85
+  },
+  "base": "assets/characters/jeanie/base.glb",
+  "animations": {},
+  "idle_anim": "idle"
+}

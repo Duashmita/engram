@@ -1,0 +1,15 @@
+{
+  "preset": "hale",
+  "name": "Inspector Hale",
+  "description": "A lean, angular man in his early fifties with a sharp, hawkish face\u2014pronounced cheekbones, deep-set eyes, and a thin-lipped mouth habitually compressed into a flat line. His spine is rigid and perfectly aligned, shoulders squared back, chest forward; his arms hang close to his sides with minimal space between elbows and ribs, conveying coiled restraint rather than relaxation. His jaw is perpetually tensed, the muscles at his temples faintly visible, and his gaze carries the thousand-yard stare of someone who has catalogued too many crime scenes\u2014every glance reads as surveillance, every facial micro-expression locked behind a wall of professional detachment. T-pose, humanoid, game character, realistic proportions.",
+  "ocean": {
+    "O": 0.4,
+    "C": 0.85,
+    "E": 0.3,
+    "A": 0.2,
+    "N": 0.25
+  },
+  "base": "assets/characters/hale/base.glb",
+  "animations": {},
+  "idle_anim": "idle"
+}

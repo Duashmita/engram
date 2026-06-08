@@ -1,0 +1,15 @@
+{
+  "preset": "maya",
+  "name": "Maya",
+  "description": "Maya is a 34-year-old woman with a lean, slightly slouched build and rounded shoulders from years hunched over pottery wheels and canvases. Her face is soft and open with a naturally warm expression, expressive eyebrows positioned high with a characteristic curious tilt, and eyes that crinkle at the corners from frequent animated conversation. She holds herself with relaxed, generous posture\u2014chest open, shoulders back just enough to suggest physical expressiveness and approachability, with an easy asymmetrical stance that conveys someone perpetually mid-gesture or mid-thought. T-pose, humanoid, game character, realistic proportions.",
+  "ocean": {
+    "O": 0.9,
+    "C": 0.2,
+    "E": 0.85,
+    "A": 0.8,
+    "N": 0.4
+  },
+  "base": "assets/characters/maya/base.glb",
+  "animations": {},
+  "idle_anim": "idle"
+}

@@ -16,10 +16,6 @@ data/
 docs/sessions/
 .DS_Store
 
-# Large regenerable character assets (re-create with scripts/generate_characters.py).
-# guard/ is committed as a working demo character; the rest are ignored.
-docs/assets/characters/merchant/
-docs/assets/characters/clerk/
-docs/assets/characters/jeanie/
-docs/assets/characters/maya/
-docs/assets/characters/hale/
+# Character GLBs ARE committed (preloaded preset models). Re-create any with
+# scripts/generate_characters.py. Only ignore each preset's resumable state file.
+docs/assets/characters/*/state.json

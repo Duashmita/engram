@@ -1,0 +1,15 @@
+{
+  "preset": "clerk",
+  "name": "Rico (Rigid)",
+  "description": "A lean, sinewy man in his late thirties with a rigid spine that never seems to relax, shoulders pulled back in a posture of perpetual readiness. His face is angular and austere, with a sharp jawline and hooded eyes that hold an impenetrable, almost suspicious expression\u2014the corners of his mouth barely moving, locked in a thin line of controlled reserve. His arms rest unnaturally close to his torso, fingers slightly curled inward as though guarding something invisible; even at rest, every muscle appears tensed, contained, waiting.\n\nT-pose, humanoid, game character, realistic proportions.",
+  "ocean": {
+    "O": 0.1,
+    "C": 0.9,
+    "E": 0.3,
+    "A": 0.5,
+    "N": 0.4
+  },
+  "base": "assets/characters/clerk/base.glb",
+  "animations": {},
+  "idle_anim": "idle"
+}

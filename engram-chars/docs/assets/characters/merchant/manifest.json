@@ -1,0 +1,15 @@
+{
+  "preset": "merchant",
+  "name": "Rico (Friendly)",
+  "description": "A stocky man in his late thirties with a broad chest and thick forearms built from decades of dock work, standing with shoulders rolled back and arms naturally spaced wide in an open, inviting posture. His face is broad-jawed with a rounded softness around the cheeks and kind crinkles at the eyes suggesting frequent smiling, with relaxed facial muscles and a warm, genuine expression that puts others at ease. His stance is grounded and centered, weight evenly distributed with a slight forward lean that conveys approachability and calm confidence.\n\nT-pose, humanoid, game character, realistic proportions.",
+  "ocean": {
+    "O": 0.5,
+    "C": 0.5,
+    "E": 0.9,
+    "A": 0.8,
+    "N": 0.2
+  },
+  "base": "assets/characters/merchant/base.glb",
+  "animations": {},
+  "idle_anim": "idle"
+}
