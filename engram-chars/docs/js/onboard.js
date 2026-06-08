@@ -197,7 +197,11 @@ export function startOnboarding({ onComplete }) {
     const sync = () => { next.disabled = !ta.value.trim(); };
     ta.addEventListener('input', sync);
     ta.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && ta.value.trim()) next.click();
+      // Enter advances; Shift+Enter inserts a newline.
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (ta.value.trim()) next.click();
+      }
     });
     next.addEventListener('click', () => {
       data.answers[idx] = { question: item.q, answer: ta.value.trim() };
