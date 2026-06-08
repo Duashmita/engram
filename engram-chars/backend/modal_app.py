@@ -1057,9 +1057,9 @@ if modal is not None:
     @app.function(
         image=image,
         # Create with:
-        #   modal secret create engram-keys \
+        #   modal secret create engramchar-keys \
         #     ANTHROPIC_API_KEY=sk-ant-... VOYAGE_API_KEY=pa-... MESHY_API_KEY=msy_...
-        secrets=[modal.Secret.from_name("engram-keys")],
+        secrets=[modal.Secret.from_name("engramchar-keys")],
         # Pinned to a single container so SESSIONS (in-process dict) and the
         # bus singleton + Prolog state all stay coherent across requests.
         # Sticky sessions across containers would require modal.Dict + agent
