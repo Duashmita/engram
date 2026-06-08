@@ -27,8 +27,12 @@ export function freshState(header) {
 
     session_window: [],    // [{player, npc}]
     summaries: [],         // strings
-    facts: [],             // {kind:'asserted'|'revised'|'rejected', fact, old?}
-    key_memories: [],      // {ids, count}
+    // Seed Prolog facts the backend already has (preset relationships, etc.).
+    facts: (header?.initial_facts ?? []).map(f => ({ kind: 'asserted', fact: f })),
+    // Seed promoted key memories (ids resolve against state.memories above).
+    key_memories: (header?.key_memory_ids?.length)
+      ? { ids: header.key_memory_ids, count: header.key_memory_ids.length }
+      : [],
 
     turns: [],             // per-turn aggregates (see makeTurn)
     transcript: [],        // {who:'player'|'npc', text, mode?, turn}

@@ -544,6 +544,21 @@ def _build_header(agent: NPCAgent) -> dict:
     """Mirror chat.py's _build_viz_header but populate from a live agent."""
     p = agent.config.profile
     mems = list(agent.memory_manager.all_memories)
+
+    # Promote key memories now so the "Key memories" panel shows the character's
+    # most salient backstory from the start (normally promotion happens at end of
+    # session). Also surface seeded Prolog facts. Both load outside the event bus,
+    # so without this the panel stays empty until a turn fires.
+    ks = getattr(agent.memory_manager, "keystore", None)
+    key_ids, facts = [], []
+    if ks is not None:
+        try:
+            ks.update(mems, p)
+            key_ids = [m.id for m in getattr(ks, "_key_memories", [])]
+            facts = list(getattr(ks, "_fact_strings", []))
+        except Exception as exc:  # noqa: BLE001
+            log.warning("key-memory promotion at start failed: %s", exc)
+
     return {
         "npc_id": agent.config.npc_id,
         "npc_name": agent.config.name,
@@ -554,6 +569,8 @@ def _build_header(agent: NPCAgent) -> dict:
         # (these load on the backend outside the event bus, so they'd otherwise
         # be invisible until the first turn).
         "initial_memories": [_serialize_memory(m) for m in mems],
+        "key_memory_ids": key_ids,        # promoted top memories (by id)
+        "initial_facts": facts,           # seeded Prolog facts
         "config": {
             "retrieval_threshold": engram_config.RETRIEVAL_THRESHOLD,
             "top_k": engram_config.TOP_K_RETRIEVAL,

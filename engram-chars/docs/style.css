@@ -839,13 +839,15 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 .right-col {
   flex: 1 1 0;
   display: grid;
-  /* row 1: OCEAN (auto), row 2: pipeline capped, row 3: transcript gets the rest */
-  grid-template-rows: auto minmax(0, 0.9fr) minmax(0, 1.4fr);
-  grid-template-columns: 1fr 240px;
+  /* Single column, stacked top to bottom:
+     transcript (largest), memory + key/prolog, OCEAN, then the engram map. */
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, 1.5fr) minmax(0, 1.1fr) auto minmax(0, 0.8fr);
   grid-template-areas:
-    "panel-a panel-a"
-    "panel-b panel-c"
-    "panel-d panel-c";
+    "panel-d"
+    "panel-c"
+    "panel-a"
+    "panel-b";
   gap: 10px;
   padding: 10px;
   overflow: hidden;
@@ -853,25 +855,26 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 }
 /* min-height/min-width: 0 lets grid children shrink so inner content scrolls
    instead of expanding the row and pushing siblings off-screen */
-.right-col .panel-a { grid-area: panel-a; max-height: 220px; min-height: 0; min-width: 0; }
-.right-col .panel-b { grid-area: panel-b; min-height: 0; min-width: 0; overflow: hidden; }
-.right-col .panel-c { grid-area: panel-c; min-height: 0; min-width: 0; overflow: hidden; }
 .right-col .panel-d { grid-area: panel-d; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
+.right-col .panel-c { grid-area: panel-c; min-height: 0; min-width: 0; overflow: hidden; }
+.right-col .panel-a { grid-area: panel-a; min-height: 0; min-width: 0; }
+.right-col .panel-b { grid-area: panel-b; min-height: 0; min-width: 0; overflow: hidden; }
 
-/* Compact OCEAN radar row in the right column */
-.right-col .radar-wrap {
-  height: 120px;
-}
+/* Compact OCEAN strip, sits below the key memories + Prolog panel */
 .right-col #panel-a {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: auto 130px 1fr;
   align-items: center;
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 10px 14px;
+  max-height: 170px;
 }
-.right-col #panel-a .panel-header { writing-mode: vertical-lr; font-size: 10px; }
-.right-col #panel-a .radar-wrap { flex: 0 0 110px; height: 110px; }
-.right-col #panel-a .ocean-readout { flex: 1; font-size: 11px; line-height: 1.8; }
+.right-col #panel-a .panel-header { flex: 0 0 auto; margin: 0; }
+.right-col #panel-a .radar-wrap { height: 130px; padding: 0; }
+.right-col #panel-a .ocean-readout {
+  margin: 0; border-top: none; padding: 0;
+  font-size: 11px; line-height: 1.9;
+}
 .right-col #panel-a .persona { display: none; }
 
 /* ── Responsive: stack vertically on narrow screens ─────────── */
