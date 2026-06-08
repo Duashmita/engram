@@ -388,18 +388,27 @@ function closeStart() {
 }
 
 // Load the selected character into the start-screen viewport (see their face).
+// IMPORTANT: create the WebGL renderer ONCE per canvas, then only swap the model
+// on each selection. Re-creating a WebGLRenderer on every click loses the WebGL
+// context (browsers cap active contexts) and the viewport freezes after a few
+// selections, which looks like "can't select".
 async function previewEntry(entry, canvas) {
   if (!canvas) return;
-  if (previewChar) { previewChar.dispose?.(); previewChar = null; }
   try {
-    if (entry.source === 'custom' && entry.glbUrl) {
+    if (!previewChar || previewChar._canvas !== canvas) {
+      if (previewChar) { previewChar.dispose?.(); previewChar = null; }
       previewChar = await createCharacter(canvas, null, { previewOnly: true });
-      await previewChar.loadModelFromUrl(`${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(entry.glbUrl)}`);
-    } else {
-      previewChar = await createCharacter(canvas, entry.assetPath || null, { previewOnly: true });
+      previewChar._canvas = canvas;
+      previewChar.setBreathing?.(true);
+      previewChar.lookAtPointer?.(true);
     }
-    previewChar.setBreathing?.(true);
-    previewChar.lookAtPointer?.(true);
+    let url = null;
+    if (entry.source === 'custom' && entry.glbUrl) {
+      url = `${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(entry.glbUrl)}`;
+    } else if (entry.assetPath) {
+      url = `${entry.assetPath}/base.glb`;
+    }
+    if (url && previewChar.loadModelFromUrl) await previewChar.loadModelFromUrl(url);
   } catch (e) { console.warn('[preview] failed', e); }
 }
 
