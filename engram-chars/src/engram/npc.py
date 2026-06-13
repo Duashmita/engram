@@ -288,6 +288,13 @@ class NPCAgent:
         state = {
             "turn_count": self.turn_count,
             "history": self.history,
+            "baseline_ocean": {
+                "O": self.profile.O,
+                "C": self.profile.C,
+                "E": self.profile.E,
+                "A": self.profile.A,
+                "N": self.profile.N,
+            },
             "profile_deltas": {
                 "_dO": self.profile._dO,
                 "_dC": self.profile._dC,
@@ -315,6 +322,15 @@ class NPCAgent:
 
         self.turn_count = int(state.get("turn_count", 0))
         self.history = list(state.get("history", []))
+
+        baseline = state.get("baseline_ocean", {})
+        if baseline:
+            self.config.profile.O = float(baseline.get("O", 0.5))
+            self.config.profile.C = float(baseline.get("C", 0.5))
+            self.config.profile.E = float(baseline.get("E", 0.5))
+            self.config.profile.A = float(baseline.get("A", 0.5))
+            self.config.profile.N = float(baseline.get("N", 0.5))
+
         deltas = state.get("profile_deltas", {})
         for attr in ("_dO", "_dC", "_dE", "_dA", "_dN"):
             setattr(self.profile, attr, float(deltas.get(attr, 0.0)))

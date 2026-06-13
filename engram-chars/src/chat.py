@@ -216,21 +216,28 @@ def _build_config_interactive() -> NPCConfig:
 def _build_config_from_name(name: str, data_dir: str) -> NPCConfig:
     """Resume an existing NPC by name. Errors if no state exists."""
     npc_id = _slugify(name)
-    if not _existing_state_path(data_dir, npc_id):
+    state_path = _existing_state_path(data_dir, npc_id)
+    if not state_path:
         raise SystemExit(
             f"No saved NPC named '{name}' under {data_dir}/. "
             f"Drop --name to create one interactively, or use --fresh."
         )
-    # Resume requires SOME config, persona/backstory aren't persisted in state.json,
-    # so we reconstruct a minimal config from the directory and let memory + facts
-    # carry the personality continuity. Profile is restored from history but baseline
-    # OCEAN values aren't in state.json, so we default to 0.5 across.
+    # Load baseline OCEAN from state.json if available
+    ocean = {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5}
+    try:
+        with open(state_path, "r", encoding="utf-8") as fh:
+            state = json.load(fh)
+            baseline = state.get("baseline_ocean", {})
+            if baseline:
+                ocean = {k: float(baseline.get(k, 0.5)) for k in ocean}
+    except (json.JSONDecodeError, OSError):
+        pass
     return NPCConfig(
         npc_id=npc_id,
         name=name,
         persona=f"{name} resuming a prior session.",
         backstory=[],
-        profile=OCEANProfile(name=name, O=0.5, C=0.5, E=0.5, A=0.5, N=0.5),
+        profile=OCEANProfile(name=name, **ocean),
         initial_facts=[],
     )
 
