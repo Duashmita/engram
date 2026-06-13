@@ -8,3 +8,8 @@ node_modules
 
 # local SQLite fallback (backend/db.py)
 engram.sqlite3*
+
+# OS / env / caches
+.DS_Store
+.venv/
+.llm_cache/
