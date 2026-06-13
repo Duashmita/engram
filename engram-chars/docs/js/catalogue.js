@@ -185,7 +185,7 @@ export function showStartScreen(options) {
   headerTop.appendChild(el('div', 'cat-brand', 'Engram'));
   const links = el('nav', 'cat-links');
   links.setAttribute('aria-label', 'Project links');
-  const paperLink = el('a', 'cat-link', 'Paper');
+  const paperLink = el('a', 'cat-link cat-link-cta', 'Paper');
   paperLink.href = PAPER_URL;
   paperLink.target = '_blank';
   paperLink.rel = 'noopener';

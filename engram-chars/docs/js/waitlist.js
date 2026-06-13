@@ -68,6 +68,8 @@ async function submit() {
   if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Join waitlist'; }
 
   if (joined) {
+    // Remember the signup so the in-chat auto-prompt never nags this user again.
+    try { localStorage.setItem('engram_waitlist_joined', '1'); } catch (_) { /* private mode */ }
     setStatus("You're on the list! We'll be in touch at " + email + '.', true);
   } else {
     // Endpoint missing or unreachable: hand off to the user's mail client and

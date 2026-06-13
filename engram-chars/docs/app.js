@@ -325,9 +325,13 @@ function boot() {
     document.getElementById('settings-dialog').showModal();
   });
 
-  // Export to Unity (placeholder, no functionality yet).
+  // Unity export isn't live yet — route the click to the waitlist so interested
+  // users can register their interest. Falls back to the toast if the dialog
+  // module fails to load.
   document.getElementById('btn-unity')?.addEventListener('click', () => {
-    showToast('Unity export coming soon');
+    import('./js/waitlist.js')
+      .then(m => m.openWaitlist?.())
+      .catch(() => showToast('Unity export coming soon'));
   });
 
   // Prepare Live-mode UI chrome (kept hidden behind the start/onboarding overlay).

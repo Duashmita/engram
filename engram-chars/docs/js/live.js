@@ -36,6 +36,7 @@ let currentSessionId = null;
 let npcId            = null;
 let inFlight         = false; // one /turn at a time
 let messageQueue     = [];    // messages typed while a turn is in-flight
+let userTurnCount    = 0;     // completed user turns this page-load (waitlist nudge)
 let beaconInstalled  = false;
 // Pending OCEAN overrides. null = use preset baseline; set when user edits sliders.
 let pendingOcean     = null;
@@ -722,6 +723,7 @@ async function sendMessage(text) {
 
   updateQueueStatus('streaming…');
   await consumeSSE(res);
+  userTurnCount += 1;
 
   inFlight = false;
   document.getElementById('composer-input')?.focus();
@@ -733,7 +735,23 @@ async function sendMessage(text) {
     await sendMessage(next);
   } else {
     setComposerStatus('');
+    // Conversation has settled — once they've had a couple of exchanges, invite
+    // them onto the waitlist (once per browser).
+    maybePromptWaitlist();
   }
+}
+
+// After a couple of exchanges with a character, gently invite the user onto the
+// waitlist so they can use these characters in their own game when it's live.
+// Fires once per browser and never if they've already joined.
+function maybePromptWaitlist() {
+  if (userTurnCount < 2) return;
+  try {
+    if (localStorage.getItem('engram_waitlist_joined')) return;
+    if (localStorage.getItem('engram_waitlist_prompted')) return;
+    localStorage.setItem('engram_waitlist_prompted', '1');
+  } catch (_) { /* private mode: still prompt this once */ }
+  import('./waitlist.js').then(m => m.openWaitlist?.()).catch(() => {});
 }
 
 function updateQueueStatus(prefix = '') {
