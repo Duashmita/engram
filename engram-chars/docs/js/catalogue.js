@@ -8,9 +8,8 @@
 // All styles live in catalogue.css (the app links it). Classes use a cat- prefix.
 
 // Research links shown in the panel header.
-// TODO: set real URL for the paper and the repository.
-const PAPER_URL = '#';
-const GITHUB_URL = 'https://github.com/';
+const PAPER_URL = 'https://camps.aptaracorp.com/ACM_PMS/PMS/ACM/FDG26/102/03e19e98-4a72-11f1-b513-16ffd757ba29/OUT/fdg26-102.html';
+const GITHUB_URL = 'https://github.com/Duashmita/engram';
 
 const STORAGE_KEY = 'engram_catalogue';
 const OCEAN_KEYS = ['O', 'C', 'E', 'A', 'N'];
@@ -188,6 +187,8 @@ export function showStartScreen(options) {
   links.setAttribute('aria-label', 'Project links');
   const paperLink = el('a', 'cat-link', 'Paper');
   paperLink.href = PAPER_URL;
+  paperLink.target = '_blank';
+  paperLink.rel = 'noopener';
   const ghLink = el('a', 'cat-link', 'GitHub');
   ghLink.href = GITHUB_URL;
   ghLink.target = '_blank';
