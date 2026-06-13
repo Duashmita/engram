@@ -61,6 +61,13 @@ from engram.npc import NPCAgent  # noqa: E402
 from engram.observability import bus  # noqa: E402
 from engram.presets import PRESETS, get_preset  # noqa: E402
 
+# SQLite persistence layer (backend/db.py). Same dual-path dance as src above:
+# next to this file in local dev, under /root/engram/backend in the container.
+for _candidate in (_THIS_DIR, "/root/engram/backend"):
+    if os.path.isdir(_candidate) and _candidate not in sys.path:
+        sys.path.insert(0, _candidate)
+import db as engram_db  # noqa: E402
+
 
 log = logging.getLogger("engram.backend")
 if not log.handlers:
@@ -77,7 +84,7 @@ log.setLevel(logging.INFO)
 SESSION_TTL_S = 3600
 HARD_TURN_CAP = 30
 # Rate limits apply to the shared-key path (no BYOK). The onboarding wizard fires
-# several calls per character (infer_ocean, appearance, greeting, start, …), so
+# several calls per character (infer_character, greeting, start, …), so
 # keep these generous, the old 5/min tripped mid-wizard and surfaced as
 # "personality model unreachable".
 RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "120"))
@@ -88,15 +95,52 @@ _SESSION_BASE_DIR = "/tmp/engram_sessions"
 # ---------------------------------------------------------------------------
 # Device-persistent memory store
 # ---------------------------------------------------------------------------
-# In-process fallback (local dev / Modal single-container). Modal.Dict is
-# wired in at the bottom of this file where `modal` is available.
+# Backed by SQLite (backend/db.py); on Modal the DB lives on a persistent
+# Volume mounted at /data (wired in the Modal block at the bottom). The
+# in-process dict is a last-resort fallback when the DB is unavailable.
+# Keys are "<device_id>:<npc_id>".
 _DEVICE_MEM: dict = {}
 
+
+def _split_device_key(key: str) -> tuple[str, str]:
+    device_id, _, npc_id = key.partition(":")
+    return npc_id, device_id
+
+
+def _legacy_device_get(key: str) -> dict | None:
+    """Read from the pre-SQLite modal.Dict store. Overridden in the Modal
+    block when that Dict is reachable; no-op everywhere else."""
+    return None
+
+
 def _device_get(key: str) -> dict | None:
+    npc_id, device_id = _split_device_key(key)
+    try:
+        saved = engram_db.load_npc_snapshot(npc_id, device_id)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("db snapshot load failed key=%s…: %s", key[:12], exc)
+        saved = None
+    if saved is not None:
+        return saved
+    # One-time lazy migration from the legacy modal.Dict store.
+    legacy = _legacy_device_get(key)
+    if legacy:
+        try:
+            engram_db.save_npc_snapshot(npc_id, device_id, legacy)
+            log.info("migrated legacy device memory key=%s…", key[:12])
+        except Exception:  # noqa: BLE001
+            pass
+        return legacy
     return _DEVICE_MEM.get(key)
 
+
 def _device_put(key: str, value: dict) -> None:
-    _DEVICE_MEM[key] = value
+    npc_id, device_id = _split_device_key(key)
+    try:
+        engram_db.save_npc_snapshot(npc_id, device_id, value)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("db snapshot save failed key=%s…: %s", key[:12], exc)
+        _DEVICE_MEM[key] = value
 
 
 def _restore_device_memory(device_id: str, npc_id: str, data_dir_root: str) -> bool:
@@ -175,6 +219,21 @@ def _save_device_memory(sess: "_Session") -> None:
     if data:
         _device_put(key, data)
         log.info("device memory saved device=%s npc=%s", sess.device_id[:8], sess.npc_id)
+        # Append to the attribution ledger so the NPC's accumulated memories
+        # stay traceable to the speaker who was present when they formed.
+        try:
+            engram_db.append_memories(sess.npc_id, sess.device_id, [
+                {
+                    "id": m.get("id"),
+                    "text": m.get("text"),
+                    "source": m.get("source"),
+                    "importance": (m.get("tags") or {}).get("importance"),
+                    "tags": m.get("tags"),
+                }
+                for m in (data.get("memories") or []) if isinstance(m, dict)
+            ])
+        except Exception as exc:  # noqa: BLE001
+            log.warning("memory ledger append failed npc=%s: %s", sess.npc_id, exc)
 
 
 # ---------------------------------------------------------------------------
@@ -222,12 +281,17 @@ class TurnReq(BaseModel):
     gemini_key: Optional[str] = None  # kept for backwards compat
 
 
-class EndReq(BaseModel):
-    session_id: str
+# /end parses its body manually (beacons send text/plain), no model needed.
 
 
 class InferOceanReq(BaseModel):
     qa: list  # [{"question": str, "answer": str}, ...]
+    anthropic_key: Optional[str] = None
+
+
+class InferCharacterReq(BaseModel):
+    qa: list  # [{"question": str, "answer": str}, ...]
+    name: Optional[str] = ""
     anthropic_key: Optional[str] = None
 
 
@@ -243,6 +307,9 @@ class GreetingReq(BaseModel):
     persona: Optional[str] = ""
     ocean: dict
     anthropic_key: Optional[str] = None
+    # When set, the greeting is recorded in that session's history so the
+    # NPC knows it already spoke first.
+    session_id: Optional[str] = None
 
 
 class GenerateCharacterReq(BaseModel):
@@ -463,6 +530,10 @@ def _purge_expired() -> None:
         s = SESSIONS.pop(sid, None)
         if s is not None:
             _save_device_memory(s)
+            try:
+                engram_db.record_session_end(sid, s.turn_count)
+            except Exception:  # noqa: BLE001
+                pass
             shutil.rmtree(s.data_dir, ignore_errors=True)
             log.info("session expired sid=%s npc=%s", sid, s.npc_id)
 
@@ -583,6 +654,85 @@ def _build_header(agent: NPCAgent) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Onboarding-wizard LLM helpers (shared by /infer_character, /infer_ocean,
+# /appearance so the legacy endpoints stay behaviour-identical)
+# ---------------------------------------------------------------------------
+
+def _rate_gate(byok: Optional[str], request: Request) -> Optional[JSONResponse]:
+    """Apply the shared-key rate limit when no BYOK key is supplied.
+
+    Returns a 429 JSONResponse to short-circuit with, or None to proceed.
+    """
+    if byok:
+        return None
+    ip = _client_ip(request)
+    ok, retry = _check_rate(ip)
+    if not ok:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "rate_limited", "retry_after_s": retry},
+        )
+    return None
+
+
+def _format_qa(qa: Optional[list]) -> str:
+    """Render onboarding Q&A pairs into a prompt block."""
+    qa_lines = []
+    for item in (qa or []):
+        if isinstance(item, dict):
+            q = str(item.get("question", "")).strip()
+            a = str(item.get("answer", "")).strip()
+            if q or a:
+                qa_lines.append(f"Q: {q}\nA: {a}")
+    return "\n\n".join(qa_lines) or "(no answers provided)"
+
+
+# Shared between /appearance and /infer_character so the appearance rules
+# stay identical (Meshy needs the exact T-pose suffix).
+_APPEARANCE_RULES = (
+    "- Focus on body build, posture, facial structure, and expression.\n"
+    "- Let the personality show through body language.\n"
+    "- Do NOT mention any colors.\n"
+    "- End the description with exactly: T-pose, humanoid, game character, "
+    "realistic proportions."
+)
+
+_OCEAN_TRAIT_LINES = (
+    "- O: Openness\n- C: Conscientiousness\n- E: Extraversion\n"
+    "- A: Agreeableness\n- N: Neuroticism"
+)
+
+_ARCHETYPE_RULE = (
+    "a short, evocative archetype: a 2-4 word "
+    "title that captures their personality like a character class or trope "
+    "(e.g. \"The Wary Sentinel\", \"The Open Wanderer\", \"The Rigid "
+    "Archivist\", \"The Warm Broker\")"
+)
+
+
+def _parse_ocean_result(result: dict) -> tuple[dict[str, float], str, str]:
+    """Pull (ocean, summary, archetype) out of an LLM JSON result, clamped."""
+    ocean: dict[str, float] = {}
+    for trait in ('O', 'C', 'E', 'A', 'N'):
+        try:
+            val = float(result.get(trait, 0.5))
+        except (TypeError, ValueError):
+            val = 0.5
+        ocean[trait] = round(max(0.0, min(1.0, val)), 3)
+
+    summary = result.get("summary", "")
+    if not isinstance(summary, str):
+        summary = str(summary)
+
+    archetype = result.get("archetype", "")
+    if not isinstance(archetype, str):
+        archetype = str(archetype)
+    archetype = archetype.strip() or "The Enigma"
+
+    return ocean, summary, archetype
+
+
+# ---------------------------------------------------------------------------
 # FastAPI app
 # ---------------------------------------------------------------------------
 
@@ -634,9 +784,28 @@ async def start(body: StartReq, request: Request, x_anthropic_key: Optional[str]
 
     # Restore saved device memory before agent construction so NPCAgent
     # finds state.json and skips _init_backstory().
+    speaker_line = None
     if body.device_id:
         restored = _restore_device_memory(body.device_id, npc_id, data_dir_root)
         log.info("device %s npc=%s restored=%s", body.device_id[:8], npc_id, restored)
+        # Speaker awareness: the NPC knows different people talk to it across
+        # visits. Situational context only — personality still flows from OCEAN.
+        try:
+            ctx = engram_db.speaker_context(npc_id, body.device_id)
+            who = ctx["speaker_label"] + (
+                ", who has visited you before" if ctx["is_returning"]
+                else ", meeting you for the first time"
+            )
+            n_speakers = ctx["distinct_speakers"]
+            speaker_line = (
+                "Situational context: different people speak with you across "
+                f"visits, and you can tell them apart. Right now you are "
+                f"speaking with {who}. You have met "
+                f"{n_speakers} different {'person' if n_speakers == 1 else 'people'} "
+                f"across {ctx['total_sessions'] + 1} visits."
+            )
+        except Exception as exc:  # noqa: BLE001
+            log.warning("speaker context failed npc=%s: %s", npc_id, exc)
 
     if body.custom:
         traits = _ocean_from_dict(body.ocean)
@@ -662,6 +831,9 @@ async def start(body: StartReq, request: Request, x_anthropic_key: Optional[str]
                         raise HTTPException(400, f"ocean.{trait} must be in [0, 1]")
                     setattr(config.profile, trait, round(val, 3))
 
+    if speaker_line:
+        config.persona = f"{config.persona}\n\n{speaker_line}"
+
     # Run agent construction OUTSIDE the live event bus, backstory init can
     # emit dozens of memory_added events that would otherwise race the SSE
     # response. We surface them in the header instead.
@@ -677,6 +849,13 @@ async def start(body: StartReq, request: Request, x_anthropic_key: Optional[str]
         npc_id=npc_id, agent=agent, llm=llm, data_dir=data_dir_root,
         device_id=body.device_id,
     )
+    try:
+        engram_db.record_session_start(
+            session_id, npc_id, body.device_id,
+            npc_name=config.name, kind="custom" if body.custom else "preset",
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning("session start record failed: %s", exc)
     log.info("session start sid=%s npc=%s mem=%d",
              session_id, npc_id, header["initial_memory_count"])
     return {"session_id": session_id, "header": header}
@@ -761,49 +940,157 @@ async def turn(body: TurnReq, request: Request, x_anthropic_key: Optional[str] =
 
 
 @api.post("/end")
-async def end(body: EndReq) -> Response:
-    """Drop a session and clean up its sandbox. Idempotent."""
+async def end(request: Request) -> Response:
+    """Drop a session and clean up its sandbox. Idempotent.
+
+    Parses the body manually so it accepts both application/json and
+    text/plain: the browser-close beacon must send text/plain, because
+    cross-origin beacons cannot preflight an application/json payload.
+    """
     _purge_expired()
-    sess = SESSIONS.pop(body.session_id, None)
+    try:
+        payload = json.loads((await request.body()).decode("utf-8") or "{}")
+    except Exception:  # noqa: BLE001
+        payload = {}
+    session_id = str(payload.get("session_id") or "")
+    sess = SESSIONS.pop(session_id, None)
     if sess is not None:
         try:
             # Best-effort end_session for symmetry with chat.py, never let
             # cleanup throw across the network boundary.
             sess.agent.end_session()
         except Exception as exc:  # noqa: BLE001
-            log.warning("agent.end_session failed sid=%s: %s", body.session_id, exc)
+            log.warning("agent.end_session failed sid=%s: %s", session_id, exc)
         _save_device_memory(sess)
+        try:
+            engram_db.record_session_end(session_id, sess.turn_count)
+        except Exception:  # noqa: BLE001
+            pass
         shutil.rmtree(sess.data_dir, ignore_errors=True)
         log.info("session end sid=%s npc=%s turns=%d",
-                 body.session_id, sess.npc_id, sess.turn_count)
+                 session_id, sess.npc_id, sess.turn_count)
     return Response(status_code=204)
+
+
+@api.post("/waitlist")
+async def waitlist(request: Request):
+    """Store a waitlist signup {email, note}. Accepts JSON or text/plain.
+    Returns ok even for duplicate emails (no signal leak, friendlier UX)."""
+    ip = _client_ip(request)
+    ok, retry = _check_rate(ip)
+    if not ok:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "rate_limited", "retry_after_s": retry},
+        )
+    try:
+        payload = json.loads((await request.body()).decode("utf-8") or "{}")
+    except Exception:  # noqa: BLE001
+        payload = {}
+    email = str(payload.get("email") or "").strip()
+    note = str(payload.get("note") or "").strip()[:2000]
+    if "@" not in email or "." not in email.rpartition("@")[2] or len(email) > 254:
+        raise HTTPException(400, "valid email required")
+    try:
+        engram_db.add_waitlist(email, note)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("waitlist add failed: %s", exc)
+        raise HTTPException(503, "waitlist storage unavailable")
+    log.info("waitlist signup %s", email)
+    return {"ok": True}
+
+
+@api.post("/infer_character")
+def infer_character(body: InferCharacterReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
+    """Combined onboarding inference: OCEAN + summary + archetype + 3D
+    appearance description in ONE Anthropic call.
+
+    Replaces the wizard's /infer_ocean + /appearance pair (both kept for
+    backwards compat). The prompt is schema-shaped to mirror the JSON output.
+    """
+    _purge_expired()
+
+    byok = body.anthropic_key or x_anthropic_key
+    gate = _rate_gate(byok, request)
+    if gate is not None:
+        return gate
+
+    llm = _resolve_llm(byok)
+
+    qa_text = _format_qa(body.qa)
+    name = (body.name or "").strip() or "the character"
+
+    prompt = (
+        "You are a personality psychologist and character designer. Below are "
+        "question-and-answer pairs describing what kind of person a fictional "
+        f"character named {name} is.\n\n"
+        f"{qa_text}\n\n"
+        "Do ALL of the following:\n"
+        "1. Infer this character's Big Five (OCEAN) personality traits, each "
+        "on a 0.0-1.0 scale (0.0 = very low, 1.0 = very high):\n"
+        f"{_OCEAN_TRAIT_LINES}\n"
+        "2. Write a 2-3 sentence personality summary of this character.\n"
+        f"3. Give this character {_ARCHETYPE_RULE}.\n"
+        "4. Write a 2-3 sentence physical appearance description for a 3D "
+        "character model, consistent with the inferred personality:\n"
+        f"{_APPEARANCE_RULES}\n\n"
+        "Respond with JSON only, exactly this shape:\n"
+        "{\n"
+        '  "O": <float 0.0-1.0>,\n'
+        '  "C": <float 0.0-1.0>,\n'
+        '  "E": <float 0.0-1.0>,\n'
+        '  "A": <float 0.0-1.0>,\n'
+        '  "N": <float 0.0-1.0>,\n'
+        '  "summary": "<2-3 sentence personality summary>",\n'
+        '  "archetype": "<2-4 word archetype>",\n'
+        '  "appearance_description": "<2-3 sentences ending with: T-pose, '
+        'humanoid, game character, realistic proportions.>"\n'
+        "}"
+    )
+
+    try:
+        result = llm.generate_json(prompt, max_tokens=768)
+    except Exception as exc:  # noqa: BLE001
+        log.exception("infer_character generate_json failed")
+        raise HTTPException(503, f"inference failed: {exc}")
+
+    if not isinstance(result, dict):
+        result = {}
+
+    ocean, summary, archetype = _parse_ocean_result(result)
+
+    appearance = result.get("appearance_description", "")
+    if not isinstance(appearance, str):
+        appearance = str(appearance)
+    appearance = appearance.strip()
+
+    log.info("infer_character ocean=%s archetype=%s appearance_len=%d",
+             ocean, archetype, len(appearance))
+    return {
+        "ocean": ocean,
+        "summary": summary,
+        "archetype": archetype,
+        "appearance_description": appearance,
+    }
 
 
 @api.post("/infer_ocean")
 def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
-    """Infer Big Five OCEAN scores + a personality summary from Q&A pairs."""
+    """Infer Big Five OCEAN scores + a personality summary from Q&A pairs.
+
+    Legacy endpoint, the wizard now calls /infer_character (one combined
+    LLM call). Kept for backwards compat; shares helpers with it.
+    """
     _purge_expired()
 
     byok = body.anthropic_key or x_anthropic_key
-    if not byok:
-        ip = _client_ip(request)
-        ok, retry = _check_rate(ip)
-        if not ok:
-            return JSONResponse(
-                status_code=429,
-                content={"error": "rate_limited", "retry_after_s": retry},
-            )
+    gate = _rate_gate(byok, request)
+    if gate is not None:
+        return gate
 
     llm = _resolve_llm(byok)
 
-    qa_lines = []
-    for item in (body.qa or []):
-        if isinstance(item, dict):
-            q = str(item.get("question", "")).strip()
-            a = str(item.get("answer", "")).strip()
-            if q or a:
-                qa_lines.append(f"Q: {q}\nA: {a}")
-    qa_text = "\n\n".join(qa_lines) or "(no answers provided)"
+    qa_text = _format_qa(body.qa)
 
     prompt = (
         "You are a personality psychologist. Below are question-and-answer pairs "
@@ -811,13 +1098,9 @@ def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Optional
         f"{qa_text}\n\n"
         "Infer this character's Big Five (OCEAN) personality traits, each on a "
         "0.0-1.0 scale (0.0 = very low, 1.0 = very high):\n"
-        "- O: Openness\n- C: Conscientiousness\n- E: Extraversion\n"
-        "- A: Agreeableness\n- N: Neuroticism\n\n"
+        f"{_OCEAN_TRAIT_LINES}\n\n"
         "Also write a 2-3 sentence personality summary of this character.\n\n"
-        "Finally, give this character a short, evocative archetype: a 2-4 word "
-        "title that captures their personality like a character class or trope "
-        "(e.g. \"The Wary Sentinel\", \"The Open Wanderer\", \"The Rigid "
-        "Archivist\", \"The Warm Broker\").\n\n"
+        f"Finally, give this character {_ARCHETYPE_RULE}.\n\n"
         "Respond with JSON only, with keys O, C, E, A, N (floats 0.0-1.0), "
         "summary (string), and archetype (string)."
     )
@@ -831,22 +1114,7 @@ def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Optional
     if not isinstance(result, dict):
         result = {}
 
-    ocean: dict[str, float] = {}
-    for trait in ('O', 'C', 'E', 'A', 'N'):
-        try:
-            val = float(result.get(trait, 0.5))
-        except (TypeError, ValueError):
-            val = 0.5
-        ocean[trait] = round(max(0.0, min(1.0, val)), 3)
-
-    summary = result.get("summary", "")
-    if not isinstance(summary, str):
-        summary = str(summary)
-
-    archetype = result.get("archetype", "")
-    if not isinstance(archetype, str):
-        archetype = str(archetype)
-    archetype = archetype.strip() or "The Enigma"
+    ocean, summary, archetype = _parse_ocean_result(result)
 
     log.info("infer_ocean ocean=%s archetype=%s", ocean, archetype)
     return {"ocean": ocean, "summary": summary, "archetype": archetype}
@@ -854,18 +1122,17 @@ def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Optional
 
 @api.post("/appearance")
 def appearance(body: AppearanceReq, request: Request, x_anthropic_key: Optional[str] = Header(None)) -> dict:
-    """Generate a 3D character appearance description from name, persona, OCEAN."""
+    """Generate a 3D character appearance description from name, persona, OCEAN.
+
+    The wizard only calls this on "Regenerate"; the first description comes
+    from the combined /infer_character call. Shares _APPEARANCE_RULES with it.
+    """
     _purge_expired()
 
     byok = body.anthropic_key or x_anthropic_key
-    if not byok:
-        ip = _client_ip(request)
-        ok, retry = _check_rate(ip)
-        if not ok:
-            return JSONResponse(
-                status_code=429,
-                content={"error": "rate_limited", "retry_after_s": retry},
-            )
+    gate = _rate_gate(byok, request)
+    if gate is not None:
+        return gate
 
     llm = _resolve_llm(byok)
 
@@ -879,11 +1146,7 @@ def appearance(body: AppearanceReq, request: Request, x_anthropic_key: Optional[
         f"Persona: {body.persona or '(none)'}\n"
         f"OCEAN personality (0.0-1.0): {ocean_text}\n\n"
         "Rules:\n"
-        "- Focus on body build, posture, facial structure, and expression.\n"
-        "- Let the personality show through body language.\n"
-        "- Do NOT mention any colors.\n"
-        "- End the description with exactly: T-pose, humanoid, game character, "
-        "realistic proportions.\n\n"
+        f"{_APPEARANCE_RULES}\n\n"
         "Respond with the description text only."
     )
 
@@ -904,14 +1167,9 @@ def greeting(body: GreetingReq, request: Request, x_anthropic_key: Optional[str]
     _purge_expired()
 
     byok = body.anthropic_key or x_anthropic_key
-    if not byok:
-        ip = _client_ip(request)
-        ok, retry = _check_rate(ip)
-        if not ok:
-            return JSONResponse(
-                status_code=429,
-                content={"error": "rate_limited", "retry_after_s": retry},
-            )
+    gate = _rate_gate(byok, request)
+    if gate is not None:
+        return gate
 
     llm = _resolve_llm(byok)
 
@@ -944,18 +1202,33 @@ def greeting(body: GreetingReq, request: Request, x_anthropic_key: Optional[str]
         raise HTTPException(503, f"greeting generation failed: {exc}")
 
     greeting_text = (greeting_text or "").strip().strip('"').strip("'").strip()
+    if body.session_id and greeting_text:
+        sess = SESSIONS.get(body.session_id)
+        if sess is not None:
+            # Record the unprompted opener so later turns know it was said.
+            sess.agent.history.append(
+                {"player": "(approaches for the first time)", "npc": greeting_text}
+            )
+            sess.last_used_ts = time.time()
     log.info("greeting generated name=%s len=%d", body.name, len(greeting_text))
     return {"greeting": greeting_text}
 
 
 @api.post("/generate_character")
-async def generate_character(body: GenerateCharacterReq) -> dict:
+async def generate_character(body: GenerateCharacterReq, request: Request):
     """Kick off a background Meshy text-to-3D pipeline (preview->refine->rig).
 
     Returns a job_id the frontend polls via /character_status. If no Meshy key
     is configured, returns {"job_id": None, "disabled": True} so the frontend
     keeps its grey placeholder instead of erroring.
     """
+    # Meshy jobs burn paid credits; always gate on the per-IP limiter.
+    ok, retry = _check_rate(_client_ip(request))
+    if not ok:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "rate_limited", "retry_after_s": retry},
+        )
     if not MESHY_API_KEY:
         log.info("generate_character disabled (no MESHY_API_KEY)")
         return {"job_id": None, "disabled": True}
@@ -994,9 +1267,15 @@ async def character_status(job_id: str) -> dict:
 
 
 @api.get("/proxy_glb")
-def proxy_glb(url: str):
+def proxy_glb(url: str, request: Request):
     """Stream a Meshy CDN GLB through our origin so the browser can load it
     without cross-origin (CORS) issues. Only allows Meshy asset URLs."""
+    ok, retry = _check_rate(_client_ip(request))
+    if not ok:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "rate_limited", "retry_after_s": retry},
+        )
     if not (url.startswith("https://assets.meshy.ai/") or url.startswith("https://api.meshy.ai/")):
         raise HTTPException(400, "only meshy asset urls are allowed")
     try:
@@ -1023,24 +1302,19 @@ except ImportError:  # pragma: no cover, local-dev fallback
 
 
 if modal is not None:
-    # Upgrade _DEVICE_MEM to a Modal.Dict so memory survives container restarts.
+    # Legacy pre-SQLite store: kept read-only so old device memories migrate
+    # lazily into the DB on first lookup (see _device_get).
     try:
         _modal_device_dict = modal.Dict.from_name("engram-device-memory", create_if_missing=True)
 
-        def _device_get(key: str) -> dict | None:  # noqa: F811
+        def _legacy_device_get(key: str) -> dict | None:  # noqa: F811
             try:
                 return _modal_device_dict.get(key)
             except Exception:
-                return _DEVICE_MEM.get(key)
-
-        def _device_put(key: str, value: dict) -> None:  # noqa: F811
-            try:
-                _modal_device_dict[key] = value
-            except Exception:
-                _DEVICE_MEM[key] = value
+                return None
 
     except Exception as _exc:
-        log.warning("modal.Dict unavailable, device memory is in-process only: %s", _exc)
+        log.warning("legacy modal.Dict unavailable, migration disabled: %s", _exc)
 
     app = modal.App("engram-demo")
     image = (
@@ -1054,12 +1328,16 @@ if modal is not None:
         )
     )
 
+    # Persistent SQLite home; db.py defaults to /data/engram.sqlite3.
+    _db_volume = modal.Volume.from_name("engram-db", create_if_missing=True)
+
     @app.function(
         image=image,
         # Create with:
         #   modal secret create engramchar-keys \
         #     ANTHROPIC_API_KEY=sk-ant-... VOYAGE_API_KEY=pa-... MESHY_API_KEY=msy_...
         secrets=[modal.Secret.from_name("engramchar-keys")],
+        volumes={"/data": _db_volume},
         # Pinned to a single container so SESSIONS (in-process dict) and the
         # bus singleton + Prolog state all stay coherent across requests.
         # Sticky sessions across containers would require modal.Dict + agent
@@ -1076,4 +1354,11 @@ if modal is not None:
         modal_src = "/root/engram/src"
         if modal_src not in sys.path:
             sys.path.insert(0, modal_src)
+        # Flush every committed DB write to the volume so memory survives
+        # container restarts and redeploys.
+        try:
+            engram_db.on_write = _db_volume.commit
+            engram_db.init_db()
+        except Exception as _db_exc:  # noqa: BLE001
+            log.warning("DB volume hookup failed: %s", _db_exc)
         return api

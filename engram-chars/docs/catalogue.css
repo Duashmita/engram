@@ -19,8 +19,13 @@
 .cat-grid {
   display: grid;
   grid-template-columns: 58% 42%;
+  /* One explicit row capped at the overlay height. Without this the implicit
+     row is auto-sized by the panel's content, the columns grow past 100vh and
+     the bottom of the screen (incl. the play button) gets clipped. */
+  grid-template-rows: minmax(0, 1fr);
   width: 100%;
   height: 100%;
+  max-height: 100vh;
   gap: 0;
 }
 
@@ -31,6 +36,7 @@
 .cat-viewport {
   position: relative;
   height: 100%;
+  min-height: 0;
   background:
     radial-gradient(120% 90% at 50% 30%, #ffffff 0%, #eef2f9 60%, #e7ecf6 100%);
   border-right: 1px solid #e2e7f0;
@@ -54,7 +60,7 @@
   bottom: 0;
   display: flex;
   justify-content: center;
-  padding: 24px;
+  padding: 16px 24px 20px;
   pointer-events: none;
   opacity: 0;
   transform: translateY(8px);
@@ -107,16 +113,26 @@
 
 .cat-panel {
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 40px 36px 28px;
+  padding: clamp(18px, 3.5vh, 32px) 32px 20px;
   box-sizing: border-box;
   background: #f5f7fb;
+  overflow: hidden;
 }
 
 .cat-header {
   flex: 0 0 auto;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
+}
+
+.cat-header-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .cat-brand {
@@ -125,11 +141,29 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #3b6cff;
-  margin-bottom: 10px;
+}
+
+/* Quiet research links (Paper / GitHub) in the panel header */
+.cat-links {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.cat-link {
+  font-size: 12px;
+  color: #6b7689;
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+.cat-link:hover {
+  color: #3b6cff;
+  text-decoration: underline;
 }
 
 .cat-title {
-  font-size: 28px;
+  font-size: clamp(20px, 3vh, 26px);
   line-height: 1.2;
   font-weight: 700;
   margin: 0 0 6px;
@@ -153,8 +187,8 @@
   border: 1px solid #d7e0f3;
   background: #ffffff;
   border-radius: 14px;
-  padding: 16px 18px;
-  margin-bottom: 16px;
+  padding: 13px 16px;
+  margin-bottom: 12px;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(27, 34, 48, 0.04);
   transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
@@ -201,6 +235,31 @@
 .cat-create-sub {
   font-size: 12.5px;
   color: #8a93a6;
+}
+
+/* "Join waitlist" text button, sits below the create-card */
+.cat-waitlist {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 2px 12px;
+  font-size: 12.5px;
+  color: #6b7689;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.cat-waitlist:hover {
+  color: #3b6cff;
+  text-decoration: underline;
+}
+
+.cat-waitlist:focus-visible {
+  outline: 2px solid #3b6cff;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Scrollable character list */
@@ -354,6 +413,19 @@
 .cat-remove:focus-visible {
   outline: 2px solid #3b6cff;
   outline-offset: 1px;
+}
+
+/* ----------------------------------------------------------------------- */
+/* Responsive: tighten on short laptop screens                             */
+/* ----------------------------------------------------------------------- */
+
+@media (max-height: 760px) {
+  .cat-header { margin-bottom: 10px; }
+  .cat-subtitle { font-size: 13px; }
+  .cat-create { padding: 10px 14px; }
+  .cat-row { padding: 10px 14px; }
+  .cat-playbar { padding: 12px 20px 14px; }
+  .cat-play-btn { padding: 11px 22px; font-size: 14px; }
 }
 
 /* ----------------------------------------------------------------------- */

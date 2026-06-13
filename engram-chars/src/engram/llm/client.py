@@ -84,14 +84,14 @@ class AnthropicClient:
         print(f"[AnthropicClient] generate() failed after 3 attempts: {last_exc}")
         return ""
 
-    def generate_json(self, prompt: str) -> dict:
+    def generate_json(self, prompt: str, max_tokens: int | None = None) -> dict:
         """
         Call generate() and parse the result as JSON.
 
         Appends a system-level instruction to guarantee JSON-only output.
         Strips markdown fences before parsing. Returns {} on any failure.
         """
-        tokens = 512
+        tokens = max_tokens or 512
         last_exc: Exception | None = None
         for attempt in range(3):
             try:

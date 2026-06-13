@@ -48,9 +48,9 @@ export function initRadar(canvas) {
         r: {
           min: 0, max: 1,
           ticks: { display: false, stepSize: 0.2 },
-          grid:  { color: 'rgba(45,55,68,0.7)' },
-          angleLines: { color: 'rgba(45,55,68,0.7)' },
-          pointLabels: { color: '#d6deeb', font: { size: 11 } },
+          grid:  { color: 'rgba(27,34,48,0.12)' },
+          angleLines: { color: 'rgba(27,34,48,0.12)' },
+          pointLabels: { color: '#5a6678', font: { size: 11 } },
         },
       },
     },

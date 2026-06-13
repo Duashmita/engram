@@ -15,7 +15,8 @@ import {
   flyInMemoryCard, buildCharacterCard, confetti,
 } from './onboard-visuals.js';
 
-const LS_KEY = 'engram_gemini_key';
+const LS_KEY = 'engram_anthropic_key';
+const LS_KEY_LEGACY = 'engram_gemini_key';   // migrated forward on first read
 
 const QUESTIONS = [
   { trait: 'O', tag: 'their curiosity',   q: 'When your character meets something new or unfamiliar, do they lean in, or hold back?' },
@@ -34,13 +35,18 @@ const TRAITS = [
 ];
 
 function apiKey() {
-  const k = localStorage.getItem(LS_KEY);
-  return k && k.trim() ? k.trim() : null;
+  let k = (localStorage.getItem(LS_KEY) || '').trim();
+  if (!k) {
+    // One-time migration from the legacy localStorage name.
+    const legacy = (localStorage.getItem(LS_KEY_LEGACY) || '').trim();
+    if (legacy) { localStorage.setItem(LS_KEY, legacy); k = legacy; }
+  }
+  return k || null;
 }
 function postJSON(path, bodyObj) {
   const headers = { 'Content-Type': 'application/json' };
   const key = apiKey();
-  if (key) bodyObj.anthropic_key = key;
+  if (key) { bodyObj.anthropic_key = key; headers['X-Anthropic-Key'] = key; }
   return fetch(`${BACKEND_URL}${path}`, {
     method: 'POST', headers, body: JSON.stringify(bodyObj),
   });
@@ -79,6 +85,23 @@ async function kickoffGeneration(name, description) {
 }
 
 export function startOnboarding({ onComplete }) {
+  // Fresh wizard run: reset module-level state. Without this, creating a
+  // second character in the same page load would inherit the first one's
+  // answers/appearance and _genKicked would stay true, so 3D generation
+  // would never kick off again.
+  _genKicked = false;
+  Object.assign(data, {
+    name: '',
+    answers: [],
+    ocean: { O: 0.5, C: 0.5, E: 0.5, A: 0.5, N: 0.5 },
+    summary: '',
+    archetype: '',
+    appearanceDescription: '',
+    memories: '',
+    notes: '',
+    genJobId: null,
+  });
+
   const overlay = document.createElement('div');
   overlay.id = 'onboard-overlay';
   overlay.className = 'onboard-overlay';
@@ -227,14 +250,20 @@ export function startOnboarding({ onComplete }) {
           <p class="onboard-loading-text">Reading ${esc(data.name)}…</p>
         </div>`;
       try {
-        const res = await postJSON('/infer_ocean', { qa: data.answers });
+        // ONE combined call: OCEAN + summary + archetype + appearance
+        // description (was /infer_ocean + /appearance, two Anthropic calls).
+        const res = await postJSON('/infer_character', { qa: data.answers, name: data.name });
         if (!res.ok) throw new Error(res.status);
         const j = await res.json();
         if (j.ocean) data.ocean = normalizeOcean(j.ocean);
         data.summary = j.summary || '';
         data.archetype = j.archetype || 'The Enigma';
+        // Stash the appearance so the appearance step makes NO network call
+        // (it only hits /appearance when this is empty, or on Regenerate).
+        // Re-inference (after Back-to-questions) also refreshes it here.
+        if (j.appearance_description) data.appearanceDescription = j.appearance_description;
       } catch (err) {
-        console.warn('[onboard] infer_ocean error', err);
+        console.warn('[onboard] infer_character error', err);
         data.summary = 'The personality model was unreachable, start from neutral and shape them by hand.';
         data.archetype = 'The Unknown';
       }
@@ -309,6 +338,9 @@ export function startOnboarding({ onComplete }) {
     async function load() {
       appear.innerHTML = `<div class="onboard-typing" id="ob-type"></div>`;
       char?.materialize?.(1100);   // the form shimmers in as the words arrive
+      // Normally already populated by /infer_character at the reveal step, so
+      // this makes no network call. /appearance is the fallback (combined
+      // inference failed) and the Regenerate path (which clears the text).
       let text = data.appearanceDescription;
       if (!text) {
         try {

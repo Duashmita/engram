@@ -46,10 +46,35 @@ let dinoGame         = null;
 const customConfigs = {};
 
 // LocalStorage keys
-const LS_SESSION   = 'engram_live_session_id';
-const LS_NPC       = 'engram_live_npc_id';
-const LS_KEY       = 'engram_gemini_key';
-const LS_DEVICE_ID = 'engram_device_id';
+const LS_SESSION    = 'engram_live_session_id';
+const LS_NPC        = 'engram_live_npc_id';
+const LS_KEY        = 'engram_anthropic_key';
+const LS_KEY_LEGACY = 'engram_gemini_key';   // migrated forward on first read
+const LS_DEVICE_ID  = 'engram_device_id';
+
+/**
+ * Read the user's Anthropic API key, migrating the legacy
+ * 'engram_gemini_key' localStorage entry forward (copied once) if present.
+ * Returns null when no key is stored.
+ */
+export function getApiKey() {
+  let k = (localStorage.getItem(LS_KEY) || '').trim();
+  if (!k) {
+    const legacy = (localStorage.getItem(LS_KEY_LEGACY) || '').trim();
+    if (legacy) { localStorage.setItem(LS_KEY, legacy); k = legacy; }
+  }
+  return k || null;
+}
+
+/** Standard Anthropic BYOK plumbing: header + body field, both set. */
+function applyApiKey(headers, bodyObj) {
+  const key = getApiKey();
+  if (key) {
+    headers['X-Anthropic-Key'] = key;
+    if (bodyObj) bodyObj.anthropic_key = key;
+  }
+  return key;
+}
 
 function getDeviceId() {
   let id = localStorage.getItem(LS_DEVICE_ID);
@@ -309,7 +334,7 @@ function wireSettingsDialog() {
   if (open && !open._wired) {
     open._wired = true;
     open.addEventListener('click', () => {
-      input.value = localStorage.getItem(LS_KEY) ?? '';
+      input.value = getApiKey() ?? '';
       dlg.showModal();
     });
   }
@@ -318,8 +343,14 @@ function wireSettingsDialog() {
     save.addEventListener('click', e => {
       e.preventDefault();
       const v = (input.value ?? '').trim();
-      if (v) localStorage.setItem(LS_KEY, v);
-      else   localStorage.removeItem(LS_KEY);
+      if (v) {
+        localStorage.setItem(LS_KEY, v);
+      } else {
+        // Remove the legacy entry too, otherwise getApiKey() would
+        // resurrect the cleared key from the old name.
+        localStorage.removeItem(LS_KEY);
+        localStorage.removeItem(LS_KEY_LEGACY);
+      }
       dlg.close();
     });
   }
@@ -328,6 +359,7 @@ function wireSettingsDialog() {
     clear.addEventListener('click', e => {
       e.preventDefault();
       localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(LS_KEY_LEGACY);
       input.value = '';
     });
   }
@@ -340,14 +372,30 @@ function wireSettingsDialog() {
 function installBeacon() {
   if (beaconInstalled) return;
   beaconInstalled = true;
-  window.addEventListener('beforeunload', () => {
-    if (!currentSessionId) return;
+  let sent = false;
+  const endSession = () => {
+    if (!currentSessionId || sent) return;
+    sent = true;
+    const payload = JSON.stringify({ session_id: currentSessionId });
     try {
-      const blob = new Blob([JSON.stringify({ session_id: currentSessionId })],
-                            { type: 'application/json' });
-      navigator.sendBeacon(`${BACKEND_URL}/end`, blob);
+      // text/plain keeps this a "simple" request. Cross-origin beacons can't
+      // preflight, so an application/json blob never leaves the browser
+      // (GitHub Pages -> modal.run) and the close-save silently fails.
+      const blob = new Blob([payload], { type: 'text/plain' });
+      if (navigator.sendBeacon(`${BACKEND_URL}/end`, blob)) return;
+    } catch (_) { /* fall through */ }
+    try {
+      fetch(`${BACKEND_URL}/end`, {
+        method: 'POST', keepalive: true,
+        headers: { 'Content-Type': 'text/plain' }, body: payload,
+      });
     } catch (_) { /* best-effort */ }
-  });
+  };
+  // pagehide is the reliable close/navigate signal (incl. mobile Safari);
+  // beforeunload kept as a desktop fallback. NOT visibilitychange: that fires
+  // on tab switches and would kill live sessions.
+  window.addEventListener('pagehide', endSession);
+  window.addEventListener('beforeunload', endSession);
 }
 
 function setSelectedNpc(id) {
@@ -401,16 +449,13 @@ async function startSession() {
   setComposerEnabled(false);
 
   const headers = { 'Content-Type': 'application/json' };
-  const key = localStorage.getItem(LS_KEY);
-  if (key) headers['X-Gemini-Key'] = key;
-
   const ocean = readSliders();
   const bodyObj = {
     npc_id: chosen,
     device_id: getDeviceId(),
-    ...(key    ? { gemini_key: key } : {}),
-    ...(ocean  ? { ocean }           : {}),
+    ...(ocean ? { ocean } : {}),
   };
+  applyApiKey(headers, bodyObj);
 
   let res;
   try {
@@ -418,30 +463,30 @@ async function startSession() {
   } catch (err) {
     setStatus(`network error, check your connection (${err.message})`);
     setStartLoading(false);
-    return;
+    return false;
   }
 
   if (res.status === 429) {
     const j = await safeJSON(res);
     setStatus(`rate limited, try again in ${j?.retry_after_s ?? '?'}s`);
     setStartLoading(false);
-    return;
+    return false;
   }
   if (res.status === 503) {
     setStatus('no API key, paste yours in Settings (⚙)');
     setStartLoading(false);
-    return;
+    return false;
   }
   if (res.status === 400) {
     const j = await safeJSON(res);
     setStatus(`bad request: ${j?.detail ?? res.status}`);
     setStartLoading(false);
-    return;
+    return false;
   }
   if (!res.ok) {
     setStatus(`start failed: ${res.status}`);
     setStartLoading(false);
-    return;
+    return false;
   }
 
   const data = await res.json();
@@ -460,6 +505,7 @@ async function startSession() {
   setStatus(`live with ${data.header?.npc_name ?? npcId}, say something`);
   setComposerEnabled(true);
   document.getElementById('composer-input')?.focus();
+  return true;
 }
 
 /**
@@ -468,6 +514,9 @@ async function startSession() {
  * the rest of the live flow (composer → /turn SSE) works unchanged.
  *
  * config = { name, persona, ocean:{O,C,E,A,N}, backstory:[], facts:[], appearanceDescription }
+ *
+ * Returns true when the session started, false on any failure (callers must
+ * skip the birth moment when false).
  */
 export async function startCustomSession(config) {
   setStatus('starting session…');
@@ -475,8 +524,6 @@ export async function startCustomSession(config) {
   setComposerEnabled(false);
 
   const headers = { 'Content-Type': 'application/json' };
-  const key = localStorage.getItem(LS_KEY);
-  if (key) headers['X-Gemini-Key'] = key;
 
   // Derive a stable npc_id slug from the name so generated assets can be cached.
   // registerCustomNpc both computes the slug and surfaces the character in the
@@ -492,8 +539,8 @@ export async function startCustomSession(config) {
     backstory: config.backstory || [],
     facts: config.facts || [],
     device_id: getDeviceId(),
-    ...(key ? { anthropic_key: key } : {}),
   };
+  applyApiKey(headers, bodyObj);
 
   let res;
   try {
@@ -501,13 +548,13 @@ export async function startCustomSession(config) {
   } catch (err) {
     setStatus(`network error, check your connection (${err.message})`);
     setStartLoading(false);
-    return;
+    return false;
   }
   if (!res.ok) {
     const j = await safeJSON(res);
     setStatus(`start failed: ${j?.detail ?? res.status}`);
     setStartLoading(false);
-    return;
+    return false;
   }
 
   const dataResp = await res.json();
@@ -528,12 +575,14 @@ export async function startCustomSession(config) {
   setStatus(`live with ${dataResp.header?.npc_name ?? config.name}, say something`);
   setComposerEnabled(true);
   document.getElementById('composer-input')?.focus();
+  return true;
 }
 
 /**
  * Start a session for a built-in preset NPC (from the catalogue). Posts a
  * normal (non-custom) /start so the backend uses the preset's prebaked
- * backstory and facts. Returns once the session is wired and the model loaded.
+ * backstory and facts. Returns true once the session is wired and the model
+ * loaded; false on any failure (callers must skip the birth moment).
  */
 export async function startPresetSession(presetId, ocean) {
   setStatus('starting session…');
@@ -541,15 +590,12 @@ export async function startPresetSession(presetId, ocean) {
   setComposerEnabled(false);
 
   const headers = { 'Content-Type': 'application/json' };
-  const key = localStorage.getItem(LS_KEY);
-  if (key) headers['X-Gemini-Key'] = key;
-
   const bodyObj = {
     npc_id: presetId,
     device_id: getDeviceId(),
     ...(ocean ? { ocean } : {}),
-    ...(key ? { anthropic_key: key } : {}),
   };
+  applyApiKey(headers, bodyObj);
 
   let res;
   try {
@@ -557,13 +603,13 @@ export async function startPresetSession(presetId, ocean) {
   } catch (err) {
     setStatus(`network error, check your connection (${err.message})`);
     setStartLoading(false);
-    return;
+    return false;
   }
   if (!res.ok) {
     const j = await safeJSON(res);
     setStatus(`start failed: ${j?.detail ?? res.status}`);
     setStartLoading(false);
-    return;
+    return false;
   }
 
   const dataResp = await res.json();
@@ -582,6 +628,7 @@ export async function startPresetSession(presetId, ocean) {
   setStatus(`live with ${dataResp.header?.npc_name ?? presetId}, say something`);
   setComposerEnabled(true);
   document.getElementById('composer-input')?.focus();
+  return true;
 }
 
 /**
@@ -620,13 +667,12 @@ async function sendMessage(text) {
   updateQueueStatus();
 
   const headers = { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' };
-  const key = localStorage.getItem(LS_KEY);
-  if (key) headers['X-Gemini-Key'] = key;
-  const body = JSON.stringify({
+  const bodyObj = {
     session_id: currentSessionId,
     player_input: text,
-    ...(key ? { gemini_key: key } : {}),
-  });
+  };
+  applyApiKey(headers, bodyObj);
+  const body = JSON.stringify(bodyObj);
 
   let res;
   try {

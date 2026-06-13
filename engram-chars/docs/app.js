@@ -7,7 +7,7 @@
 
 import { freshState, apply, rebuild } from './js/state.js';
 import { initRadar, renderAll }        from './js/render.js';
-import { enterLive, exitLive, startCustomSession, startPresetSession, injectNpcLine } from './js/live.js';
+import { enterLive, exitLive, startCustomSession, startPresetSession, injectNpcLine, getApiKey } from './js/live.js';
 import { BACKEND_URL } from './config.js';
 import { createCharacter }             from './js/character.js';
 import { handleEvent, setInitialIdle } from './js/animations.js';
@@ -350,6 +350,10 @@ function boot() {
   // never auto-restores a stale session.
   enterLive({ stateRef, applyFn: apply, renderFn: renderAll, onSessionStart: initCharacter, resume: false });
 
+  // Waitlist dialog (file owned by the catalogue layer; guard so a missing
+  // module can never break boot).
+  import('./js/waitlist.js').then(m => m.initWaitlist?.()).catch(() => {});
+
   // Show the catalogue start screen first.
   showStart();
 }
@@ -420,14 +424,18 @@ async function playEntry(entry) {
   localStorage.removeItem('engram_live_session_id');
   localStorage.removeItem('engram_live_npc_id');
   try {
+    let ok;
     if (entry.source === 'custom') {
-      await startCustomSession(entry);
-      if (entry.glbUrl && char?.loadModelFromUrl) {
+      ok = await startCustomSession(entry);
+      if (ok && entry.glbUrl && char?.loadModelFromUrl) {
         try { await char.loadModelFromUrl(`${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(entry.glbUrl)}`); } catch (_) {}
       }
     } else {
-      await startPresetSession(entry.id, entry.ocean);
+      ok = await startPresetSession(entry.id, entry.ocean);
     }
+    // The start functions surface their own failure status; without a live
+    // session the birth moment (greeting) would be wrong, so skip it.
+    if (!ok) return;
     await birthMoment(entry);
   } catch (e) {
     console.error('[play] failed:', e);
@@ -458,12 +466,15 @@ async function onWizardComplete(characterConfig) {
     ocean: characterConfig.ocean,
     persona: characterConfig.persona,
     backstory: characterConfig.backstory || [],
+    facts: characterConfig.facts || [],
+    appearanceDescription: characterConfig.appearanceDescription || '',
     source: 'custom',
   };
   try { saveToCatalogue(entry); } catch (_) {}
 
   try {
-    await startCustomSession(characterConfig);
+    const ok = await startCustomSession(characterConfig);
+    if (!ok) return;   // start failed; its status message is already shown
     if (!char) await initCharacter(slug);
     await birthMoment(characterConfig);
     if (characterConfig.genJobId) pollAndSwapModel(characterConfig.genJobId, entry);
@@ -508,7 +519,8 @@ async function pollAndSwapModel(jobId, catalogueEntry) {
     if (!job || job.status === 'error') { break; }
 
     if (job.stage && STAGE_LABEL[job.stage]) {
-      STATUS(`${job.name ?? 'your character'}: ${STAGE_LABEL[job.stage]} (${job.progress ?? 0}%)`);
+      // The backend job has no name field; use the catalogue entry's.
+      STATUS(`${catalogueEntry?.name ?? 'your character'}: ${STAGE_LABEL[job.stage]} (${job.progress ?? 0}%)`);
     }
     // Persist the generated face to the catalogue so it shows next time.
     if (job.glb_url && catalogueEntry) {
@@ -539,9 +551,13 @@ async function birthMoment(config) {
   // Fetch and show the character's first spoken line.
   try {
     const headers = { 'Content-Type': 'application/json' };
-    const key = localStorage.getItem('engram_gemini_key');
+    const key = getApiKey();   // migrates the legacy localStorage name forward
     const body = { name: config.name, persona: config.persona, ocean: config.ocean };
-    if (key) body.anthropic_key = key;
+    // Let the backend record the greeting in this session's history so the
+    // NPC knows it already spoke first.
+    const sid = localStorage.getItem('engram_live_session_id');
+    if (sid) body.session_id = sid;
+    if (key) { body.anthropic_key = key; headers['X-Anthropic-Key'] = key; }
     const res = await fetch(`${BACKEND_URL}/greeting`, {
       method: 'POST', headers, body: JSON.stringify(body),
     });

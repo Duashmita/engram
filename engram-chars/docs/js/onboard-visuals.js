@@ -2,15 +2,15 @@
  * onboard-visuals.js
  *
  * Self-contained ES module providing the "rewarding" visual components for a
- * character-creation onboarding wizard in a dark-themed web app.
+ * character-creation onboarding wizard in a light-themed web app.
  *
  * Fully self-contained: injects its own CSS once (a single <style> appended to
  * document.head on first use). No external stylesheet, no external imports,
  * vanilla JS + Canvas 2D only.
  *
- * Palette:
- *   background #0d1117, surface #161c25, text #d6deeb,
- *   muted #7a8699, accent #6aa3ff
+ * Palette (matches the app's light theme in style.css):
+ *   background #f5f7fb, surface #ffffff, text #1c2433,
+ *   muted #5a6678, accent #6aa3ff
  *
  * All injected CSS classes are namespaced with `ov-`, EXCEPT `.character-card`
  * (kept verbatim because the wizard styles it too).
@@ -57,10 +57,10 @@
 /* ===================== palette & constants ===================== */
 
 const PALETTE = {
-  bg: '#0d1117',
-  surface: '#161c25',
-  text: '#d6deeb',
-  muted: '#7a8699',
+  bg: '#f5f7fb',
+  surface: '#ffffff',
+  text: '#1c2433',
+  muted: '#5a6678',
   accent: '#6aa3ff',
 };
 
@@ -101,8 +101,8 @@ function ensureStyles() {
       text-align: center;
       margin: 0 0 0.5em 0;
       opacity: 0;
-      text-shadow: 0 0 18px rgba(106, 163, 255, 0.45),
-                   0 0 4px rgba(106, 163, 255, 0.3);
+      text-shadow: 0 0 18px rgba(106, 163, 255, 0.28),
+                   0 0 4px rgba(106, 163, 255, 0.18);
       animation: ov-arch-in 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
     .ov-arch-summary {
@@ -123,8 +123,9 @@ function ensureStyles() {
       border-radius: 10px;
       background: ${PALETTE.surface};
       color: ${PALETTE.text};
-      border: 1px solid rgba(106, 163, 255, 0.25);
-      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(106, 163, 255, 0.30);
+      box-shadow: 0 1px 2px rgba(28, 36, 51, 0.06),
+                  0 6px 22px rgba(28, 36, 51, 0.14);
       font-size: 0.85rem;
       line-height: 1.35;
       pointer-events: none;
@@ -325,11 +326,11 @@ export function createFormingRadar(canvas) {
         else ctx.lineTo(p.x, p.y);
       }
       ctx.closePath();
-      ctx.strokeStyle = `rgba(122, 134, 153, ${0.10 + ring * 0.015})`;
+      ctx.strokeStyle = `rgba(90, 102, 120, ${0.14 + ring * 0.02})`;
       ctx.stroke();
     }
     // spokes
-    ctx.strokeStyle = 'rgba(122, 134, 153, 0.16)';
+    ctx.strokeStyle = 'rgba(90, 102, 120, 0.22)';
     for (let i = 0; i < 5; i++) {
       const p = axisPoint(cx, cy, R, i, 1);
       ctx.beginPath();

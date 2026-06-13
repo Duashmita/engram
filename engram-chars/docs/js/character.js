@@ -68,7 +68,7 @@ export async function createCharacter(canvas, assetBasePath, opts = {}) {
     renderer.toneMappingExposure = 1.1;
   } catch (e) {
     console.error('[character] WebGL init failed', e);
-    canvas.style.background = '#12182a';
+    canvas.style.background = '#eef2f9';
     // Return a stub so callers don't crash; all methods are no-ops.
     return {
       playAnim() {}, setParticles() {}, update() {},

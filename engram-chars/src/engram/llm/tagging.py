@@ -29,6 +29,65 @@ def _default_event_tags() -> EventTags:
 
 
 # ---------------------------------------------------------------------------
+# Shared tag-schema prompt fragments
+# ---------------------------------------------------------------------------
+# Single source of truth for the EventTags JSON shape. Used by tag_event's
+# standalone prompt below AND by the combined response+tags prompt in
+# pipeline/response.py, so both calls produce the exact same tag structure.
+
+TAG_SCHEMA_FIELDS = """\
+  "emotion_valence": <float from -1.0 (very negative) to 1.0 (very positive)>,
+  "social_type": <one of "solitude", "conversation", "cooperation", "conflict">,
+  "threat_level": <float 0.0 to 1.0; 0=no threat, 1=extreme threat>,
+  "goal_relevance": <float 0.0 to 1.0; how relevant to the NPC's current goals>,
+  "novelty_level": <float 0.0 to 1.0; how new or surprising this event is>,
+  "self_relevance": <float 0.0 to 1.0; how much this directly involves the NPC>,
+  "importance": <integer 1-10>,
+  "ocean": {
+    "O": <int 1-5; how strongly this event activates Openness (5=strongly, 1=irrelevant)>,
+    "C": <int 1-5; how strongly this event activates Conscientiousness>,
+    "E": <int 1-5; how strongly this event activates Extraversion>,
+    "A": <int 1-5; how strongly this event activates Agreeableness>,
+    "N": <int 1-5; how strongly this event activates Neuroticism>
+  }"""
+
+TAG_OCEAN_NOTE = (
+    "OCEAN tags reflect which personality trait dimensions this event MOST "
+    "engages, not the NPC's own personality, but which traits any observer "
+    "would need to process this event (e.g. a betrayal event strongly "
+    "activates A and N; a discovery activates O)."
+)
+
+
+def tags_from_dict(data: dict) -> EventTags:
+    """Robustly build EventTags from a (possibly partial / dirty) LLM dict.
+
+    Mirrors tag_event's parse path so the combined response+tags call in
+    pipeline/response.py degrades exactly the same way on malformed output.
+    """
+    if not isinstance(data, dict) or not data:
+        return _default_event_tags()
+    try:
+        return EventTags.from_dict(data)
+    except Exception:  # noqa: BLE001
+        try:
+            defaults = {
+                "emotion_valence": 0.0,
+                "social_type": "solitude",
+                "threat_level": 0.0,
+                "goal_relevance": 0.5,
+                "novelty_level": 0.5,
+                "self_relevance": 0.5,
+                "importance": 5,
+                "ocean": dict(_DEFAULT_OCEAN_TAG),
+            }
+            defaults.update({k: v for k, v in data.items() if k in defaults})
+            return EventTags.from_dict(defaults)
+        except Exception:  # noqa: BLE001
+            return _default_event_tags()
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -58,48 +117,16 @@ Context: {context}
 
 Return exactly this JSON structure:
 {{
-  "emotion_valence": <float from -1.0 (very negative) to 1.0 (very positive)>,
-  "social_type": <one of "solitude", "conversation", "cooperation", "conflict">,
-  "threat_level": <float 0.0 to 1.0; 0=no threat, 1=extreme threat>,
-  "goal_relevance": <float 0.0 to 1.0; how relevant to the NPC's current goals>,
-  "novelty_level": <float 0.0 to 1.0; how new or surprising this event is>,
-  "self_relevance": <float 0.0 to 1.0; how much this directly involves the NPC>,
-  "importance": <integer 1-10>,
-  "ocean": {{
-    "O": <int 1-5; how strongly this event activates Openness (5=strongly, 1=irrelevant)>,
-    "C": <int 1-5; how strongly this event activates Conscientiousness>,
-    "E": <int 1-5; how strongly this event activates Extraversion>,
-    "A": <int 1-5; how strongly this event activates Agreeableness>,
-    "N": <int 1-5; how strongly this event activates Neuroticism>
-  }}
+{TAG_SCHEMA_FIELDS}
 }}
 
-OCEAN tags reflect which personality trait dimensions this event MOST engages, not the NPC's own personality, but which traits any observer would need to process this event (e.g. a betrayal event strongly activates A and N; a discovery activates O).
+{TAG_OCEAN_NOTE}
 """
 
     data = client.generate_json(prompt)
     if not data:
         return _default_event_tags()
-
-    try:
-        return EventTags.from_dict(data)
-    except Exception:  # noqa: BLE001
-        # Attempt a best-effort construction with whatever keys we got.
-        try:
-            defaults = {
-                "emotion_valence": 0.0,
-                "social_type": "solitude",
-                "threat_level": 0.0,
-                "goal_relevance": 0.5,
-                "novelty_level": 0.5,
-                "self_relevance": 0.5,
-                "importance": 5,
-                "ocean": dict(_DEFAULT_OCEAN_TAG),
-            }
-            defaults.update({k: v for k, v in data.items() if k in defaults})
-            return EventTags.from_dict(defaults)
-        except Exception:  # noqa: BLE001
-            return _default_event_tags()
+    return tags_from_dict(data)
 
 
 def extract_facts(

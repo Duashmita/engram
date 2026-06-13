@@ -4,3 +4,7 @@ QUESTIONS.md
 CLAUDE.md
 ARCHITECTURE.md
 refrences/
+node_modules
+
+# local SQLite fallback (backend/db.py)
+engram.sqlite3*

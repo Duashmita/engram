@@ -10,7 +10,8 @@ trait-name labels; concrete bad/good examples anchor register and
 from __future__ import annotations
 
 from ..llm.client import GeminiClient
-from ..models import Memory, NPCConfig, OCEANProfile, ThreatAssessment
+from ..llm.tagging import TAG_OCEAN_NOTE, TAG_SCHEMA_FIELDS, tags_from_dict
+from ..models import EventTags, Memory, NPCConfig, OCEANProfile, ThreatAssessment
 
 
 # ---------------------------------------------------------------------------
@@ -79,7 +80,7 @@ Examples of the difference between robotic and embodied:
 # Public API
 # ---------------------------------------------------------------------------
 
-def generate_response(
+def _build_prompt_parts(
     player_input: str,
     config: NPCConfig,
     profile: OCEANProfile,
@@ -87,12 +88,11 @@ def generate_response(
     assessment: ThreatAssessment,
     mode: str,                              # standard | fight_flight | instinct
     history: list[dict],
-    llm: GeminiClient,
     summaries: list[str] | None = None,
     prior_attempt: str | None = None,
     prior_attempt_conflicts: list[tuple[str, str]] | None = None,
-) -> str:
-    """Generate the NPC's reply to *player_input*."""
+) -> list[str]:
+    """Shared actor's-brief prompt body (everything up to the final cue)."""
     parts: list[str] = []
 
     # ---- identity --------------------------------------------------------
@@ -190,6 +190,99 @@ def generate_response(
     parts.append(_EXAMPLES)
 
     parts.append(f"Player: {player_input}")
-    parts.append(f"{config.name}:")
+    return parts
 
+
+def generate_response(
+    player_input: str,
+    config: NPCConfig,
+    profile: OCEANProfile,
+    retrieved: list[Memory],
+    assessment: ThreatAssessment,
+    mode: str,                              # standard | fight_flight | instinct
+    history: list[dict],
+    llm: GeminiClient,
+    summaries: list[str] | None = None,
+    prior_attempt: str | None = None,
+    prior_attempt_conflicts: list[tuple[str, str]] | None = None,
+) -> str:
+    """Generate the NPC's reply to *player_input*."""
+    parts = _build_prompt_parts(
+        player_input, config, profile, retrieved, assessment, mode, history,
+        summaries=summaries,
+        prior_attempt=prior_attempt,
+        prior_attempt_conflicts=prior_attempt_conflicts,
+    )
+    parts.append(f"{config.name}:")
     return llm.generate("\n\n".join(parts))
+
+
+def generate_response_with_tags(
+    player_input: str,
+    config: NPCConfig,
+    profile: OCEANProfile,
+    retrieved: list[Memory],
+    assessment: ThreatAssessment,
+    mode: str,                              # standard | fight_flight | instinct
+    history: list[dict],
+    llm: GeminiClient,
+    summaries: list[str] | None = None,
+    prior_attempt: str | None = None,
+    prior_attempt_conflicts: list[tuple[str, str]] | None = None,
+) -> tuple[str, EventTags | None]:
+    """Generate the NPC's reply AND the EventTags for the exchange in one call.
+
+    Folds Stage 6's tag_event() into the dialogue call: the model writes the
+    reply, then tags the full exchange (the player's message plus that reply),
+    which is exactly the text consolidation stores
+    (``Player: {input} | {name}: {response}``). The tag schema is the shared
+    TAG_SCHEMA_FIELDS from llm.tagging, so the tag structure is byte-identical
+    to the standalone tag_event() prompt. Personality is NOT injected into the
+    tagging instructions, matching tag_event(): OCEAN tags describe which
+    trait dimensions the *event* activates; personality modulation happens
+    downstream in retrieval weighting and key-memory promotion.
+
+    Returns ``(dialogue, tags)``. On any JSON failure, falls back to the plain
+    generate_response() call and returns ``(dialogue, None)`` so the caller can
+    tag separately (correctness over the saved call).
+    """
+    parts = _build_prompt_parts(
+        player_input, config, profile, retrieved, assessment, mode, history,
+        summaries=summaries,
+        prior_attempt=prior_attempt,
+        prior_attempt_conflicts=prior_attempt_conflicts,
+    )
+    parts.append(
+        f"Write {config.name}'s reply (all the rules above apply to it "
+        "unchanged). Then tag the full exchange, the player's message plus "
+        "that reply, for the memory system.\n\n"
+        "Respond with ONLY this JSON object (no prose, no fences):\n"
+        "{\n"
+        f'  "dialogue": "<{config.name}\'s reply, exactly as spoken, nothing else>",\n'
+        '  "tags": {\n'
+        f"{TAG_SCHEMA_FIELDS}\n"
+        "  }\n"
+        "}\n\n"
+        f"{TAG_OCEAN_NOTE}"
+    )
+
+    data = llm.generate_json("\n\n".join(parts))
+    dialogue = data.get("dialogue") if isinstance(data, dict) else None
+    if isinstance(dialogue, str) and dialogue.strip():
+        raw_tags = data.get("tags")
+        tags = (
+            tags_from_dict(raw_tags)
+            if isinstance(raw_tags, dict) and raw_tags
+            else None
+        )
+        return dialogue.strip(), tags
+
+    # JSON path failed, regenerate as plain text; caller tags separately.
+    fallback = generate_response(
+        player_input, config, profile, retrieved, assessment, mode, history,
+        llm,
+        summaries=summaries,
+        prior_attempt=prior_attempt,
+        prior_attempt_conflicts=prior_attempt_conflicts,
+    )
+    return fallback, None

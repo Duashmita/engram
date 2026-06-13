@@ -41,7 +41,7 @@ from .pipeline.consolidation import (
     consolidate,
     post_session_fact_check,
 )
-from .pipeline.response import generate_response
+from .pipeline.response import generate_response_with_tags
 from .pipeline.retrieval import scored_retrieve, tag_retrieve
 from .pipeline.threat import assess_threat
 
@@ -155,7 +155,11 @@ class NPCAgent:
         summaries = (
             self.memory_manager.longterm.get_summaries() if mode == "standard" else None
         )
-        response = generate_response(
+        # Combined call: dialogue + EventTags for the exchange in ONE LLM
+        # round-trip (folds Stage 6's tag_event into response generation).
+        # response_tags is None when the JSON path failed, consolidate()
+        # then falls back to the standalone tag_event call.
+        response, response_tags = generate_response_with_tags(
             player_input=player_input,
             config=self.config,
             profile=self.profile,
@@ -183,7 +187,9 @@ class NPCAgent:
                 _emit_stage="post",
             )
             if response_conflicts:
-                response = generate_response(
+                # Re-roll replaces the response, so its tags must be re-rolled
+                # too: the consolidated memory stores the FINAL exchange.
+                response, response_tags = generate_response_with_tags(
                     player_input=player_input,
                     config=self.config,
                     profile=self.profile,
@@ -207,6 +213,7 @@ class NPCAgent:
             self.memory_manager,
             self.llm,
             memory_id=str(uuid.uuid4()),
+            tags=response_tags,
         )
         self.session_memories.append(new_memory)
         bus.emit("consolidated", memory_id=new_memory.id, text=new_memory.text)

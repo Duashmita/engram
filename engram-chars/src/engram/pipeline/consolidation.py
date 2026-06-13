@@ -28,7 +28,7 @@ import time
 from ..llm.client import GeminiClient
 from ..llm.tagging import extract_facts, tag_event
 from ..memory.manager import MemoryManager
-from ..models import Memory, NPCConfig, OCEANProfile
+from ..models import EventTags, Memory, NPCConfig, OCEANProfile
 from ..observability import bus
 
 
@@ -88,6 +88,7 @@ def consolidate(
     memory_manager: MemoryManager,
     llm: GeminiClient,
     memory_id: str,
+    tags: EventTags | None = None,
 ) -> Memory:
     """
     Encode one dialogue exchange as a Memory and persist it.
@@ -108,6 +109,10 @@ def consolidate(
         Configured GeminiClient.
     memory_id:
         Unique identifier for this memory (caller-generated, e.g. UUID).
+    tags:
+        Pre-computed EventTags for this exchange (from the combined
+        response+tags LLM call in pipeline.response). When None, falls back
+        to a standalone tag_event() call, one extra LLM round-trip.
 
     Returns
     -------
@@ -119,8 +124,10 @@ def consolidate(
     # Step 2, embed the combined text
     embedding = llm.embed(combined_text)
 
-    # Step 3, tag the combined text
-    tags = tag_event(combined_text, f"{config.name} interaction", llm)
+    # Step 3, tag the combined text (skipped when the response call already
+    # tagged this exact exchange)
+    if tags is None:
+        tags = tag_event(combined_text, f"{config.name} interaction", llm)
 
     # Step 4, create Memory
     memory = Memory(

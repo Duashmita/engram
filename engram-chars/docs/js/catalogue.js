@@ -3,8 +3,14 @@
 // Lets the user preview a character in a 3D viewport, chat with it,
 // or create a brand new one. Manages a saved-NPC catalogue in localStorage.
 //
-// Pure vanilla JS + DOM. No three.js, no external imports.
+// Pure vanilla JS + DOM. No three.js; the only import is a lazy one of the
+// sibling waitlist.js module when the waitlist button is clicked.
 // All styles live in catalogue.css (the app links it). Classes use a cat- prefix.
+
+// Research links shown in the panel header.
+// TODO: set real URL for the paper and the repository.
+const PAPER_URL = '#';
+const GITHUB_URL = 'https://github.com/';
 
 const STORAGE_KEY = 'engram_catalogue';
 const OCEAN_KEYS = ['O', 'C', 'E', 'A', 'N'];
@@ -49,7 +55,12 @@ export function saveToCatalogue(entry) {
     archetype: entry.archetype || 'Custom character',
     ocean: normalizeOcean(entry.ocean),
     persona: entry.persona || '',
-    backstory: entry.backstory || '',
+    // backstory/facts must stay arrays: the backend's /start expects lists.
+    backstory: Array.isArray(entry.backstory)
+      ? entry.backstory
+      : (entry.backstory ? [String(entry.backstory)] : []),
+    facts: Array.isArray(entry.facts) ? entry.facts : [],
+    appearanceDescription: entry.appearanceDescription || '',
     source: 'custom',
     assetPath: entry.assetPath,
     glbUrl: entry.glbUrl
@@ -171,7 +182,20 @@ export function showStartScreen(options) {
   const panel = el('div', 'cat-panel');
 
   const header = el('div', 'cat-header');
-  header.appendChild(el('div', 'cat-brand', 'Engram'));
+  const headerTop = el('div', 'cat-header-top');
+  headerTop.appendChild(el('div', 'cat-brand', 'Engram'));
+  const links = el('nav', 'cat-links');
+  links.setAttribute('aria-label', 'Project links');
+  const paperLink = el('a', 'cat-link', 'Paper');
+  paperLink.href = PAPER_URL;
+  const ghLink = el('a', 'cat-link', 'GitHub');
+  ghLink.href = GITHUB_URL;
+  ghLink.target = '_blank';
+  ghLink.rel = 'noopener';
+  links.appendChild(paperLink);
+  links.appendChild(ghLink);
+  headerTop.appendChild(links);
+  header.appendChild(headerTop);
   header.appendChild(el('h1', 'cat-title', 'Choose a character'));
   header.appendChild(el('p', 'cat-subtitle', 'Pick someone to talk to, or build your own.'));
   panel.appendChild(header);
@@ -189,6 +213,19 @@ export function showStartScreen(options) {
     onCreateNew();
   });
   panel.appendChild(createCard);
+
+  // Waitlist entry point: lazy-load the dialog wiring so the start screen
+  // stays dependency-free until the user actually clicks.
+  const waitlistBtn = el('button', 'cat-waitlist', 'Want these characters in your game? Join the waitlist');
+  waitlistBtn.type = 'button';
+  waitlistBtn.addEventListener('click', function () {
+    import('./waitlist.js')
+      .then(function (m) { m.openWaitlist(); })
+      .catch(function () {
+        window.location.href = 'mailto:asdua@ucsc.edu?subject=' + encodeURIComponent('Engram waitlist');
+      });
+  });
+  panel.appendChild(waitlistBtn);
 
   const list = el('div', 'cat-list');
   list.setAttribute('role', 'listbox');

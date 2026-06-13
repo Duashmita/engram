@@ -67,6 +67,13 @@
     <span>Unity</span>
   </button>
   <button id="btn-settings" class="ctrl" title="Settings">⚙</button>
+
+  <!-- TODO: set real URL for the paper and the repository -->
+  <nav class="topbar-links" aria-label="Project links">
+    <a class="top-link" href="#">Paper</a>
+    <a class="top-link" href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+    <button id="btn-waitlist" class="top-link top-link-btn" type="button">Join waitlist</button>
+  </nav>
 </header>
 
 <div class="scrubber-row">
@@ -221,6 +228,33 @@
   </form>
 </dialog>
 
+<dialog id="waitlist-dialog" class="settings-dialog">
+  <form>
+    <header class="settings-header">
+      <h2>Join the waitlist</h2>
+      <button id="waitlist-close" class="ctrl" type="button" title="Close">×</button>
+    </header>
+    <p class="muted settings-hint">Want these characters in your own game? Leave your email and we'll reach out.</p>
+    <label class="settings-row">
+      <span>Email</span>
+      <input id="waitlist-email" type="email" autocomplete="email" placeholder="you@example.com" />
+    </label>
+    <label class="settings-row">
+      <span>What are you building? (optional)</span>
+      <textarea id="waitlist-note" rows="3" placeholder="A roguelike with persistent NPCs…"></textarea>
+    </label>
+    <p id="waitlist-status" class="muted settings-hint waitlist-status" aria-live="polite"></p>
+    <div class="settings-actions">
+      <button id="waitlist-send" class="ctrl primary" type="submit">Join waitlist</button>
+    </div>
+  </form>
+</dialog>
+
 <script type="module" src="app.js"></script>
+<script type="module">
+  // Waitlist dialog wiring. Idempotent, so app.js calling initWaitlist() too is harmless.
+  import { initWaitlist } from './js/waitlist.js';
+  initWaitlist();
+</script>
 </body>
 </html>
