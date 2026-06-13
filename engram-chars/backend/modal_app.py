@@ -1054,8 +1054,12 @@ def infer_character(body: InferCharacterReq, request: Request, x_anthropic_key: 
         log.exception("infer_character generate_json failed")
         raise HTTPException(503, f"inference failed: {exc}")
 
-    if not isinstance(result, dict):
-        result = {}
+    # generate_json swallows model errors into {}. Surface that as a 503 so
+    # the wizard shows a retryable failure instead of neutral 0.5s + "The
+    # Enigma" dressed up as success.
+    if not isinstance(result, dict) or not result:
+        log.warning("infer_character got empty model response")
+        raise HTTPException(503, "inference returned no result, retry")
 
     ocean, summary, archetype = _parse_ocean_result(result)
 
@@ -1111,8 +1115,10 @@ def infer_ocean(body: InferOceanReq, request: Request, x_anthropic_key: Optional
         log.exception("infer_ocean generate_json failed")
         raise HTTPException(503, f"inference failed: {exc}")
 
-    if not isinstance(result, dict):
-        result = {}
+    # Same honesty rule as /infer_character: empty model response -> 503.
+    if not isinstance(result, dict) or not result:
+        log.warning("infer_ocean got empty model response")
+        raise HTTPException(503, "inference returned no result, retry")
 
     ocean, summary, archetype = _parse_ocean_result(result)
 

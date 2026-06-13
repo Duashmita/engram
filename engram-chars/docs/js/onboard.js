@@ -241,8 +241,11 @@ export function startOnboarding({ onComplete }) {
     setStep(2);
     // Infer the first time, and RETRY whenever the previous attempt failed
     // (so a transient backend hiccup doesn't permanently trap "The Unknown").
-    // Skip only when we already have a real, successful result.
-    const haveRealResult = data.archetype && data.archetype !== 'The Unknown';
+    // Skip only when we already have a real, successful result. "The Enigma"
+    // is the backend's own soft-failure placeholder (empty model response),
+    // so it counts as a failure too — as does a missing summary.
+    const haveRealResult = data.archetype && data.summary
+      && data.archetype !== 'The Unknown' && data.archetype !== 'The Enigma';
     if (!haveRealResult) {
       card.innerHTML = `
         <div class="onboard-loading">
