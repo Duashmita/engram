@@ -17,6 +17,7 @@ imported by both the Modal wrapper and uvicorn.
 from __future__ import annotations
 
 import asyncio
+import hmac
 import json
 import logging
 import os
@@ -998,6 +999,26 @@ async def waitlist(request: Request):
         raise HTTPException(503, "waitlist storage unavailable")
     log.info("waitlist signup %s", email)
     return {"ok": True}
+
+
+@api.get("/waitlist")
+def list_waitlist_admin(x_admin_key: Optional[str] = Header(None)) -> dict:
+    """Admin-only: list waitlist signups, newest-friendly (ordered by id).
+
+    Protected by the WAITLIST_ADMIN_KEY env var (add it to the engramchar-keys
+    Modal secret). Pass the same value as the ``X-Admin-Key`` request header.
+    Fails closed: if no key is configured server-side the endpoint is
+    unavailable (503) rather than open, so a missing secret can never leak the
+    list. The key compare is constant-time to avoid timing oracles.
+    """
+    expected = os.environ.get("WAITLIST_ADMIN_KEY", "").strip()
+    if not expected:
+        raise HTTPException(503, "admin key not configured")
+    provided = (x_admin_key or "").strip()
+    if not provided or not hmac.compare_digest(provided, expected):
+        raise HTTPException(401, "unauthorized")
+    rows = engram_db.list_waitlist()
+    return {"count": len(rows), "waitlist": rows}
 
 
 @api.post("/infer_character")
