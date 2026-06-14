@@ -1015,8 +1015,12 @@ body.onboarding-active .topbar { visibility: hidden; }
   z-index: 900;
   background: var(--bg);
   display: flex;
-  align-items: center;
+  /* flex-start + margin:auto on the stage centers it when it fits but lets it
+     scroll (instead of clipping the top) when the content is taller than the
+     viewport — a centered flex child taller than its container is unscrollable. */
+  align-items: flex-start;
   justify-content: center;
+  overflow-y: auto;
   padding: 32px;
 }
 
@@ -1026,7 +1030,11 @@ body.onboarding-active .topbar { visibility: hidden; }
   gap: 48px;
   width: 100%;
   max-width: 1040px;
-  height: min(640px, 80vh);
+  /* Grow with content (content-heavy reveal step needs room) but never taller
+     than the viewport; the card scrolls if it ever exceeds the cap. */
+  min-height: min(560px, 78vh);
+  max-height: 88vh;
+  margin: auto;
 }
 
 .onboard-char {
@@ -1185,7 +1193,7 @@ body.onboarding-active .topbar { visibility: hidden; }
   /* Stack vertically and let the whole overlay scroll, so a tall column
      (character + radar + card) never collides with itself on small screens. */
   .onboard-overlay { align-items: flex-start; overflow-y: auto; }
-  .onboard-stage { flex-direction: column; height: auto; max-height: none; gap: 24px; }
+  .onboard-stage { flex-direction: column; min-height: 0; max-height: none; gap: 24px; }
   .onboard-char { flex: 0 0 240px; }
   .onboard-right { flex: 1 1 auto; }
   .onboard-card { flex: 1 1 auto; max-width: none; }
@@ -1256,6 +1264,11 @@ body.onboarding-active .topbar { visibility: hidden; }
 
 /* the reveal */
 .onboard-reveal { min-height: 60px; }
+/* Keep both blocks at their full content height. Flex items shrink by default,
+   so a long summary would otherwise collapse the reveal box and overflow down
+   onto the sliders below it. */
+.onboard-reveal,
+.onboard-refine { flex-shrink: 0; }
 .onboard-birth-h { text-align: center; }
 
 /* appearance typing */
