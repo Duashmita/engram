@@ -952,25 +952,65 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 }
 .right-col #panel-a .persona { display: none; }
 
-/* ── Responsive: stack vertically on narrow screens ─────────── */
+/* ── Responsive: chat-first, scrollable stack on narrow screens ───────────
+   The desktop cockpit is a fixed-height, no-scroll viewport. On phones that
+   crams every panel into a tiny internal scroll box. Instead, let the whole
+   page scroll and give each panel a real, usable height — conversation first,
+   analytical panels below. */
 @media (max-width: 860px) {
+  html, body { height: auto; }
+  body { overflow-y: auto; }
+
   #stage.stage-split {
     flex-direction: column;
+    overflow: visible;
+    height: auto;
+    flex: 0 0 auto;
   }
+
+  /* Character: compact so the conversation is reachable with one short scroll */
   .char-viewport {
-    flex: 0 0 45vh;
+    flex: 0 0 auto;
+    height: 34vh;
+    min-height: 200px;
     border-right: none;
     border-bottom: 1px solid var(--border);
   }
+
+  /* Drop the cramped fractional grid for a simple vertical stack */
   .right-col {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr) auto minmax(0, 0.8fr);
-    grid-template-areas:
-      "panel-d"
-      "panel-c"
-      "panel-a"
-      "panel-b";
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    height: auto;
+    gap: 10px;
+    padding: 10px;
   }
+
+  /* Transcript + composer first and tallest (the primary interaction);
+     analytical panels below at readable, internally-scrolling sizes. */
+  .right-col .panel { overflow: hidden; }
+  .right-col .panel-d { order: 1; height: 64vh; min-height: 380px; }
+  .right-col .panel-c { order: 2; max-height: 70vh; }
+  .right-col .panel-a { order: 3; }
+  .right-col .panel-b { order: 4; max-height: 75vh; }
+
+  /* OCEAN strip → stacked card (the desktop 3-column strip is too tight) */
+  .right-col #panel-a {
+    grid-template-columns: 1fr;
+    max-height: none;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+  .right-col #panel-a .radar-wrap { height: 200px; }
+  .right-col #panel-a .ocean-readout { font-size: 12px; line-height: 1.8; }
+  .right-col #panel-a .persona { display: block; }
+
+  /* Readability + comfortable touch targets */
+  .transcript { font-size: 13px; }
+  .composer textarea { font-size: 16px; }   /* ≥16px stops iOS zoom-on-focus */
+  .composer.visible { max-height: 260px; }
+  .composer #composer-send { height: 40px; padding: 0 18px; }
 }
 
 /* ---------- Unity export button ---------- */
