@@ -443,16 +443,24 @@ def speaker_context(npc_id: str, device_id: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def add_waitlist(email: str, note: str = "") -> bool:
-    """Insert an email; returns True when new, False when a duplicate."""
+    """Insert an email signup; upsert a non-empty note onto an existing row.
+
+    The UI is two-step: the email arrives first (note empty), then an optional
+    note can arrive in a second call once the row already exists. A non-empty
+    note therefore updates the existing row; an empty note never clobbers a
+    stored one. Returns True when a row was inserted or updated."""
     email = (email or "").strip().lower()
     if not email:
         return False
+    note = (note or "").strip()
     now = time.time()
 
     def op(conn: sqlite3.Connection):
         cur = conn.execute(
-            "INSERT OR IGNORE INTO waitlist (email, note, created_at) VALUES (?, ?, ?)",
-            (email, (note or "").strip(), now),
+            "INSERT INTO waitlist (email, note, created_at) VALUES (?, ?, ?) "
+            "ON CONFLICT(email) DO UPDATE SET note = excluded.note "
+            "WHERE excluded.note != ''",
+            (email, note, now),
         )
         return cur.rowcount > 0
 
