@@ -1,17 +1,19 @@
-name: Deploy docs to GitHub Pages
+name: Deploy engram-chars to GitHub Pages
 
+# The live site is served from the `gh-pages` branch (Settings → Pages →
+# "Deploy from a branch"). The real source is `engram-chars/docs`. This workflow
+# publishes that directory to gh-pages automatically, replacing the old manual
+# `git subtree split` + force-push dance.
 on:
   push:
-    branches: [main]
+    branches: [main, engram-chars-3d]   # engram-chars-3d is the current working branch; main is prod after merge
     paths:
-      - "docs/**"
+      - "engram-chars/docs/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write   # peaceiris pushes to the gh-pages branch via GITHUB_TOKEN
 
 concurrency:
   group: pages
@@ -19,15 +21,13 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: Publish engram-chars/docs to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: docs
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./engram-chars/docs
+          publish_branch: gh-pages
+          # peaceiris adds .nojekyll automatically (Jekyll stays disabled).
