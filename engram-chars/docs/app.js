@@ -40,20 +40,11 @@ function getState() { return stateRef.state; }
 function setState(s) { stateRef.state = s; }
 
 // Surface any uncaught error on-page so failures are visible without DevTools.
+// Errors are logged to the console only — no visible banner for visitors.
 function showError(msg) {
-  let b = document.getElementById('app-error-banner');
-  if (!b) {
-    b = document.createElement('div');
-    b.id = 'app-error-banner';
-    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#e23b54;color:#fff;font:13px/1.4 system-ui;padding:8px 14px;white-space:pre-wrap;';
-    document.body.appendChild(b);
-  }
-  b.textContent = 'Error: ' + msg;
+  console.error('[engram] ' + msg);
 }
 window.addEventListener('error', e => {
-  // "ResizeObserver loop ..." is a benign warning the browser self-recovers from
-  // — never paint the red error banner for it (especially on a live demo).
-  if (/ResizeObserver loop/i.test(e.message || '')) return;
   showError((e.message || 'script error') + (e.filename ? ' @ ' + e.filename.split('/').pop() + ':' + e.lineno : ''));
 });
 window.addEventListener('unhandledrejection', e => showError('promise: ' + (e.reason?.message || e.reason || 'unknown')));
