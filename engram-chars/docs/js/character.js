@@ -330,7 +330,15 @@ export async function createCharacter(canvas, assetBasePath, opts = {}) {
     camera.aspect = w / Math.max(h, 1);
     camera.updateProjectionMatrix();
   }
-  const ro = new ResizeObserver(resize);
+  // Defer to the next frame: resize() changes the size of the very element the
+  // observer watches, which fires the benign-but-noisy "ResizeObserver loop
+  // completed with undelivered notifications" warning if done synchronously.
+  let _roPending = false;
+  const ro = new ResizeObserver(() => {
+    if (_roPending) return;
+    _roPending = true;
+    requestAnimationFrame(() => { _roPending = false; resize(); });
+  });
   ro.observe(canvas);
   resize();
 

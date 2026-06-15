@@ -50,7 +50,12 @@ function showError(msg) {
   }
   b.textContent = 'Error: ' + msg;
 }
-window.addEventListener('error', e => showError((e.message || 'script error') + (e.filename ? ' @ ' + e.filename.split('/').pop() + ':' + e.lineno : '')));
+window.addEventListener('error', e => {
+  // "ResizeObserver loop ..." is a benign warning the browser self-recovers from
+  // — never paint the red error banner for it (especially on a live demo).
+  if (/ResizeObserver loop/i.test(e.message || '')) return;
+  showError((e.message || 'script error') + (e.filename ? ' @ ' + e.filename.split('/').pop() + ':' + e.lineno : ''));
+});
 window.addEventListener('unhandledrejection', e => showError('promise: ' + (e.reason?.message || e.reason || 'unknown')));
 
 let i_emit      = 0;
