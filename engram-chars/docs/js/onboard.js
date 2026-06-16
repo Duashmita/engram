@@ -84,7 +84,12 @@ async function kickoffGeneration(name, description) {
   } catch (e) { console.warn('[onboard] generation kickoff failed', e); }
 }
 
-export function startOnboarding({ onComplete }) {
+export function startOnboarding({ onComplete, initial } = {}) {
+  // Edit mode: we were handed a saved catalogue entry to modify, rather than
+  // starting from a blank slate. In that case we skip the name + interview and
+  // open straight on the personality sliders, prefilled from the saved data.
+  const editMode = !!initial;
+
   // Fresh wizard run: reset module-level state. Without this, creating a
   // second character in the same page load would inherit the first one's
   // answers/appearance and _genKicked would stay true, so 3D generation
@@ -101,6 +106,19 @@ export function startOnboarding({ onComplete }) {
     notes: '',
     genJobId: null,
   });
+
+  if (editMode) {
+    // Prefill from the saved catalogue entry. Leave `answers` empty: edit mode
+    // never runs the interview, so there is nothing to re-infer from.
+    Object.assign(data, {
+      name: initial.name || '',
+      ocean: normalizeOcean(initial.ocean || {}),
+      summary: initial.persona || '',
+      appearanceDescription: initial.appearanceDescription || '',
+      memories: (initial.backstory || []).join('\n'),
+      archetype: initial.archetype || '',
+    });
+  }
 
   const overlay = document.createElement('div');
   overlay.id = 'onboard-overlay';
@@ -237,6 +255,9 @@ export function startOnboarding({ onComplete }) {
   }
 
   // ── 2. The reveal, archetype + radar draws itself ──────────────────────────
+  // In create mode this runs the (single) backend inference, then renders the
+  // sliders. In edit mode we already have a personality from the saved entry,
+  // so we skip the network entirely and render the sliders straight away.
   async function reveal() {
     setStep(2);
     // Infer the first time, and RETRY whenever the previous attempt failed
@@ -271,7 +292,14 @@ export function startOnboarding({ onComplete }) {
         data.archetype = 'The Unknown';
       }
     }
+    await renderSliders();
+  }
 
+  // The personality reveal + slider refinement view, with NO network calls.
+  // Reachable two ways: after inference in create mode (via reveal), and as the
+  // very first step in edit mode (rendered directly from the prefilled ocean).
+  async function renderSliders() {
+    setStep(2);
     // Archetype lands, then the radar draws to the true shape.
     card.innerHTML = `
       <div class="onboard-reveal" id="ob-reveal"></div>
@@ -285,7 +313,9 @@ export function startOnboarding({ onComplete }) {
       radar.reveal(data.ocean),
     ]);
 
-    // Offer refinement (sliders) below the reveal, gently faded in.
+    // Offer refinement (sliders) below the reveal, gently faded in. In edit
+    // mode the sliders are the first step, so the Back-to-questions button is
+    // hidden (there are no questions to go back to).
     const refine = card.querySelector('#ob-refine');
     refine.innerHTML = `
       <p class="onboard-subnote">This is who your words made. Refine them, or leave them be.</p>
@@ -299,7 +329,7 @@ export function startOnboarding({ onComplete }) {
           </div>`).join('')}
       </div>
       <div class="onboard-actions">
-        <button id="ob-back" class="onboard-btn ghost">Back to questions</button>
+        ${editMode ? '' : '<button id="ob-back" class="onboard-btn ghost">Back to questions</button>'}
         <button id="ob-next" class="onboard-btn primary">Give them a face</button>
       </div>`;
     for (const t of TRAITS) {
@@ -314,8 +344,9 @@ export function startOnboarding({ onComplete }) {
     }
     refine.querySelector('#ob-next').addEventListener('click', stepAppearance);
     // Back to the interview to change answers. Clearing archetype makes the
-    // reveal re-infer the personality from the edited answers.
-    refine.querySelector('#ob-back').addEventListener('click', () => {
+    // reveal re-infer the personality from the edited answers. (Create mode
+    // only: hidden in edit mode, where this is the first step.)
+    refine.querySelector('#ob-back')?.addEventListener('click', () => {
       data.archetype = '';
       stepInterview(QUESTIONS.length - 1);
     });
@@ -331,12 +362,13 @@ export function startOnboarding({ onComplete }) {
       <div class="onboard-appear" id="ob-appear"></div>
       <div class="onboard-actions">
         <button id="ob-back" class="onboard-btn ghost">Back</button>
-        <button id="ob-regen" class="onboard-btn ghost">Regenerate</button>
+        <button id="ob-regen" class="onboard-btn ghost">Regenerate text</button>
         <button id="ob-next" class="onboard-btn primary">Give them a past</button>
       </div>`;
     const appear = card.querySelector('#ob-appear');
-    // Back to the personality reveal/sliders (no re-inference, re-entrant).
-    card.querySelector('#ob-back').addEventListener('click', reveal);
+    // Back to the personality reveal/sliders (no re-inference, re-entrant). In
+    // edit mode go straight to the sliders, bypassing the inference guard.
+    card.querySelector('#ob-back').addEventListener('click', editMode ? renderSliders : reveal);
 
     async function load() {
       appear.innerHTML = `<div class="onboard-typing" id="ob-type"></div>`;
@@ -378,10 +410,12 @@ export function startOnboarding({ onComplete }) {
     card.innerHTML = `
       <h2 class="onboard-h">Give ${esc(data.name)} a past</h2>
       <p class="onboard-subnote">Each memory becomes part of them. Add as many as you like.</p>
+      <label class="onboard-label" for="ob-mem-line">Key memories</label>
       <div class="onboard-mem-input">
         <input id="ob-mem-line" class="onboard-input" type="text"
-               placeholder="A memory, a moment, a fact they carry… (Enter to add)" autocomplete="off" />
+               placeholder="A memory, a moment, a fact they carry…" autocomplete="off" />
       </div>
+      <p class="onboard-subnote">Press Enter to add each memory.</p>
       <ul class="onboard-mem-list" id="ob-mem-list"></ul>
       <label class="onboard-label" for="ob-notes">Backstory, scripts, or notes (optional)</label>
       <textarea id="ob-notes" class="onboard-textarea" rows="3"
@@ -397,6 +431,18 @@ export function startOnboarding({ onComplete }) {
     const list = card.querySelector('#ob-mem-list');
     const notes = card.querySelector('#ob-notes');
     const memArr = data.memories ? data.memories.split('\n').filter(Boolean) : [];
+
+    // Seed the memory list from the interview answers (#17): the things the
+    // user typed about this character are also memories the character carries.
+    // Only when the list starts empty (so we don't clobber an edited list or a
+    // prefilled edit-mode backstory), and never duplicating an existing line.
+    if (memArr.length === 0 && Array.isArray(data.answers)) {
+      for (const a of data.answers) {
+        const t = (a?.answer || '').trim();
+        if (t && !memArr.includes(t)) memArr.push(t);
+      }
+      data.memories = memArr.join('\n');
+    }
 
     const renderList = () => {
       list.innerHTML = memArr.map((m, i) =>
@@ -484,7 +530,15 @@ export function startOnboarding({ onComplete }) {
     onComplete?.(characterConfig);
   }
 
-  stepName();
+  // Edit mode opens on the personality sliders, prefilled from the saved entry;
+  // create mode begins at the blank-slate name step.
+  if (editMode) {
+    nameplate.textContent = data.name;
+    nameplate.classList.add('visible');
+    renderSliders();
+  } else {
+    stepName();
+  }
 }
 
 // ── helpers ────────────────────────────────────────────────────────────────

@@ -13,6 +13,7 @@ import { createCharacter }             from './js/character.js';
 import { handleEvent, setInitialIdle } from './js/animations.js';
 import { startOnboarding }             from './js/onboard.js';
 import { showStartScreen, saveToCatalogue } from './js/catalogue.js';
+import { initTooltips }                from './js/tooltip.js';
 
 // Built-in premade characters shown on the start screen.
 const PRESET_ENTRIES = [
@@ -67,6 +68,15 @@ const STATUS = (msg) => { document.getElementById('status-text').textContent = m
 const MODE_KEY = 'engram_mode';
 let currentMode = 'live';  // start in live mode
 
+// ── Loading overlay ───────────────────────────────────────────────────────────
+// Toggle the static #char-loading overlay that lives inside .char-viewport.
+function showCharLoading() {
+  document.getElementById('char-loading')?.classList.remove('hidden');
+}
+function hideCharLoading() {
+  document.getElementById('char-loading')?.classList.add('hidden');
+}
+
 // ── Character init ────────────────────────────────────────────────────────────
 async function initCharacter(npcId) {
   const canvas = document.getElementById('char-canvas');
@@ -86,27 +96,36 @@ async function initCharacter(npcId) {
     } catch (_) {}
   }
 
+  showCharLoading();
   try {
     char = await createCharacter(canvas, assetPath);
   } catch (e) {
     console.error('[app] createCharacter failed:', e);
     STATUS('Character failed to load, check console');
+    hideCharLoading();
     return;
   }
-  console.log('[app] character created', { npcId, assetPath, hasChar: !!char,
-    w: canvas.clientWidth, h: canvas.clientHeight });
-  STATUS(assetPath ? 'Character loaded' : 'Using placeholder character (no 3D model generated for this NPC yet)');
 
-  // createCharacter self-drives its own render loop now; update() is a no-op,
-  // but we keep a light loop for any state-driven hooks.
-  function animLoop() {
-    charRAF = requestAnimationFrame(animLoop);
-    if (char) char.update();
+  // Everything past the successful create runs in a try/finally so the loading
+  // overlay can never get stuck up if a downstream hook throws.
+  try {
+    console.log('[app] character created', { npcId, assetPath, hasChar: !!char,
+      w: canvas.clientWidth, h: canvas.clientHeight });
+    STATUS(assetPath ? 'Character loaded' : 'Using placeholder character (no 3D model generated for this NPC yet)');
+
+    // createCharacter self-drives its own render loop now; update() is a no-op,
+    // but we keep a light loop for any state-driven hooks.
+    function animLoop() {
+      charRAF = requestAnimationFrame(animLoop);
+      if (char) char.update();
+    }
+    animLoop();
+
+    // Apply initial idle based on current state
+    if (getState()) setInitialIdle(getState(), char);
+  } finally {
+    hideCharLoading();
   }
-  animLoop();
-
-  // Apply initial idle based on current state
-  if (getState()) setInitialIdle(getState(), char);
 }
 
 // ── Render wrapper that also updates the character ────────────────────────────
@@ -354,7 +373,22 @@ function boot() {
   // module can never break boot).
   import('./js/waitlist.js').then(m => m.initWaitlist?.()).catch(() => {});
 
+  // Back-to-characters button (static topbar HTML, present at boot).
+  document.getElementById('btn-home')?.addEventListener('click', goHome);
+
+  // Tooltips: event delegation, so dynamically-added catalogue info-dots are
+  // covered too. Wire once.
+  initTooltips();
+
   // Show the catalogue start screen first.
+  showStart();
+}
+
+// Dispose the cockpit character and return to the catalogue start screen.
+// Mirrors installNewCharacterButton's click handler.
+function goHome() {
+  if (char) { char.dispose?.(); char = null; }
+  if (charRAF) { cancelAnimationFrame(charRAF); charRAF = null; }
   showStart();
 }
 
@@ -376,6 +410,7 @@ function showStart() {
       presets: PRESET_ENTRIES,
       onPreview: previewEntry,
       onPlay: playEntry,
+      onEdit: editEntry,
       onCreateNew: () => { closeStart(); launchWizard(); },
     });
   } catch (e) {
@@ -428,7 +463,10 @@ async function playEntry(entry) {
     if (entry.source === 'custom') {
       ok = await startCustomSession(entry);
       if (ok && entry.glbUrl && char?.loadModelFromUrl) {
-        try { await char.loadModelFromUrl(`${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(entry.glbUrl)}`); } catch (_) {}
+        showCharLoading(); char.setLoading?.(true);
+        try { await char.loadModelFromUrl(`${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(entry.glbUrl)}`); }
+        catch (_) {}
+        finally { char.setLoading?.(false); hideCharLoading(); }
       }
     } else {
       ok = await startPresetSession(entry.id, entry.ocean);
@@ -448,7 +486,18 @@ function launchWizard() {
   startOnboarding({ onComplete: onWizardComplete });
 }
 
-async function onWizardComplete(characterConfig) {
+// Edit an existing (custom) catalogue entry: run the wizard in EDIT mode
+// (prefilled, interview skipped) and upsert the SAME entry id on completion.
+function editEntry(entry) {
+  closeStart();
+  document.body.classList.add('onboarding-active');
+  startOnboarding({
+    initial: entry,
+    onComplete: (cfg) => onWizardComplete(cfg, entry.id),
+  });
+}
+
+async function onWizardComplete(characterConfig, existingId) {
   customCharacter = characterConfig;
   document.body.classList.remove('onboarding-active');
   localStorage.removeItem('engram_live_session_id');
@@ -460,7 +509,9 @@ async function onWizardComplete(characterConfig) {
   const slug = (characterConfig.name || 'custom')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'custom';
   const entry = {
-    id: 'custom-' + slug,
+    // When editing, reuse the existing id so saveToCatalogue UPDATES the same
+    // saved character instead of creating a duplicate.
+    id: existingId || ('custom-' + slug),
     name: characterConfig.name,
     archetype: characterConfig.archetype || 'Custom',
     ocean: characterConfig.ocean,
@@ -531,8 +582,10 @@ async function pollAndSwapModel(jobId, catalogueEntry) {
     if (job.glb_url && job.glb_url !== lastUrl && char?.loadModelFromUrl) {
       lastUrl = job.glb_url;
       const proxied = `${BACKEND_URL}/proxy_glb?url=${encodeURIComponent(job.glb_url)}`;
+      showCharLoading(); char.setLoading?.(true);
       try { await char.loadModelFromUrl(proxied); STATUS('✨ character updated'); }
       catch (e) { console.warn('[app] model swap failed', e); }
+      finally { char.setLoading?.(false); hideCharLoading(); }
     }
     if (job.status === 'done') { STATUS('Character ready'); break; }
   }

@@ -252,35 +252,6 @@
   color: #8a93a6;
 }
 
-/* "Join waitlist" text button, sits below the create-card */
-.cat-waitlist {
-  flex: 0 0 auto;
-  align-self: flex-start;
-  background: #3b6cff;
-  border: 1px solid #3b6cff;
-  border-radius: 8px;
-  padding: 8px 14px;
-  margin: 0 2px 12px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-  transition: background 120ms ease, box-shadow 120ms ease;
-}
-
-.cat-waitlist:hover {
-  background: #2f5ce0;
-  color: #fff;
-  text-decoration: none;
-  box-shadow: 0 2px 12px rgba(59, 108, 255, 0.4);
-}
-
-.cat-waitlist:focus-visible {
-  outline: 2px solid #3b6cff;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
 /* Scrollable character list */
 .cat-list {
   flex: 1 1 auto;
@@ -342,6 +313,46 @@
   box-shadow: 0 6px 18px rgba(59, 108, 255, 0.16);
 }
 
+/* Left-side face portrait (monogram fallback + rendered thumbnail) */
+.cat-row-portrait {
+  position: relative;
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef2f9;
+  box-shadow: inset 0 0 0 1px rgba(27, 34, 48, 0.06);
+}
+
+.cat-portrait-mono {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.cat-portrait-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.cat-portrait-img-in {
+  opacity: 1;
+}
+
 .cat-row-info {
   flex: 1 1 auto;
   min-width: 0;
@@ -365,6 +376,28 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* OCEAN readout block: small label + info dot, then the five bars */
+.cat-ocean-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cat-ocean-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cat-ocean-label-text {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9aa3b5;
 }
 
 /* OCEAN mini readout: five tiny bars */
@@ -405,16 +438,21 @@
   pointer-events: none;
 }
 
-/* Remove (x) button for saved customs */
+/* Remove (x) button for saved customs.
+   Pinned to the top-right corner so it stays reachable and clear of the
+   vertically-centered hover actions (Chat / Edit). */
 .cat-remove {
-  flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
   color: #9aa3b5;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -432,6 +470,99 @@
 .cat-remove:focus-visible {
   outline: 2px solid #3b6cff;
   outline-offset: 1px;
+}
+
+/* Hover-reveal actions (Chat / Edit), pinned to the row's right edge.
+   A soft left-fading scrim keeps the pills legible over the row content. */
+.cat-row-actions {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 36px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    #ffffff 36px,
+    #ffffff 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 130ms ease;
+}
+
+.cat-row-active .cat-row-actions {
+  background: linear-gradient(
+    90deg,
+    rgba(247, 249, 255, 0) 0%,
+    #f7f9ff 36px,
+    #f7f9ff 100%
+  );
+}
+
+.cat-row:hover .cat-row-actions,
+.cat-row:focus-within .cat-row-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Primary "Chat" pill, reuses the accent blue */
+.cat-row-chat {
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #3b6cff;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 12px rgba(59, 108, 255, 0.28);
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.cat-row-chat:hover {
+  background: #2f5ce6;
+  transform: translateY(-1px);
+}
+
+.cat-row-chat:active {
+  transform: translateY(0);
+}
+
+.cat-row-chat:focus-visible {
+  outline: 2px solid #1b2230;
+  outline-offset: 2px;
+}
+
+/* Secondary "Edit" pill for custom characters */
+.cat-row-edit {
+  border: 1px solid #c3d0ef;
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #3b6cff;
+  background: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.cat-row-edit:hover {
+  background: rgba(59, 108, 255, 0.1);
+  border-color: #3b6cff;
+}
+
+.cat-row-edit:focus-visible {
+  outline: 2px solid #3b6cff;
+  outline-offset: 2px;
 }
 
 /* ----------------------------------------------------------------------- */
@@ -468,5 +599,35 @@
 
   .cat-title {
     font-size: 22px;
+  }
+
+  /* Touch screens have no hover: let rows wrap and keep the portrait +
+     info on the first line, with the actions always visible below. */
+  .cat-row {
+    flex-wrap: wrap;
+    padding-right: 40px; /* room for the corner remove (x) */
+  }
+
+  .cat-row-portrait {
+    width: 46px;
+    height: 46px;
+  }
+
+  /* Pull the actions out of the absolute overlay and into normal flow so
+     they are always reachable by tap (no hover state on touch). */
+  .cat-row-actions {
+    position: static;
+    transform: none;
+    order: 3;
+    flex-basis: 100%;
+    margin-top: 10px;
+    padding-left: 0;
+    background: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cat-row-active .cat-row-actions {
+    background: none;
   }
 }

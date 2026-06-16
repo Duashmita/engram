@@ -72,8 +72,9 @@ export async function createCharacter(canvas, assetBasePath, opts = {}) {
     // Return a stub so callers don't crash; all methods are no-ops.
     return {
       playAnim() {}, setParticles() {}, update() {},
-      setBreathing() {}, materialize() { return Promise.resolve(); },
-      greet() { return Promise.resolve(); }, lookAtPointer() {}, dispose() {}
+      setBreathing() {}, setLoading() {}, materialize() { return Promise.resolve(); },
+      greet() { return Promise.resolve(); }, lookAtPointer() {},
+      loadModelFromUrl() { return Promise.resolve(); }, dispose() {}
     };
   }
 
@@ -139,6 +140,8 @@ export async function createCharacter(canvas, assetBasePath, opts = {}) {
   let greetT        = 0;             // remaining time (s); 0 = inactive
   let greetDur      = 0;
   let materializing = false;         // true while materialize() ramps scale/opacity
+  let loadingOn     = false;         // gentle continuous yaw spin while a model loads
+  let loadingYaw    = 0;             // accumulated extra yaw applied during loading
 
   /** Capture the model's resting transform as the breathing baseline. */
   function captureBase() {
@@ -403,10 +406,20 @@ export async function createCharacter(canvas, assetBasePath, opts = {}) {
         model.rotation.x = 0;
       }
 
+      // Loading spin: a gentle continuous yaw so it's obvious something is
+      // happening while a real model is fetched/swapped in. Accumulates on top of
+      // the base yaw and composes with breathing/look-at; eases back to 0 when off.
+      if (loadingOn) {
+        loadingYaw += dt * 0.9;                 // ~0.9 rad/s, calm and readable
+      } else if (loadingYaw !== 0) {
+        loadingYaw *= Math.exp(-4 * dt);        // unwind the extra yaw smoothly
+        if (Math.abs(loadingYaw) < 0.001) loadingYaw = 0;
+      }
+
       // Look-at-pointer yaw + a faint idle sway, smoothly damped toward target.
       const swayYaw = (breathingOn && !clipActive && greetT <= 0)
         ? Math.sin(elapsed * 0.6) * 0.03 : 0;
-      const desiredY = baseRotY + (lookAtOn ? targetYaw : 0) + swayYaw;
+      const desiredY = baseRotY + (lookAtOn ? targetYaw : 0) + swayYaw + loadingYaw;
       // Exponential damping (frame-rate independent-ish).
       const k = 1 - Math.exp(-6 * dt);
       model.rotation.y += (desiredY - model.rotation.y) * k;
@@ -436,6 +449,13 @@ export async function createCharacter(canvas, assetBasePath, opts = {}) {
   // ── "Alive" idle controls ───────────────────────────────────────────────────
   function setBreathing(on) {
     breathingOn = !!on;
+  }
+
+  // Loading motion: gentle continuous yaw spin on the current model (placeholder
+  // or real) so the viewport visibly signals work in progress. The actual yaw is
+  // applied in frame() and eases back to the resting orientation when turned off.
+  function setLoading(on) {
+    loadingOn = !!on;
   }
 
   // Pointer-driven look-at. We keep the handler referenced so dispose() can
@@ -618,7 +638,7 @@ export async function createCharacter(canvas, assetBasePath, opts = {}) {
   return {
     playAnim, setParticles,
     update: () => {},   // no-op: internal renderLoop owns the per-frame step
-    setBreathing, materialize, greet, lookAtPointer, loadModelFromUrl,
+    setBreathing, setLoading, materialize, greet, lookAtPointer, loadModelFromUrl,
     dispose() {
       if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
       ro.disconnect();

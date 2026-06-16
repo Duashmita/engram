@@ -3,9 +3,11 @@
 // Lets the user preview a character in a 3D viewport, chat with it,
 // or create a brand new one. Manages a saved-NPC catalogue in localStorage.
 //
-// Pure vanilla JS + DOM. No three.js; the only import is a lazy one of the
-// sibling waitlist.js module when the waitlist button is clicked.
+// Pure vanilla DOM for the layout. Face thumbnails are produced by the shared
+// offscreen renderer in portrait.js (the only direct import here).
 // All styles live in catalogue.css (the app links it). Classes use a cat- prefix.
+
+import { getPortrait } from './portrait.js';
 
 // Research links shown in the panel header.
 const PAPER_URL = 'https://camps.aptaracorp.com/ACM_PMS/PMS/ACM/FDG26/102/03e19e98-4a72-11f1-b513-16ffd757ba29/OUT/fdg26-102.html';
@@ -107,7 +109,53 @@ function el(tag, className, text) {
   return node;
 }
 
+// First word of a name, used for short button labels and monogram initials.
+function firstName(name) {
+  const n = (name || '').trim();
+  if (!n) return '';
+  return n.split(/\s+/)[0];
+}
+
+// Stable HSL color derived from the name, for the monogram fallback circle.
+function colorFromName(name) {
+  const s = name || '?';
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) % 360;
+  }
+  return `hsl(${h}, 52%, 58%)`;
+}
+
+const OCEAN_TIP =
+  'OCEAN is the Big Five personality model: Openness, Conscientiousness, ' +
+  'Extraversion, Agreeableness, Neuroticism, each from 0 to 1. Personality ' +
+  'shapes what this character remembers, retrieves, and forgets.';
+
+// Build an info "i" dot per the shared markup contract. CSS for .info-dot /
+// .tip-bubble is provided by style.css (loaded on the same page).
+function buildInfoDot(tip) {
+  const dot = document.createElement('span');
+  dot.className = 'info-dot';
+  dot.setAttribute('data-tip', tip);
+  dot.setAttribute('tabindex', '0');
+  dot.setAttribute('role', 'img');
+  dot.setAttribute('aria-label', 'More info');
+  dot.textContent = 'i';
+  return dot;
+}
+
 function buildOceanReadout(ocean) {
+  // Outer block: a small "OCEAN" label + info dot, then the five bars.
+  const block = el('div', 'cat-ocean-block');
+
+  const labelRow = el('div', 'cat-ocean-label');
+  labelRow.appendChild(el('span', 'cat-ocean-label-text', 'OCEAN'));
+  const dot = buildInfoDot(OCEAN_TIP);
+  // The dot is interactive; don't let a click bubble up to row selection.
+  dot.addEventListener('click', function (ev) { ev.stopPropagation(); });
+  labelRow.appendChild(dot);
+  block.appendChild(labelRow);
+
   const wrap = el('div', 'cat-ocean');
   wrap.setAttribute('aria-hidden', 'true');
   const norm = normalizeOcean(ocean);
@@ -122,7 +170,41 @@ function buildOceanReadout(ocean) {
     cell.appendChild(tag);
     wrap.appendChild(cell);
   }
-  return wrap;
+  block.appendChild(wrap);
+  return block;
+}
+
+// Build the left-side portrait: a colored monogram circle shown immediately,
+// then (async) a rendered face thumbnail that fades in if one is available.
+function buildPortrait(entry) {
+  const holder = el('div', 'cat-row-portrait');
+  holder.setAttribute('aria-hidden', 'true');
+
+  const fn = firstName(entry.name);
+  const initial = (fn ? fn.charAt(0) : (entry.name || '?').charAt(0) || '?').toUpperCase();
+  const mono = el('span', 'cat-portrait-mono', initial);
+  mono.style.background = colorFromName(entry.name);
+  holder.appendChild(mono);
+
+  // Render a face in the background; swap it in with a soft fade if it works.
+  Promise.resolve()
+    .then(function () { return getPortrait(entry); })
+    .then(function (dataUrl) {
+      if (!dataUrl || !holder.isConnected) return;
+      const img = el('img', 'cat-portrait-img');
+      img.alt = '';
+      img.decoding = 'async';
+      img.addEventListener('load', function () {
+        img.classList.add('cat-portrait-img-in');
+      });
+      img.src = dataUrl;
+      holder.appendChild(img);
+    })
+    .catch(function () {
+      // Keep the monogram on any failure.
+    });
+
+  return holder;
 }
 
 // ---------------------------------------------------------------------------
@@ -134,6 +216,7 @@ export function showStartScreen(options) {
   const mountEl = opts.mountEl;
   const onPreview = typeof opts.onPreview === 'function' ? opts.onPreview : function () {};
   const onPlay = typeof opts.onPlay === 'function' ? opts.onPlay : function () {};
+  const onEdit = typeof opts.onEdit === 'function' ? opts.onEdit : function () {};
   const onCreateNew = typeof opts.onCreateNew === 'function' ? opts.onCreateNew : function () {};
   const presets = Array.isArray(opts.presets) ? opts.presets : [];
 
@@ -207,26 +290,13 @@ export function showStartScreen(options) {
   createIcon.setAttribute('aria-hidden', 'true');
   createCard.appendChild(createIcon);
   const createText = el('span', 'cat-create-text');
-  createText.appendChild(el('span', 'cat-create-title', 'Create new character'));
-  createText.appendChild(el('span', 'cat-create-sub', 'Start from a blank persona'));
+  createText.appendChild(el('span', 'cat-create-title', 'Make your own Character'));
+  createText.appendChild(el('span', 'cat-create-sub', 'Design a persona and personality from scratch'));
   createCard.appendChild(createText);
   createCard.addEventListener('click', function () {
     onCreateNew();
   });
   panel.appendChild(createCard);
-
-  // Waitlist entry point: lazy-load the dialog wiring so the start screen
-  // stays dependency-free until the user actually clicks.
-  const waitlistBtn = el('button', 'cat-waitlist', 'Want these characters in your game? Join the waitlist');
-  waitlistBtn.type = 'button';
-  waitlistBtn.addEventListener('click', function () {
-    import('./waitlist.js')
-      .then(function (m) { m.openWaitlist(); })
-      .catch(function () {
-        window.location.href = 'mailto:asdua@ucsc.edu?subject=' + encodeURIComponent('Engram waitlist');
-      });
-  });
-  panel.appendChild(waitlistBtn);
 
   const list = el('div', 'cat-list');
   list.setAttribute('role', 'listbox');
@@ -282,11 +352,42 @@ export function showStartScreen(options) {
       row.setAttribute('tabindex', '0');
       row.setAttribute('aria-selected', 'false');
 
+      // Portrait: monogram fallback first, then swap in a rendered face.
+      row.appendChild(buildPortrait(entry));
+
       const info = el('div', 'cat-row-info');
       info.appendChild(el('div', 'cat-row-name', entry.name || 'Unnamed'));
       info.appendChild(el('div', 'cat-row-archetype', entry.archetype || ''));
       info.appendChild(buildOceanReadout(entry.ocean));
       row.appendChild(info);
+
+      // Hover/focus actions: a primary Chat button, plus Edit for customs.
+      const actions = el('div', 'cat-row-actions');
+
+      const fn = firstName(entry.name);
+      const chatBtn = el('button', 'cat-row-chat');
+      chatBtn.type = 'button';
+      chatBtn.textContent = (fn && fn.length <= 12) ? ('Chat with ' + fn) : 'Chat';
+      chatBtn.setAttribute('aria-label', 'Chat with ' + (entry.name || 'character'));
+      chatBtn.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        onPlay(entry);
+      });
+      actions.appendChild(chatBtn);
+
+      if (entry.source === 'custom') {
+        const editBtn = el('button', 'cat-row-edit');
+        editBtn.type = 'button';
+        editBtn.textContent = 'Edit';
+        editBtn.setAttribute('aria-label', 'Edit ' + (entry.name || 'character'));
+        editBtn.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          onEdit(entry);
+        });
+        actions.appendChild(editBtn);
+      }
+
+      row.appendChild(actions);
 
       if (entry.source === 'custom') {
         const removeBtn = el('button', 'cat-remove');

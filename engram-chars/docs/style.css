@@ -49,14 +49,60 @@ button { font-family: inherit; }
 .hidden { display: none !important; }
 .muted  { color: var(--muted); font-size: 11px; }
 
+/* ---------- info dots + tooltip bubble (global; catalogue uses these too) ---------- */
+.info-dot {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px;
+  margin-left: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 9px; font-weight: 700; line-height: 1;
+  font-family: var(--sans);
+  text-transform: lowercase;
+  letter-spacing: 0;
+  opacity: 0.55;
+  cursor: help;
+  vertical-align: middle;
+  flex: 0 0 auto;
+  transition: opacity 120ms;
+}
+.info-dot:hover, .info-dot:focus { opacity: 1; outline: none; }
+
+.tip-bubble {
+  position: fixed;
+  z-index: 4000;
+  background: #1b2230;
+  color: #ffffff;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 8px 10px;
+  border-radius: 8px;
+  max-width: 260px;
+  box-shadow: 0 6px 20px rgba(17, 22, 33, 0.28);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.tip-bubble.on { opacity: 1; }
+
 /* ---------- top bar ---------- */
 .topbar {
-  display: flex; align-items: center; gap: 18px;
+  display: flex; align-items: center; gap: 14px;
   padding: 10px 16px;
   background: var(--bg-2);
   border-bottom: 1px solid var(--border);
   flex: 0 0 auto;
 }
+/* Right-hand group: settings + Unity + project links, pushed to the far edge
+   so the bar reads [Characters] [brand] ........ [Settings] [Unity] [links]. */
+.topbar-right {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 10px;
+}
+/* Back-to-catalogue button lives at the far left, ahead of the brand. */
+#btn-home { flex: 0 0 auto; gap: 5px; }
+#btn-home span { line-height: 1; }
 .brand { display: flex; align-items: center; gap: 10px; }
 .logo-dot {
   width: 12px; height: 12px; border-radius: 50%;
@@ -686,13 +732,13 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 }
 .settings-actions .ctrl { width: auto; padding: 0 14px; height: 32px; font-size: 11px; }
 
-#btn-settings { margin-left: 6px; }
+#btn-settings { margin-left: 0; }
 
 /* ---------- topbar research links ---------- */
 .topbar-links {
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: 14px;
   padding-left: 12px;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--border-2);
   white-space: nowrap;
 }
 .top-link {
@@ -764,14 +810,27 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
 
   main#stage { overflow: visible; }
 
-  /* topbar: wrap into rows */
+  /* topbar: wrap into rows. Row 1 = [Characters] [brand]; the right-hand
+     group (settings, Unity, links) wraps to its own full-width row below. */
   .topbar {
     flex-wrap: wrap;
-    gap: 8px 12px;
+    gap: 8px 10px;
     padding: 8px 12px;
   }
-  .brand { flex: 1; min-width: 0; }
-  #btn-settings { margin-left: 0; order: 2; }
+  #btn-home { order: 0; height: 40px; }
+  .brand { order: 1; flex: 1; min-width: 0; }
+
+  .topbar-right {
+    order: 2;
+    margin-left: 0;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    justify-content: flex-start;
+  }
+  #btn-settings { margin-left: 0; height: 40px; }
+  #btn-unity { height: 40px; }
+
   .mode-toggle { order: 3; flex: 1 1 100%; }
   .mode-btn { flex: 1; text-align: center; }
   .session-picker {
@@ -800,12 +859,16 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
     justify-content: flex-start;
   }
   .speed { flex-wrap: wrap; }
+  /* links wrap onto their own row, full width, comfortable touch targets */
   .topbar-links {
-    order: 7;
     flex: 1 1 100%;
+    flex-wrap: wrap;
     border-left: none;
     padding-left: 0;
+    gap: 10px 14px;
   }
+  .top-link { padding: 6px 0; }
+  .top-cta { padding: 8px 14px; }
 
   /* single-view: stack panels vertically */
   .layout-single {
@@ -893,6 +956,38 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 3;
+}
+
+/* ── Loading overlay (toggled by app.js via the .hidden class) ─────────────── */
+.char-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  /* sit on the same light backdrop as the viewport so it blends in */
+  background: radial-gradient(ellipse at 50% 42%, rgba(255,255,255,0.86) 0%, rgba(238,243,251,0.82) 55%, rgba(221,230,243,0.8) 100%);
+  backdrop-filter: blur(1.5px);
+}
+.char-spinner {
+  width: 38px; height: 38px;
+  border: 3px solid var(--border-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: char-spin 0.8s linear infinite;
+}
+@keyframes char-spin { to { transform: rotate(360deg); } }
+.char-loading-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .char-spinner { animation-duration: 1.6s; }
 }
 .mode-pill {
   display: inline-block;
@@ -1011,6 +1106,21 @@ main#stage { flex: 1; min-height: 0; overflow: hidden; }
   .composer textarea { font-size: 16px; }   /* ≥16px stops iOS zoom-on-focus */
   .composer.visible { max-height: 260px; }
   .composer #composer-send { height: 40px; padding: 0 18px; }
+
+  /* No horizontal overflow on phones: nothing should push past the viewport. */
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .char-viewport { min-width: 0; }
+  .right-col { min-width: 0; }
+
+  /* Loading overlay reads fine at the compact viewport height */
+  .char-spinner { width: 32px; height: 32px; }
+
+  /* Info dots: keep them tappable and out of the way of the count badges */
+  .info-dot { width: 16px; height: 16px; opacity: 0.6; }
+  .sub-header h3, .panel-header h2 { display: inline-flex; align-items: center; }
+
+  /* Tooltip bubble: never wider than the screen */
+  .tip-bubble { max-width: calc(100vw - 32px); }
 }
 
 /* ---------- Unity export button ---------- */

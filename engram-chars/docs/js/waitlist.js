@@ -81,7 +81,7 @@ async function submitEmail() {
 
   const joined = await postWaitlist(email, '');
 
-  if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Join waitlist'; }
+  if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Join our waitlist'; }
 
   if (joined) {
     // Remember the signup so the in-chat auto-prompt never nags this user again.
@@ -115,7 +115,7 @@ async function submitNote() {
   if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send'; }
 
   if (ok) {
-    setStatus('waitlist-thanks-status', 'Got it — thanks for the details!', true);
+    setStatus('waitlist-thanks-status', 'Got it, thanks for the details!', true);
   } else {
     mailtoFallback(_email, note);
     setStatus('waitlist-thanks-status', 'Sent via email instead. Thanks!', true);

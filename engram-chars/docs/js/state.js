@@ -6,6 +6,8 @@
 // the renderer (render.js). Keeping state pure means scrubbing back/forward
 // just reapplies events from scratch.
 
+import { deDash } from './text.js';
+
 export function freshState(header) {
   const baseline = header?.baseline_ocean ?? { O:0.5, C:0.5, E:0.5, A:0.5, N:0.5 };
   return {
@@ -139,8 +141,8 @@ export function apply(state, ev) {
 
     case 'response_generated': {
       const t = currentTurn(state);
-      if (t) t.response = { text: p.text ?? '', attempt: p.attempt ?? 1 };
-      state.transcript.push({ who: 'npc', text: p.text ?? '', mode: t?.mode, turn: state.current_turn });
+      if (t) t.response = { text: deDash(p.text ?? ''), attempt: p.attempt ?? 1 };
+      state.transcript.push({ who: 'npc', text: deDash(p.text ?? ''), mode: t?.mode, turn: state.current_turn });
       break;
     }
 

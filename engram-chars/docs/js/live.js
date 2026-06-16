@@ -16,6 +16,7 @@ import { BACKEND_URL } from '../config.js';
 import { freshState } from './state.js';
 import { setRadarInteractCallback } from './render.js';
 import { DinoGame } from './dino.js';
+import { deDash } from './text.js';
 
 // NPC presets shown in the picker. ocean values mirror presets.py.
 const NPC_PRESETS = [
@@ -638,7 +639,7 @@ export async function startPresetSession(presetId, ocean) {
  */
 export function injectNpcLine(text) {
   if (!stateRef?.state || !text) return;
-  stateRef.state.transcript.push({ who: 'npc', text, turn: 0 });
+  stateRef.state.transcript.push({ who: 'npc', text: deDash(text), turn: 0 });
   renderFn?.(stateRef.state);
 }
 
@@ -735,17 +736,17 @@ async function sendMessage(text) {
     await sendMessage(next);
   } else {
     setComposerStatus('');
-    // Conversation has settled — once they've had a couple of exchanges, invite
+    // Conversation has settled — once they've sent 3 messages, invite
     // them onto the waitlist (once per browser).
     maybePromptWaitlist();
   }
 }
 
-// After a couple of exchanges with a character, gently invite the user onto the
+// After 3 messages to a character, gently invite the user onto the
 // waitlist so they can use these characters in their own game when it's live.
 // Fires once per browser and never if they've already joined.
 function maybePromptWaitlist() {
-  if (userTurnCount < 2) return;
+  if (userTurnCount < 3) return;
   try {
     if (localStorage.getItem('engram_waitlist_joined')) return;
     if (localStorage.getItem('engram_waitlist_prompted')) return;

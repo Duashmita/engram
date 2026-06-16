@@ -36,6 +36,10 @@
 <body>
 
 <header class="topbar">
+  <button id="btn-home" class="ctrl ctrl-wide" title="Back to characters">
+    <span aria-hidden="true">&#8592;</span><span>Characters</span>
+  </button>
+
   <div class="brand">
     <div class="logo-dot"></div>
     <h1>Engram <span class="sub" id="brand-sub">Characters</span></h1>
@@ -50,15 +54,15 @@
   <div id="live-picker" class="live-picker hidden">
     <label for="live-npc-select">NPC</label>
     <select id="live-npc-select"></select>
-    <button id="btn-ocean" class="ctrl" title="Tune OCEAN personality">OCEAN ▾</button>
+    <button id="btn-ocean" class="ctrl" title="Tune OCEAN personality">OCEAN &#9662;</button>
     <button id="live-start" class="ctrl primary" title="Start session">Start session</button>
   </div>
 
   <div class="controls">
-    <button id="btn-reset"       class="ctrl" title="Reset">⟲</button>
-    <button id="btn-step"        class="ctrl" title="Step one event">›</button>
-    <button id="btn-step-turn"   class="ctrl" title="Step to next turn">»</button>
-    <button id="btn-play"        class="ctrl primary" title="Play/Pause">▶</button>
+    <button id="btn-reset"       class="ctrl" title="Reset">&#10226;</button>
+    <button id="btn-step"        class="ctrl" title="Step one event">&#8250;</button>
+    <button id="btn-step-turn"   class="ctrl" title="Step to next turn">&#187;</button>
+    <button id="btn-play"        class="ctrl primary" title="Play/Pause">&#9658;</button>
     <div class="speed">
       <button data-speed="0.5">0.5x</button>
       <button data-speed="1" class="active">1x</button>
@@ -67,20 +71,24 @@
     </div>
   </div>
 
-  <button id="btn-unity" class="ctrl ctrl-wide" title="Unity export — join the waitlist">
-    <svg width="14" height="14" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-      <path fill="currentColor" d="M22.9 6.0l-6.0 10.4 6.0 10.4 3.0-1.7v-5.0l-4.3 7.4-2.5-1.5 4.3-7.5h-8.6l4.3 7.5-2.5 1.5-4.3-7.4 4.3-7.5h8.6l-4.3 7.5 2.5 1.5 4.3-7.4v-5.0z"/>
-      <path fill="currentColor" d="M16.0 1.3l-7.0 4.0-7.0 12.1 7.0 12.1 7.0 4.0 7.0-4.0-2.6-1.5-4.4 2.5-4.4-2.5-4.4-7.6h8.8l4.4 7.6 2.6-1.5-7.0-12.1z"/>
-    </svg>
-    <span>Unity</span>
-  </button>
-  <button id="btn-settings" class="ctrl" title="Settings">⚙</button>
+  <div class="topbar-right">
+    <button id="btn-settings" class="ctrl" title="Settings">&#9881;</button>
 
-  <nav class="topbar-links" aria-label="Project links">
-    <a class="top-link top-cta" href="https://camps.aptaracorp.com/ACM_PMS/PMS/ACM/FDG26/102/03e19e98-4a72-11f1-b513-16ffd757ba29/OUT/fdg26-102.html" target="_blank" rel="noopener">Paper</a>
-    <a class="top-link" href="https://github.com/Duashmita/engram" target="_blank" rel="noopener">GitHub</a>
-    <button id="btn-waitlist" class="top-link top-link-btn top-cta primary" type="button">Join waitlist</button>
-  </nav>
+    <button id="btn-unity" class="ctrl ctrl-wide" title="Unity export, join the waitlist">
+      <svg width="14" height="14" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M16 2.6 27.7 9.35 22.0 12.65 16.0 9.2 10.0 12.65 4.3 9.35z"/>
+        <path fill="currentColor" d="M27.7 22.65 16 29.4 16 22.8 21.7 19.5 21.7 12.95 27.7 9.65z"/>
+        <path fill="currentColor" d="M4.3 22.65 4.3 9.65 10.3 12.95 10.3 19.5 16 22.8 16 29.4z"/>
+      </svg>
+      <span>Unity</span>
+    </button>
+
+    <nav class="topbar-links" aria-label="Project links">
+      <a class="top-link" href="https://camps.aptaracorp.com/ACM_PMS/PMS/ACM/FDG26/102/03e19e98-4a72-11f1-b513-16ffd757ba29/OUT/fdg26-102.html" target="_blank" rel="noopener">Paper</a>
+      <a class="top-link" href="https://github.com/Duashmita/engram" target="_blank" rel="noopener">GitHub</a>
+      <button id="btn-waitlist" class="top-link top-link-btn top-cta primary" type="button">Join our waitlist</button>
+    </nav>
+  </div>
 </header>
 
 <div class="scrubber-row">
@@ -94,6 +102,10 @@
   <!-- ── Left: 3D character viewport ───────────────────────────────────── -->
   <section class="char-viewport">
     <canvas id="char-canvas"></canvas>
+    <div id="char-loading" class="char-loading hidden">
+      <div class="char-spinner" aria-hidden="true"></div>
+      <span class="char-loading-label">Summoning…</span>
+    </div>
     <div class="char-overlay">
       <span id="char-mode-pill" class="mode-pill"></span>
     </div>
@@ -105,7 +117,7 @@
     <!-- Panel A, OCEAN radar -->
     <section class="panel panel-a" id="panel-a">
       <header class="panel-header">
-        <h2>OCEAN</h2>
+        <h2>OCEAN<span class="info-dot" data-tip="OCEAN is the Big Five personality model: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism, each from 0 to 1. Personality shapes what this character remembers, retrieves, and forgets." tabindex="0" role="img" aria-label="More info">i</span></h2>
         <div class="npc-name" id="npc-name">-</div>
       </header>
       <div class="radar-wrap" id="radar-wrap">
@@ -118,7 +130,7 @@
     <!-- Panel B, Pipeline timeline -->
     <section class="panel panel-b">
       <header class="panel-header">
-        <h2>Pipeline</h2>
+        <h2>Pipeline<span class="info-dot" data-tip="Each turn runs a pipeline. The response mode is picked per turn: Standard (normal recall), Fight or flight (a threat was detected), or Instinct (nothing relevant was recalled)." tabindex="0" role="img" aria-label="More info">i</span></h2>
         <div class="legend">
           <span class="lg lg-standard">standard</span>
           <span class="lg lg-fight">fight/flight</span>
@@ -131,16 +143,16 @@
     <!-- Panel C, Memory store -->
     <aside class="panel panel-c">
       <section class="sub">
-        <header class="sub-header"><h3>Session window</h3><span class="muted" id="window-count">0/7</span></header>
+        <header class="sub-header"><h3>Session window<span class="info-dot" data-tip="Session memory: a rolling window of the last few messages the character is actively holding in mind." tabindex="0" role="img" aria-label="More info">i</span></h3><span class="muted" id="window-count">0/7</span></header>
         <div class="window-track" id="window-track"></div>
         <div class="summaries" id="summaries"></div>
       </section>
       <section class="sub">
-        <header class="sub-header"><h3>All memories</h3><span class="muted" id="mem-count">0</span></header>
+        <header class="sub-header"><h3>All memories<span class="info-dot" data-tip="Every memory the character has encoded, scored by personality. Older ones get summarized or forgotten over time." tabindex="0" role="img" aria-label="More info">i</span></h3><span class="muted" id="mem-count">0</span></header>
         <div class="mem-list" id="mem-list"></div>
       </section>
       <section class="sub">
-        <header class="sub-header"><h3>Key memories &amp; Prolog facts</h3></header>
+        <header class="sub-header"><h3>Key memories &amp; Prolog facts<span class="info-dot" data-tip="Top memories get promoted to logical facts. SWI-Prolog then checks new statements against them for contradictions." tabindex="0" role="img" aria-label="More info">i</span></h3></header>
         <div class="key-list" id="key-list"></div>
         <div class="facts-list" id="facts-list"></div>
       </section>
@@ -239,17 +251,17 @@
   <!-- Step 1: email only -->
   <form id="waitlist-form">
     <header class="settings-header">
-      <h2>Join the waitlist</h2>
+      <h2>Want these characters in your games?</h2>
       <button id="waitlist-close" class="ctrl" type="button" title="Close">×</button>
     </header>
-    <p class="muted settings-hint">Want these characters in your own game? Leave your email and we'll reach out.</p>
+    <p class="muted settings-hint">Leave your email and we'll reach out when it's ready.</p>
     <label class="settings-row">
       <span>Email</span>
       <input id="waitlist-email" type="email" autocomplete="email" placeholder="you@example.com" />
     </label>
     <p id="waitlist-status" class="muted settings-hint waitlist-status" aria-live="polite"></p>
     <div class="settings-actions">
-      <button id="waitlist-send" class="ctrl primary" type="submit">Join waitlist</button>
+      <button id="waitlist-send" class="ctrl primary" type="submit">Join our waitlist</button>
     </div>
   </form>
 

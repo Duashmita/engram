@@ -183,6 +183,7 @@ def _build_prompt_parts(
         "- Show, don't tell. Anxious = trails off, hedges. Not \"I'm anxious\".\n"
         f"{engagement_rule}\n"
         "- No bio recitation.\n"
+        "- No em dashes or en dashes. Use commas, periods, or short sentences instead.\n"
         "- Blunt / rude / profane if the character calls for it. Character beats helpfulness.\n"
         "- No stage directions. No asterisks. No third person."
     )
