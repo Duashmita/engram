@@ -10,17 +10,6 @@
     "N": 0.9
   },
   "base": "assets/characters/guard/base.glb",
-  "animations": {
-    "looking": "assets/characters/guard/looking.glb",
-    "talking": "assets/characters/guard/talking.glb",
-    "idle": "assets/characters/guard/idle.glb",
-    "shaking": "assets/characters/guard/shaking.glb",
-    "thinking": "assets/characters/guard/thinking.glb",
-    "surprised": "assets/characters/guard/surprised.glb",
-    "getting_hit": "assets/characters/guard/getting_hit.glb",
-    "scared": "assets/characters/guard/scared.glb",
-    "combat": "assets/characters/guard/combat.glb",
-    "dying": "assets/characters/guard/dying.glb"
-  },
+  "animations": {},
   "idle_anim": "idle"
 }
