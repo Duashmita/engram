@@ -4,3 +4,6 @@ numpy>=1.24.0
 # Optional: SWI-Prolog must be installed first (brew install swi-prolog)
 # before pyswip will work. Without it, memory strength falls back to Python.
 # pyswip>=0.2.10
+
+# Optional: only needed to run bench/latency_bench.py against Claude candidates.
+# anthropic>=0.40.0

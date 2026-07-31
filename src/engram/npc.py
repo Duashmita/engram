@@ -247,18 +247,37 @@ class NPCAgent:
     # ------------------------------------------------------------------
 
     def _init_backstory(self) -> None:
-        """Embed and store each backstory entry; assert seed Prolog facts."""
+        """Embed and store each backstory entry; assert seed Prolog facts.
+
+        Each entry's embed() + tag_event() calls are independent of every
+        other entry, so they're fanned out across threads instead of run
+        one entry at a time — this was previously 2N sequential network
+        round-trips for N backstory lines.
+        """
+        from concurrent.futures import ThreadPoolExecutor
+
         from .llm.tagging import tag_event
 
         n = len(self.config.backstory)
-        for i, backstory_text in enumerate(self.config.backstory):
-            print(
-                f"    [{self.config.npc_id}] backstory {i + 1}/{n} ...",
-                end="\r",
-                flush=True,
-            )
-            embedding = self.llm.embed(backstory_text)
-            tags = tag_event(backstory_text, f"{self.config.name} backstory", self.llm)
+        if n == 0:
+            return
+
+        def _fetch(text: str) -> tuple[list[float], object]:
+            embedding = self.llm.embed(text)
+            tags = tag_event(text, f"{self.config.name} backstory", self.llm)
+            return embedding, tags
+
+        print(
+            f"    [{self.config.npc_id}] embedding + tagging {n} backstory entries ...",
+            end="\r",
+            flush=True,
+        )
+        with ThreadPoolExecutor(max_workers=min(8, n)) as pool:
+            results = list(pool.map(_fetch, self.config.backstory))
+
+        for i, (backstory_text, (embedding, tags)) in enumerate(
+            zip(self.config.backstory, results)
+        ):
             memory = Memory(
                 id=f"{self.config.npc_id}_backstory_{i}",
                 text=backstory_text,

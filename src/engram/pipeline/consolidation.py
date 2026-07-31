@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from ..llm.client import GeminiClient
 from ..llm.tagging import extract_facts, tag_event
@@ -116,11 +117,13 @@ def consolidate(
     # Step 1 — combine into a single text representation
     combined_text = f"Player: {player_input} | {config.name}: {npc_response}"
 
-    # Step 2 — embed the combined text
-    embedding = llm.embed(combined_text)
-
-    # Step 3 — tag the combined text
-    tags = tag_event(combined_text, f"{config.name} interaction", llm)
+    # Step 2 + 3 — embed and tag the combined text. Neither call depends on
+    # the other's result, so they run concurrently instead of back-to-back.
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        embedding_future = pool.submit(llm.embed, combined_text)
+        tags_future = pool.submit(tag_event, combined_text, f"{config.name} interaction", llm)
+        embedding = embedding_future.result()
+        tags = tags_future.result()
 
     # Step 4 — create Memory
     memory = Memory(

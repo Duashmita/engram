@@ -1,0 +1,10 @@
+candidate,prompt,seconds
+kimi-k3,threat_assessment,6.842967999982648
+kimi-k3,threat_assessment,8.682655000011437
+kimi-k3,threat_assessment,4.448060099966824
+kimi-k3,dialogue_generation,3.5199277999345213
+kimi-k3,dialogue_generation,3.1611976000713184
+kimi-k3,dialogue_generation,4.038562599918805
+kimi-k3,memory_tagging,6.7647644999669865
+kimi-k3,memory_tagging,6.9574514999985695
+kimi-k3,memory_tagging,5.963296400033869

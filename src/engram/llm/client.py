@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from google import genai
 from google.genai import types
@@ -45,8 +46,16 @@ class GeminiClient:
 
         Retries up to 3 times with a 2-second backoff.  Returns an empty
         string if all attempts fail.
+
+        Thinking is disabled unconditionally: none of this pipeline's calls
+        (threat scoring, JSON tagging, one-line dialogue) need chain-of-
+        thought reasoning, and leaving it on can silently consume the whole
+        max_tokens budget on internal thinking tokens before any visible
+        text is produced — response.candidates[0].content.parts comes back
+        None, downstream JSON parsing fails, and the caller falls back to
+        pattern-floor-only behavior without any visible error.
         """
-        config_kwargs: dict = {}
+        config_kwargs: dict = {"thinking_config": types.ThinkingConfig(thinking_budget=0)}
         if max_tokens is not None:
             config_kwargs["max_output_tokens"] = max_tokens
 
@@ -56,7 +65,7 @@ class GeminiClient:
                 response = self._client.models.generate_content(
                     model=self._chat_model,
                     contents=prompt,
-                    config=types.GenerateContentConfig(**config_kwargs) if config_kwargs else None,
+                    config=types.GenerateContentConfig(**config_kwargs),
                 )
                 # Extract text parts directly to avoid SDK warning about
                 # non-text parts (e.g. thought_signature from thinking models).
@@ -64,7 +73,10 @@ class GeminiClient:
                     parts = response.candidates[0].content.parts
                     text = "".join(p.text for p in parts if getattr(p, "text", None))
                     return text
-                except (AttributeError, IndexError):
+                except (AttributeError, IndexError, TypeError):
+                    # TypeError covers parts is None (e.g. safety-filtered
+                    # or token-exhausted responses) — fall back rather than
+                    # retry uselessly against the same deterministic result.
                     return response.text or ""
             except Exception as exc:  # noqa: BLE001
                 last_exc = exc
@@ -128,9 +140,14 @@ class GeminiClient:
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
         """
-        Embed each text in *texts* and return a list of vectors.
+        Embed each text in *texts* and return a list of vectors, in the
+        same order as *texts*.
 
-        Calls embed() sequentially.  Any individual failure produces an
-        empty list for that position.
+        Calls embed() concurrently (network I/O, so threads overlap their
+        wait time). Any individual failure produces an empty list for that
+        position.
         """
-        return [self.embed(text) for text in texts]
+        if not texts:
+            return []
+        with ThreadPoolExecutor(max_workers=min(8, len(texts))) as pool:
+            return list(pool.map(self.embed, texts))
